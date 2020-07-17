@@ -17,9 +17,9 @@ namespace symmetric_ciphers {
     class AES {
 
         private:
-            uint16_t key_len;           /* Stores the length of the Key used in AES */
-            uint8_t block_size;         /* Size of the data block used */
-            uint8_t round_num;          /* Number of rounds performed */
+            uint16_t    key_len;        /* Stores the length of the Key used in AES */
+            uint8_t     block_size;     /* Size of the data block used */
+            uint8_t     round_num;      /* Number of rounds performed */
 
         public:
             enum key_size {             /* Enum to handle different AES Modes */
