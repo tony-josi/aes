@@ -9,3 +9,16 @@
  *  @copyright      Copyright (C) 2020 Tony Josi
  *  @bug            No known bugs.
  */
+
+#include <cstdint>
+
+namespace symmetric_ciphers {
+
+    class AES {
+
+        private:
+
+
+    };
+
+}
