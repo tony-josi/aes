@@ -14,6 +14,10 @@
 
 namespace symmetric_ciphers {
 
+    typedef uint8_t     __aes_u8;
+    typedef uint16_t    __aes_u16;
+    typedef uint32_t    __aes_u32;
+
     class AES {
 
         private:

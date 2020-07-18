@@ -8,3 +8,8 @@
  *  @copyright      Copyright (C) 2020 Tony Josi
  *  @bug            No known bugs.
  */
+
+namespace {
+    
+}
+
