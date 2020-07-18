@@ -9,7 +9,18 @@
  *  @bug            No known bugs.
  */
 
+#include "../inc/aes.hpp"
+
 namespace {
-    
+
+    int __aes_expand_key(
+        const symmetric_ciphers::   __aes_u8   key[], 
+        symmetric_ciphers::         __aes_u8   expand_key[], 
+        const symmetric_ciphers::   __aes_u16  key_len
+        ) {
+
+        return 0;
+    }
+
 }
 
