@@ -150,7 +150,10 @@ namespace {
             out[i] = AES_S_BOX[ out[i] ];
 
         /* XOR Round Constant to least significant byte */
-        out[0] ^= AES_RCON[round];
+        if(round < sizeof(AES_RCON))
+            out[0] ^= AES_RCON[round];
+        else
+            throw std::out_of_range("AES_RCON out of range"); 
 
         return 0;
 
