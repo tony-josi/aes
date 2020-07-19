@@ -146,6 +146,7 @@ namespace {
         symmetric_ciphers::__aes_u16 expand_key_len = 0;
         symmetric_ciphers::__aes_u16 actual_key_len = 0;
 
+        /* Select expanded key sizes based on actual key size */
         switch (key_len) {
 
         case 128:
@@ -192,9 +193,11 @@ namespace {
             memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, AES_WORD_SIZE);
             cur_exp_key_offset += AES_WORD_SIZE;
 
+            /* Compute key for remaining words in the block */
             __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
             
             if(key_len == 256) {
+                /* Do special key schedule if i >= N & (i % n) == 4 */
                 __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
                 __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
             } else if(key_len == 192) 
@@ -204,7 +207,7 @@ namespace {
         return 0;
     }
 
-}
+} /* End of anonymous namespace */
 
 /* Test Headers*/
 #include <iostream>
