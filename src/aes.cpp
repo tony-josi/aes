@@ -58,19 +58,40 @@ namespace {
         0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36
     };
 
+    constexpr static int AES_WORD_SIZE =        4;
+
 
     int __aes_key_scheduler(
         symmetric_ciphers::         __aes_u8    round,
-        const symmetric_ciphers::   __aes_u8    in[4],
-        const symmetric_ciphers::   __aes_u8    out[4]
-    );
-
-    inline void __xor_4_bytes(
-        symmetric_ciphers::         __aes_u8    target[4],
-        const symmetric_ciphers::   __aes_u8    operand[4]
+        const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8    out[AES_WORD_SIZE]
     ) {
 
-        for(int i = 0; i < 4; ++i) 
+        /* Rotate word */
+        for(int i = 0; i < (AES_WORD_SIZE - 1); i++) 
+            out[i] = in[i + 1];
+        out[3] = in[0];
+
+        /* Substitute word */
+        for(int i = 0; i < AES_WORD_SIZE; i++) 
+            out[i] = AES_S_BOX[ out[i] ];
+
+        /* XOR Round Constant to least significant byte */
+        if(round < sizeof(AES_RCON))
+            out[0] ^= AES_RCON[round];
+        else
+            throw std::out_of_range("AES_RCON index out of range"); 
+
+        return 0;
+
+    }
+
+    inline void __aes_xor_word(
+        symmetric_ciphers::         __aes_u8    target[AES_WORD_SIZE],
+        const symmetric_ciphers::   __aes_u8    operand[AES_WORD_SIZE]
+    ) {
+
+        for(int i = 0; i < AES_WORD_SIZE; ++i) 
             target[i] ^= operand[i];
 
     }
@@ -117,17 +138,17 @@ namespace {
         for(int round_key_index = 1; cur_exp_key_offset < expand_key_len; round_key_index++) {
 
             /* Process the last 4 bytes */
-            symmetric_ciphers::__aes_u8     temp_key_buff_1[4];
-            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - 4)), 4);
+            symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
+            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
             
-            symmetric_ciphers::__aes_u8     temp_key_buff_2[4];
+            symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
             __aes_key_scheduler(round_key_index, temp_key_buff_1, temp_key_buff_2);
 
             /* XOR the pre - processed last 4 bytes with corresponding word from 
                previous round */
-            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - actual_key_len)), 4);
-            __xor_4_bytes(temp_key_buff_1, temp_key_buff_2);
-            memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, 4);
+            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - actual_key_len)), AES_WORD_SIZE);
+            __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
+            memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, AES_WORD_SIZE);
 
         }
 
@@ -135,30 +156,7 @@ namespace {
         return 0;
     }
 
-    int __aes_key_scheduler(
-        symmetric_ciphers::         __aes_u8    round,
-        const symmetric_ciphers::   __aes_u8    in[4],
-        symmetric_ciphers::         __aes_u8    out[4]
-    ) {
 
-        /* Rotate word */
-        for(int i = 0; i < 3; i++) 
-            out[i] = in[i + 1];
-        out[3] = in[0];
-
-        /* Substitute word */
-        for(int i = 0; i < 4; i++) 
-            out[i] = AES_S_BOX[ out[i] ];
-
-        /* XOR Round Constant to least significant byte */
-        if(round < sizeof(AES_RCON))
-            out[0] ^= AES_RCON[round];
-        else
-            throw std::out_of_range("AES_RCON index out of range"); 
-
-        return 0;
-
-    }
 
 }
 
