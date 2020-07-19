@@ -10,13 +10,16 @@
  *  @bug            No known bugs.
  */
 
+#ifndef __AES_MAIN_HEADER
+#define __AES_MAIN_HEADER
+
 #include <cstdint>
 
 namespace symmetric_ciphers {
 
-    typedef uint8_t __aes_u8;
-    typedef uint16_t __aes_u16;
-    typedef uint32_t __aes_u32;
+    typedef uint8_t     __aes_u8;
+    typedef uint16_t    __aes_u16;
+    typedef uint32_t    __aes_u32;
 
     enum key_size {          /* Enum to handle different AES Modes */
       AES_128,               /* AES 128 bit key mode */
@@ -49,3 +52,5 @@ namespace symmetric_ciphers {
     };
 
 } /* namespace symmetric_ciphers */
+
+#endif /* __AES_MAIN_HEADER */
