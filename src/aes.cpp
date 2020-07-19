@@ -65,6 +65,16 @@ namespace {
         const symmetric_ciphers::   __aes_u8    out[4]
     );
 
+    inline void __xor_4_bytes(
+        symmetric_ciphers::         __aes_u8    target[4],
+        const symmetric_ciphers::   __aes_u8    operand[4]
+    ) {
+
+        for(int i = 0; i < 4; ++i) 
+            target[i] ^= operand[i];
+
+    }
+
     int __aes_expand_key(
         const symmetric_ciphers::   __aes_u8   key[], 
         symmetric_ciphers::         __aes_u8   expand_key[], 
@@ -101,8 +111,24 @@ namespace {
 
         /* Increment an offset to the current filled 
            position in the expanded key output array */
-        symmetric_ciphers::__aes_u8 cur_exp_key_offset = 0;
+        symmetric_ciphers::__aes_u8     cur_exp_key_offset = 0;
         cur_exp_key_offset += actual_key_len;
+
+        for(int round_key_index = 1; cur_exp_key_offset < expand_key_len; round_key_index++) {
+
+            /* Process the last 4 bytes */
+            symmetric_ciphers::__aes_u8     temp_key_buff_1[4];
+            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - 4)), 4);
+            
+            symmetric_ciphers::__aes_u8     temp_key_buff_2[4];
+            __aes_key_scheduler(round_key_index, temp_key_buff_1, temp_key_buff_2);
+
+            /* XOR the pre - processed last 4 bytes with corresponding word from 
+               previous round */
+            
+
+
+        }
 
         /* Return expanded key length */
         return 0;
