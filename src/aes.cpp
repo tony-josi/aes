@@ -58,11 +58,17 @@ namespace {
     };
 
 
+    int __aes_key_scheduler(
+        symmetric_ciphers::         __aes_u8    round,
+        const symmetric_ciphers::   __aes_u8    in[4],
+        const symmetric_ciphers::   __aes_u8    out[4]
+    );
+
     int __aes_expand_key(
         const symmetric_ciphers::   __aes_u8   key[], 
         symmetric_ciphers::         __aes_u8   expand_key[], 
         const symmetric_ciphers::   __aes_u16  key_len
-        ) {
+    ) {
 
         symmetric_ciphers::__aes_u16 expand_key_len = 0;
         symmetric_ciphers::__aes_u16 actual_key_len = 0;
@@ -88,7 +94,30 @@ namespace {
             throw std::invalid_argument("Unsupported Key Length");
         }
 
+        /* Return expanded key length */
         return 0;
+    }
+
+    int __aes_key_scheduler(
+        symmetric_ciphers::         __aes_u8    round,
+        const symmetric_ciphers::   __aes_u8    in[4],
+        symmetric_ciphers::         __aes_u8    out[4]
+    ) {
+
+        /* Rotate word */
+        for(int i = 0; i < 3; i++) 
+            out[i] = in[i + 1];
+        out[3] = in[0];
+
+        /* Substitute word */
+        for(int i = 0; i < 4; i++) 
+            out[i] = AES_S_BOX[ out[i] ];
+
+        /* XOR Round Constant to first last byte */
+        out[0] ^= AES_RCON[round];
+
+        return 0;
+
     }
 
 }
