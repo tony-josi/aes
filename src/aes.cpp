@@ -12,6 +12,7 @@
 #include "../inc/aes.hpp"
 
 #include <stdexcept>
+#include <string>
 
 namespace {
 
@@ -93,6 +94,15 @@ namespace {
         default:
             throw std::invalid_argument("Unsupported Key Length");
         }
+
+        /* Clear the expanded key output array & copy initial key */
+        memset(expand_key, 0, expand_key_len);
+        memcpy(expand_key, key, actual_key_len);
+
+        /* Increment an offset to the current filled 
+           position in the expanded key output array */
+        symmetric_ciphers::__aes_u8 cur_exp_key_offset = 0;
+        cur_exp_key_offset += actual_key_len;
 
         /* Return expanded key length */
         return 0;
