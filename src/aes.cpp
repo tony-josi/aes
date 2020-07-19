@@ -68,12 +68,12 @@ namespace {
     ) {
 
         /* Rotate word */
-        for(int i = 0; i < (AES_WORD_SIZE - 1); i++) 
+        for(int i = 0; i < (AES_WORD_SIZE - 1); ++i) 
             out[i] = in[i + 1];
         out[3] = in[0];
 
         /* Substitute word */
-        for(int i = 0; i < AES_WORD_SIZE; i++) 
+        for(int i = 0; i < AES_WORD_SIZE; ++i) 
             out[i] = AES_S_BOX[ out[i] ];
 
         /* XOR Round Constant to least significant byte */
@@ -122,6 +122,19 @@ namespace {
         const symmetric_ciphers::   __aes_u8    act_key_len  
     ) {
 
+        symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
+        symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
+
+        memcpy(temp_key_buff_1, (exp_key + (exp_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
+
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            temp_key_buff_1[i] = AES_S_BOX[ temp_key_buff_1[i] ];
+
+        memcpy(temp_key_buff_2, (exp_key + (exp_offset - act_key_len)), AES_WORD_SIZE);        
+        __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
+        memcpy((exp_key + exp_offset), temp_key_buff_1, AES_WORD_SIZE);
+        exp_offset += AES_WORD_SIZE;
+
     }
 
     int __aes_expand_key(
@@ -163,7 +176,7 @@ namespace {
         symmetric_ciphers::__aes_u8     cur_exp_key_offset = 0;
         cur_exp_key_offset += actual_key_len;
 
-        for(int round_key_index = 1; cur_exp_key_offset < expand_key_len; round_key_index++) {
+        for(int round_key_index = 1; cur_exp_key_offset < expand_key_len; ++round_key_index) {
 
             /* Process the last 4 bytes */
             symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
