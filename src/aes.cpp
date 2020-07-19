@@ -113,7 +113,7 @@ namespace {
         for(int i = 0; i < 4; i++) 
             out[i] = AES_S_BOX[ out[i] ];
 
-        /* XOR Round Constant to first last byte */
+        /* XOR Round Constant to last byte */
         out[0] ^= AES_RCON[round];
 
         return 0;
