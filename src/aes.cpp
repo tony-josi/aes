@@ -58,7 +58,7 @@ namespace {
         0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36
     };
 
-    constexpr static int AES_WORD_SIZE =        4;
+    constexpr static symmetric_ciphers::__aes_u8 AES_WORD_SIZE =        4;
 
 
     int __aes_key_scheduler(
@@ -94,6 +94,25 @@ namespace {
         for(int i = 0; i < AES_WORD_SIZE; ++i) 
             target[i] ^= operand[i];
 
+    }
+
+    void __aes_compute_remaining_words(
+        symmetric_ciphers::         __aes_u8    words_required,
+        symmetric_ciphers::         __aes_u8    exp_key[AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8   &exp_offset,
+        const symmetric_ciphers::   __aes_u8    exp_key_len,
+        const symmetric_ciphers::   __aes_u8    act_key_len  
+    ) {
+        symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
+        symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
+
+        for(int i = 0; (i < words_required) && (exp_offset < exp_key_len); ++i) {
+            memcpy(temp_key_buff_1, (exp_key + (exp_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
+            memcpy(temp_key_buff_2, (exp_key + (exp_offset - act_key_len)), AES_WORD_SIZE);        
+            __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
+            memcpy((exp_key + exp_offset), temp_key_buff_1, AES_WORD_SIZE);
+            exp_offset += AES_WORD_SIZE;
+        }
     }
 
     int __aes_expand_key(
@@ -149,6 +168,7 @@ namespace {
             memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - actual_key_len)), AES_WORD_SIZE);
             __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
             memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, AES_WORD_SIZE);
+            cur_exp_key_offset += AES_WORD_SIZE;
 
         }
 
@@ -159,4 +179,16 @@ namespace {
 
 
 }
+
+
+/** 
+ *  
+ *  TODO: use pointer based XOR operation instead of loop - individual bytes & XOR
+ *
+ *  
+ *
+ *  
+ *  
+ *  
+ */
 
