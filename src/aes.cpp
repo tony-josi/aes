@@ -204,7 +204,7 @@ namespace {
                 __aes_compute_remaining_words(2, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
         }
         /* Return expanded key length */
-        return 0;
+        return expand_key_len;
     }
 
 } /* End of anonymous namespace */
