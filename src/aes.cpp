@@ -165,7 +165,7 @@ namespace {
             break;
         
         default:
-            throw std::invalid_argument("Unsupported Key Length");
+            throw std::invalid_argument("Unsupported Key Length, supports 128/192/256");
         }
 
         /* Clear the expanded key output array & copy initial key */
