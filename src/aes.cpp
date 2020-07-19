@@ -125,8 +125,9 @@ namespace {
 
             /* XOR the pre - processed last 4 bytes with corresponding word from 
                previous round */
-            
-
+            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - actual_key_len)), 4);
+            __xor_4_bytes(temp_key_buff_1, temp_key_buff_2);
+            memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, 4);
 
         }
 
@@ -153,7 +154,7 @@ namespace {
         if(round < sizeof(AES_RCON))
             out[0] ^= AES_RCON[round];
         else
-            throw std::out_of_range("AES_RCON out of range"); 
+            throw std::out_of_range("AES_RCON index out of range"); 
 
         return 0;
 
