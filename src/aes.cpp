@@ -193,16 +193,51 @@ namespace {
             cur_exp_key_offset += AES_WORD_SIZE;
 
             __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+            
             if(key_len == 256) {
                 __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
                 __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
             } else if(key_len == 192) 
                 __aes_compute_remaining_words(2, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
-
         }
         /* Return expanded key length */
         return 0;
     }
+
+}
+
+/* Test Headers*/
+#include <iostream>
+#include <cstdio>
+
+/* Test code */
+int main() {
+    symmetric_ciphers::__aes_u8 key[17] = "HELLO_THIS_IS_65";
+    symmetric_ciphers::__aes_u8 exp_key[176] {0};
+    __aes_expand_key(key, exp_key, 128);
+    for(int i = 0; i < 176; i++)
+        std::printf("%02x", exp_key[i]);
+        //std::cout << std::hex << static_cast<int>(exp_key[i]);
+    std::cout << std::endl;
+    std::cout << std::strlen((char *)exp_key) << std::endl;
+
+    symmetric_ciphers::__aes_u8 key2[25] = "HELLO_THIS_XS_6512345678";
+    symmetric_ciphers::__aes_u8 exp_key2[208] {0};
+    __aes_expand_key(key2, exp_key2, 192);
+    for(int i = 0; i < 208; i++)
+        std::printf("%02x", exp_key2[i]);
+        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
+    std::cout << std::endl;
+    std::cout << std::strlen((char *)exp_key2) << std::endl;
+
+    symmetric_ciphers::__aes_u8 key3[33] = "HELLO_THIS_XS_651234567812345678";
+    symmetric_ciphers::__aes_u8 exp_key3[240] {0};
+    __aes_expand_key(key3, exp_key3, 256);
+    for(int i = 0; i < 240; i++)
+        std::printf("%02x", exp_key3[i]);
+        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
+    std::cout << std::endl;
+    std::cout << std::strlen((char *)exp_key3) << std::endl;
 
 }
 
