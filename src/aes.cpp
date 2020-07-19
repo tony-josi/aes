@@ -98,7 +98,7 @@ namespace {
 
     void __aes_compute_remaining_words(
         symmetric_ciphers::         __aes_u8    words_required,
-        symmetric_ciphers::         __aes_u8    exp_key[AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8    exp_key[],
         symmetric_ciphers::         __aes_u8   &exp_offset,
         const symmetric_ciphers::   __aes_u8    exp_key_len,
         const symmetric_ciphers::   __aes_u8    act_key_len  
@@ -113,6 +113,15 @@ namespace {
             memcpy((exp_key + exp_offset), temp_key_buff_1, AES_WORD_SIZE);
             exp_offset += AES_WORD_SIZE;
         }
+    }
+
+    void __aes_256_key_scheduler_5th_word(
+        symmetric_ciphers::         __aes_u8    exp_key[],
+        symmetric_ciphers::         __aes_u8   &exp_offset,
+        const symmetric_ciphers::   __aes_u8    exp_key_len,
+        const symmetric_ciphers::   __aes_u8    act_key_len  
+    ) {
+
     }
 
     int __aes_expand_key(
@@ -170,13 +179,17 @@ namespace {
             memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, AES_WORD_SIZE);
             cur_exp_key_offset += AES_WORD_SIZE;
 
-        }
+            __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+            if(key_len == 256) {
+                __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+                __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+            } else if(key_len == 192) 
+                __aes_compute_remaining_words(2, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
 
+        }
         /* Return expanded key length */
         return 0;
     }
-
-
 
 }
 
