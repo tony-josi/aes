@@ -30,9 +30,11 @@ namespace symmetric_ciphers {
     class AES {
 
     private:
-        uint16_t key_len;    /* Stores the length of the Key used in AES */
-        uint8_t block_size;  /* Size of the data block used */
-        uint8_t round_num;   /* Number of rounds performed */
+        __aes_u16   key_len_bits;                    /* Stores the length of the Key used in AES */
+        __aes_u16   actual_key_len;       /* Stores the actual length of key in bytes */
+        __aes_u16   expanded_key_len;     /* Stores the expanded length of key in bytes */
+        __aes_u8    block_size;                 /* Size of the data block used */
+        __aes_u8    round_num;                  /* Number of rounds performed */
 
     public:
         /* Constructor */

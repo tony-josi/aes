@@ -96,6 +96,35 @@ namespace {
 
 } /* End of anonymous namespace */
 
+symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
+
+    this->block_size = 16;
+    switch(ks) {
+    case key_size::AES_128:
+        this->key_len_bits = 128;
+        this->round_num = 10;
+        this->actual_key_len = 16;
+        this->expanded_key_len = 176;
+        break;
+    case key_size::AES_192:
+        this->key_len_bits = 192;
+        this->round_num = 12;
+        this->actual_key_len = 24;
+        this->expanded_key_len = 208;
+        break;
+    case key_size::AES_256:
+        this->key_len_bits = 256;
+        this->round_num = 14;
+        this->actual_key_len = 32;
+        this->expanded_key_len = 240;
+        break;
+    default:
+        throw std::invalid_argument("Unsupported Key Length, supports 128/192/256");
+    }
+
+}
+
+
 /* Test Headers*/
 #include <iostream>
 #include <cstdio>
