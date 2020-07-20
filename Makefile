@@ -2,9 +2,9 @@ TARGET = aes
 STD_LIBS = 
 CXX = g++ 
 
-CXXFLAGS1 = -std=c++11 -pedantic -Wall -Wextra -Wformat -Ofast -ggdb3 
+CXXFLAGS = -std=c++11 -pedantic -Wall -Wextra -Wformat -Ofast -ggdb3 
 LFLAGS = -pedantic -Wall -Wextra 
-CXXFLAGS = -std=c++11 -Wall -pedantic -ggdb3 -Ofast -ggdb3 \
+CXXFLAGS1 = -std=c++11 -Wall -pedantic -ggdb3 -Ofast -ggdb3 \
 -pedantic-errors -Wextra -Waggregate-return -Wcast-align \
 -Wcast-qual -Wconversion \
 -Wdisabled-optimization \

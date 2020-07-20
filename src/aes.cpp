@@ -157,7 +157,30 @@ symmetric_ciphers::AES& symmetric_ciphers::AES::operator=(symmetric_ciphers::AES
 #include <iostream>
 #include <cstdio>
 
-/* Test code */
+/* Function to encrypt unsigned char array using AES */
+int symmetric_ciphers::AES::encrpyt(
+    const symmetric_ciphers::   __aes_u8    input[], 
+    const symmetric_ciphers::   __aes_u8    key[], 
+    symmetric_ciphers::         __aes_u8    output[]
+) const {
+
+    symmetric_ciphers::__aes_u8 *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
+    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+
+    for(int i = 0; i < this->expanded_key_len; i++)
+        std::printf("%02x", exp_key[i]);
+    std::cout << std::endl;
+
+    
+    (void)input;
+    (void)output;
+
+    delete[] exp_key;
+    return 0;
+
+}
+
+/* Test code 
 int main() {
     symmetric_ciphers::__aes_u8 key[17] = "HELLO_THIS_IS_65";
     symmetric_ciphers::__aes_u8 exp_key[176] {0};
@@ -187,6 +210,7 @@ int main() {
     std::cout << std::strlen((char *)exp_key3) << std::endl;
 
 }
+*/
 
 namespace {
 
