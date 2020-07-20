@@ -10,8 +10,8 @@
  *  @bug            No known bugs.
  */
 
-#ifndef __AES_MAIN_HEADER
-#define __AES_MAIN_HEADER
+#ifndef _AES_MAIN_HEADER_TJ__
+#define _AES_MAIN_HEADER_TJ__
 
 #include <cstdint>
 
@@ -56,4 +56,4 @@ namespace symmetric_ciphers {
 
 } /* namespace symmetric_ciphers */
 
-#endif /* __AES_MAIN_HEADER */
+#endif /* _AES_MAIN_HEADER_TJ__ */
