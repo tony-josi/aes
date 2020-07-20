@@ -343,7 +343,7 @@ namespace {
         for(int i = 0; i < AES_WORD_SIZE; ++i) {
 
             if(i > 0) {   
-                
+
                 symmetric_ciphers::__aes_u8 cur_row[AES_WORD_SIZE]; 
                 for(int j = 0; j < AES_WORD_SIZE; ++j) 
                     cur_row[j] = cur_state[i][j];
@@ -353,6 +353,10 @@ namespace {
             }
         }
     }
+
+    /* Lookup how to implement Galois feild values and do computation of 
+     * mix columns step
+     */
 
 } /* End of anonymous namespace */
 
