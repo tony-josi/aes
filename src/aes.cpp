@@ -63,9 +63,10 @@ namespace {
 
     /* Forward declarations for helper functions */
     int __aes_expand_key(
-        const symmetric_ciphers::   __aes_u8   key[], 
-        symmetric_ciphers::         __aes_u8   expand_key[], 
-        const symmetric_ciphers::   __aes_u16  key_len
+        const symmetric_ciphers::   __aes_u8    key[], 
+        symmetric_ciphers::         __aes_u8    expand_key[], 
+        const symmetric_ciphers::   __aes_u16   actual_key_len,
+        const symmetric_ciphers::   __aes_u16   expand_key_len
     );
 
     int __aes_key_scheduler(
@@ -133,7 +134,7 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 int main() {
     symmetric_ciphers::__aes_u8 key[17] = "HELLO_THIS_IS_65";
     symmetric_ciphers::__aes_u8 exp_key[176] {0};
-    __aes_expand_key(key, exp_key, 128);
+    __aes_expand_key(key, exp_key, 16, 176);
     for(int i = 0; i < 176; i++)
         std::printf("%02x", exp_key[i]);
         //std::cout << std::hex << static_cast<int>(exp_key[i]);
@@ -142,7 +143,7 @@ int main() {
 
     symmetric_ciphers::__aes_u8 key2[25] = "HELLO_THIS_XS_6512345678";
     symmetric_ciphers::__aes_u8 exp_key2[208] {0};
-    __aes_expand_key(key2, exp_key2, 192);
+    __aes_expand_key(key2, exp_key2, 24, 208);
     for(int i = 0; i < 208; i++)
         std::printf("%02x", exp_key2[i]);
         //std::cout << std::hex << static_cast<int>(exp_key2[i]);
@@ -151,7 +152,7 @@ int main() {
 
     symmetric_ciphers::__aes_u8 key3[33] = "HELLO_THIS_XS_651234567812345678";
     symmetric_ciphers::__aes_u8 exp_key3[240] {0};
-    __aes_expand_key(key3, exp_key3, 256);
+    __aes_expand_key(key3, exp_key3, 32, 240);
     for(int i = 0; i < 240; i++)
         std::printf("%02x", exp_key3[i]);
         //std::cout << std::hex << static_cast<int>(exp_key2[i]);
@@ -165,8 +166,8 @@ namespace {
     int __aes_expand_key(
         const symmetric_ciphers::   __aes_u8    key[], 
         symmetric_ciphers::         __aes_u8    expand_key[], 
-        const symmetric_ciphers::   __aes_u16   expand_key_len,
-        const symmetric_ciphers::   __aes_u16   actual_key_len
+        const symmetric_ciphers::   __aes_u16   actual_key_len,
+        const symmetric_ciphers::   __aes_u16   expand_key_len
     ) {
         /* Clear the expanded key output array & copy initial key */
         memset(expand_key, 0, expand_key_len);
