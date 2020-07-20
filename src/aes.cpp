@@ -100,8 +100,8 @@ namespace {
         symmetric_ciphers::         __aes_u8    words_required,
         symmetric_ciphers::         __aes_u8    exp_key[],
         symmetric_ciphers::         __aes_u8   &exp_offset,
-        const symmetric_ciphers::   __aes_u8    exp_key_len,
-        const symmetric_ciphers::   __aes_u8    act_key_len  
+        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        const symmetric_ciphers::   __aes_u16   act_key_len  
     ) {
         symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
         symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
@@ -118,22 +118,25 @@ namespace {
     void __aes_256_key_scheduler_5th_word(
         symmetric_ciphers::         __aes_u8    exp_key[],
         symmetric_ciphers::         __aes_u8   &exp_offset,
-        const symmetric_ciphers::   __aes_u8    exp_key_len,
-        const symmetric_ciphers::   __aes_u8    act_key_len  
+        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        const symmetric_ciphers::   __aes_u16   act_key_len  
     ) {
 
         symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
         symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
 
-        memcpy(temp_key_buff_1, (exp_key + (exp_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
+        if(exp_offset < exp_key_len) {
 
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            temp_key_buff_1[i] = AES_S_BOX[ temp_key_buff_1[i] ];
+            memcpy(temp_key_buff_1, (exp_key + (exp_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
 
-        memcpy(temp_key_buff_2, (exp_key + (exp_offset - act_key_len)), AES_WORD_SIZE);        
-        __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
-        memcpy((exp_key + exp_offset), temp_key_buff_1, AES_WORD_SIZE);
-        exp_offset += AES_WORD_SIZE;
+            for(int i = 0; i < AES_WORD_SIZE; ++i)
+                temp_key_buff_1[i] = AES_S_BOX[ temp_key_buff_1[i] ];
+
+            memcpy(temp_key_buff_2, (exp_key + (exp_offset - act_key_len)), AES_WORD_SIZE);        
+            __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
+            memcpy((exp_key + exp_offset), temp_key_buff_1, AES_WORD_SIZE);
+            exp_offset += AES_WORD_SIZE;
+        }
 
     }
 
@@ -177,7 +180,7 @@ namespace {
         symmetric_ciphers::__aes_u8     cur_exp_key_offset = 0;
         cur_exp_key_offset += actual_key_len;
 
-        for(int round_key_index = 1; cur_exp_key_offset < expand_key_len; ++round_key_index) {
+        for(symmetric_ciphers::__aes_u8 round_key_index = 1; cur_exp_key_offset < expand_key_len; ++round_key_index) {
 
             /* Process the last 4 bytes */
             symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
