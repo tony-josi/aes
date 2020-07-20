@@ -146,7 +146,7 @@ void symmetric_ciphers::AES::swap(symmetric_ciphers::AES& first, symmetric_ciphe
 }
 
 /* Copy Assignment Constructor - copy-assignment operator */
-symmetric_ciphers::AES& symmetric_ciphers::AES::operator=(symmetric_ciphers::AES aescp) {
+symmetric_ciphers::AES & symmetric_ciphers::AES::operator=(symmetric_ciphers::AES aescp) {
 
     symmetric_ciphers::AES::swap(*this, aescp);
     return *this;

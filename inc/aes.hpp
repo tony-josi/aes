@@ -39,13 +39,13 @@ namespace symmetric_ciphers {
 
     public:
         /* Constructor */
-        explicit AES(key_size ks);
+        AES(key_size ks);
 
         /* Copy Constructor */
-        explicit AES(const AES &aes);
+        AES(const AES &aes);
 
         /* Assignment operator for copy constructor */
-        AES &operator=(AES aes);
+        AES & operator=(AES aes);
 
         /* Function to encrypt unsigned char array using AES */
         int encrpyt(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
