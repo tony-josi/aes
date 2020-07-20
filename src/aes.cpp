@@ -61,6 +61,148 @@ namespace {
     constexpr static symmetric_ciphers::__aes_u8 AES_WORD_SIZE =        4;
 
 
+    /* Forward declarations for helper functions */
+    int __aes_expand_key(
+        const symmetric_ciphers::   __aes_u8   key[], 
+        symmetric_ciphers::         __aes_u8   expand_key[], 
+        const symmetric_ciphers::   __aes_u16  key_len
+    );
+
+    int __aes_key_scheduler(
+        symmetric_ciphers::         __aes_u8    round,
+        const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8    out[AES_WORD_SIZE]
+    );
+
+    inline void __aes_xor_word(
+        symmetric_ciphers::         __aes_u8    target[AES_WORD_SIZE],
+        const symmetric_ciphers::   __aes_u8    operand[AES_WORD_SIZE]
+    );
+
+    void __aes_compute_remaining_words(
+        symmetric_ciphers::         __aes_u8    words_required,
+        symmetric_ciphers::         __aes_u8    exp_key[],
+        symmetric_ciphers::         __aes_u8   &exp_offset,
+        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        const symmetric_ciphers::   __aes_u16   act_key_len  
+    );
+
+    void __aes_256_key_scheduler_5th_word(
+        symmetric_ciphers::         __aes_u8    exp_key[],
+        symmetric_ciphers::         __aes_u8   &exp_offset,
+        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        const symmetric_ciphers::   __aes_u16   act_key_len  
+    );
+
+} /* End of anonymous namespace */
+
+/* Test Headers*/
+#include <iostream>
+#include <cstdio>
+
+/* Test code */
+int main() {
+    symmetric_ciphers::__aes_u8 key[17] = "HELLO_THIS_IS_65";
+    symmetric_ciphers::__aes_u8 exp_key[176] {0};
+    __aes_expand_key(key, exp_key, 128);
+    for(int i = 0; i < 176; i++)
+        std::printf("%02x", exp_key[i]);
+        //std::cout << std::hex << static_cast<int>(exp_key[i]);
+    std::cout << std::endl;
+    std::cout << std::strlen((char *)exp_key) << std::endl;
+
+    symmetric_ciphers::__aes_u8 key2[25] = "HELLO_THIS_XS_6512345678";
+    symmetric_ciphers::__aes_u8 exp_key2[208] {0};
+    __aes_expand_key(key2, exp_key2, 192);
+    for(int i = 0; i < 208; i++)
+        std::printf("%02x", exp_key2[i]);
+        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
+    std::cout << std::endl;
+    std::cout << std::strlen((char *)exp_key2) << std::endl;
+
+    symmetric_ciphers::__aes_u8 key3[33] = "HELLO_THIS_XS_651234567812345678";
+    symmetric_ciphers::__aes_u8 exp_key3[240] {0};
+    __aes_expand_key(key3, exp_key3, 256);
+    for(int i = 0; i < 240; i++)
+        std::printf("%02x", exp_key3[i]);
+        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
+    std::cout << std::endl;
+    std::cout << std::strlen((char *)exp_key3) << std::endl;
+
+}
+
+namespace {
+
+    int __aes_expand_key(
+        const symmetric_ciphers::   __aes_u8   key[], 
+        symmetric_ciphers::         __aes_u8   expand_key[], 
+        const symmetric_ciphers::   __aes_u16  key_len
+    ) {
+
+        symmetric_ciphers::__aes_u16 expand_key_len = 0;
+        symmetric_ciphers::__aes_u16 actual_key_len = 0;
+
+        /* Select expanded key sizes based on actual key size */
+        switch (key_len) {
+
+        case 128:
+            actual_key_len = 16;
+            expand_key_len = 176;
+            break;
+
+        case 192:
+            actual_key_len = 24;
+            expand_key_len = 208;
+            break;
+
+        case 256:
+            actual_key_len = 32;
+            expand_key_len = 240;
+            break;
+        
+        default:
+            throw std::invalid_argument("Unsupported Key Length, supports 128/192/256");
+        }
+
+        /* Clear the expanded key output array & copy initial key */
+        memset(expand_key, 0, expand_key_len);
+        memcpy(expand_key, key, actual_key_len);
+
+        /* Increment an offset to the current filled 
+           position in the expanded key output array */
+        symmetric_ciphers::__aes_u8     cur_exp_key_offset = 0;
+        cur_exp_key_offset += actual_key_len;
+
+        for(symmetric_ciphers::__aes_u8 round_key_index = 1; cur_exp_key_offset < expand_key_len; ++round_key_index) {
+
+            /* Process the last 4 bytes */
+            symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
+            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
+            
+            symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
+            __aes_key_scheduler(round_key_index, temp_key_buff_1, temp_key_buff_2);
+
+            /* XOR the pre - processed last 4 bytes with corresponding word from 
+               previous round */
+            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - actual_key_len)), AES_WORD_SIZE);
+            __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
+            memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, AES_WORD_SIZE);
+            cur_exp_key_offset += AES_WORD_SIZE;
+
+            /* Compute key for remaining words in the block */
+            __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+            
+            if(key_len == 256) {
+                /* Do special key schedule if i >= N & (i % n) == 4 */
+                __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+                __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+            } else if(key_len == 192) 
+                __aes_compute_remaining_words(2, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
+        }
+        /* Return expanded key length */
+        return expand_key_len;
+    }
+
     int __aes_key_scheduler(
         symmetric_ciphers::         __aes_u8    round,
         const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
@@ -140,112 +282,9 @@ namespace {
 
     }
 
-    int __aes_expand_key(
-        const symmetric_ciphers::   __aes_u8   key[], 
-        symmetric_ciphers::         __aes_u8   expand_key[], 
-        const symmetric_ciphers::   __aes_u16  key_len
-    ) {
-
-        symmetric_ciphers::__aes_u16 expand_key_len = 0;
-        symmetric_ciphers::__aes_u16 actual_key_len = 0;
-
-        /* Select expanded key sizes based on actual key size */
-        switch (key_len) {
-
-        case 128:
-            actual_key_len = 16;
-            expand_key_len = 176;
-            break;
-
-        case 192:
-            actual_key_len = 24;
-            expand_key_len = 208;
-            break;
-
-        case 256:
-            actual_key_len = 32;
-            expand_key_len = 240;
-            break;
-        
-        default:
-            throw std::invalid_argument("Unsupported Key Length, supports 128/192/256");
-        }
-
-        /* Clear the expanded key output array & copy initial key */
-        memset(expand_key, 0, expand_key_len);
-        memcpy(expand_key, key, actual_key_len);
-
-        /* Increment an offset to the current filled 
-           position in the expanded key output array */
-        symmetric_ciphers::__aes_u8     cur_exp_key_offset = 0;
-        cur_exp_key_offset += actual_key_len;
-
-        for(symmetric_ciphers::__aes_u8 round_key_index = 1; cur_exp_key_offset < expand_key_len; ++round_key_index) {
-
-            /* Process the last 4 bytes */
-            symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
-            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
-            
-            symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
-            __aes_key_scheduler(round_key_index, temp_key_buff_1, temp_key_buff_2);
-
-            /* XOR the pre - processed last 4 bytes with corresponding word from 
-               previous round */
-            memcpy(temp_key_buff_1, (expand_key + (cur_exp_key_offset - actual_key_len)), AES_WORD_SIZE);
-            __aes_xor_word(temp_key_buff_1, temp_key_buff_2);
-            memcpy((expand_key + cur_exp_key_offset), temp_key_buff_1, AES_WORD_SIZE);
-            cur_exp_key_offset += AES_WORD_SIZE;
-
-            /* Compute key for remaining words in the block */
-            __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
-            
-            if(key_len == 256) {
-                /* Do special key schedule if i >= N & (i % n) == 4 */
-                __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
-                __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
-            } else if(key_len == 192) 
-                __aes_compute_remaining_words(2, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
-        }
-        /* Return expanded key length */
-        return expand_key_len;
-    }
-
 } /* End of anonymous namespace */
 
-/* Test Headers*/
-#include <iostream>
-#include <cstdio>
 
-/* Test code */
-int main() {
-    symmetric_ciphers::__aes_u8 key[17] = "HELLO_THIS_IS_65";
-    symmetric_ciphers::__aes_u8 exp_key[176] {0};
-    __aes_expand_key(key, exp_key, 128);
-    for(int i = 0; i < 176; i++)
-        std::printf("%02x", exp_key[i]);
-        //std::cout << std::hex << static_cast<int>(exp_key[i]);
-    std::cout << std::endl;
-    std::cout << std::strlen((char *)exp_key) << std::endl;
-
-    symmetric_ciphers::__aes_u8 key2[25] = "HELLO_THIS_XS_6512345678";
-    symmetric_ciphers::__aes_u8 exp_key2[208] {0};
-    __aes_expand_key(key2, exp_key2, 192);
-    for(int i = 0; i < 208; i++)
-        std::printf("%02x", exp_key2[i]);
-        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
-    std::cout << std::endl;
-    std::cout << std::strlen((char *)exp_key2) << std::endl;
-
-    symmetric_ciphers::__aes_u8 key3[33] = "HELLO_THIS_XS_651234567812345678";
-    symmetric_ciphers::__aes_u8 exp_key3[240] {0};
-    __aes_expand_key(key3, exp_key3, 256);
-    for(int i = 0; i < 240; i++)
-        std::printf("%02x", exp_key3[i]);
-        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
-    std::cout << std::endl;
-    std::cout << std::strlen((char *)exp_key3) << std::endl;
-
-}
 
 
 /** 
