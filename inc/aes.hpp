@@ -31,20 +31,21 @@ namespace symmetric_ciphers {
 
     private:
         __aes_u16   key_len_bits;                    /* Stores the length of the Key used in AES */
-        __aes_u16   actual_key_len;       /* Stores the actual length of key in bytes */
-        __aes_u16   expanded_key_len;     /* Stores the expanded length of key in bytes */
-        __aes_u8    block_size;                 /* Size of the data block used */
-        __aes_u8    round_num;                  /* Number of rounds performed */
+        __aes_u16   actual_key_len;                  /* Stores the actual length of key in bytes */
+        __aes_u16   expanded_key_len;                /* Stores the expanded length of key in bytes */
+        __aes_u8    block_size;                      /* Size of the data block used */
+        __aes_u8    round_num;                       /* Number of rounds performed */
+        void swap(AES& first, AES& second);
 
     public:
         /* Constructor */
         explicit AES(key_size ks);
 
         /* Copy Constructor */
-        explicit AES(AES &aes);
+        explicit AES(const AES &aes);
 
         /* Assignment operator for copy constructor */
-        AES &operator=(const AES &aes);
+        AES &operator=(AES aes);
 
         /* Function to encrypt unsigned char array using AES */
         int encrpyt(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
