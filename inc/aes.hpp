@@ -42,10 +42,10 @@ namespace symmetric_ciphers {
         AES(key_size ks);
 
         /* Copy Constructor */
-        AES(const AES &aes);
+        //AES(const AES &aes);
 
         /* Assignment operator for copy constructor */
-        AES & operator=(AES aes);
+        //AES & operator=(AES aes);
 
         /* Function to encrypt unsigned char array using AES */
         int encrpyt(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;

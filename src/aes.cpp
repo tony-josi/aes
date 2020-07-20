@@ -127,13 +127,14 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 }
 
 /* Copy Constructor */
+/*
 symmetric_ciphers::AES::AES(const symmetric_ciphers::AES &aescp) : 
     key_len_bits{aescp.key_len_bits},
     actual_key_len{aescp.actual_key_len},
     expanded_key_len{aescp.expanded_key_len},
     block_size{aescp.block_size},
     round_num{aescp.round_num} {}
-
+*/
 /* Private function for swapping 2 objects of AES class, used by Copy Assignment Constructor */
 void symmetric_ciphers::AES::swap(symmetric_ciphers::AES& first, symmetric_ciphers::AES& second) {
 
@@ -146,13 +147,14 @@ void symmetric_ciphers::AES::swap(symmetric_ciphers::AES& first, symmetric_ciphe
 }
 
 /* Copy Assignment Constructor - copy-assignment operator */
+/*
 symmetric_ciphers::AES & symmetric_ciphers::AES::operator=(symmetric_ciphers::AES aescp) {
 
     symmetric_ciphers::AES::swap(*this, aescp);
     return *this;
 
 }
-
+*/
 /* Test Headers*/
 #include <iostream>
 #include <cstdio>
