@@ -63,6 +63,7 @@ namespace {
 
 
     /* Forward declarations for helper functions */
+    
     int __aes_expand_key(
         const symmetric_ciphers::   __aes_u8    key[], 
         symmetric_ciphers::         __aes_u8    expand_key[], 
@@ -94,6 +95,23 @@ namespace {
         symmetric_ciphers::         __aes_u8   &exp_offset,
         const symmetric_ciphers::   __aes_u16   exp_key_len,
         const symmetric_ciphers::   __aes_u16   act_key_len  
+    );
+
+    void __aes_add_round_key(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8    round_key[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
+    void __aes_substitue_bytes(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
+    void __aes_shift_rows(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
+    void __aes_mix_columns(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
 } /* End of anonymous namespace */
