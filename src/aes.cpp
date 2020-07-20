@@ -163,36 +163,11 @@ int main() {
 namespace {
 
     int __aes_expand_key(
-        const symmetric_ciphers::   __aes_u8   key[], 
-        symmetric_ciphers::         __aes_u8   expand_key[], 
-        const symmetric_ciphers::   __aes_u16  key_len
+        const symmetric_ciphers::   __aes_u8    key[], 
+        symmetric_ciphers::         __aes_u8    expand_key[], 
+        const symmetric_ciphers::   __aes_u16   expand_key_len,
+        const symmetric_ciphers::   __aes_u16   actual_key_len
     ) {
-
-        symmetric_ciphers::__aes_u16 expand_key_len = 0;
-        symmetric_ciphers::__aes_u16 actual_key_len = 0;
-
-        /* Select expanded key sizes based on actual key size */
-        switch (key_len) {
-
-        case 128:
-            actual_key_len = 16;
-            expand_key_len = 176;
-            break;
-
-        case 192:
-            actual_key_len = 24;
-            expand_key_len = 208;
-            break;
-
-        case 256:
-            actual_key_len = 32;
-            expand_key_len = 240;
-            break;
-        
-        default:
-            throw std::invalid_argument("Unsupported Key Length, supports 128/192/256");
-        }
-
         /* Clear the expanded key output array & copy initial key */
         memset(expand_key, 0, expand_key_len);
         memcpy(expand_key, key, actual_key_len);
@@ -221,11 +196,11 @@ namespace {
             /* Compute key for remaining words in the block */
             __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
             
-            if(key_len == 256) {
+            if(actual_key_len == 32) {
                 /* Do special key schedule if i >= N & (i % n) == 4 */
                 __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
                 __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
-            } else if(key_len == 192) 
+            } else if(actual_key_len == 24) 
                 __aes_compute_remaining_words(2, expand_key, cur_exp_key_offset, expand_key_len, actual_key_len);
         }
         /* Return expanded key length */
