@@ -180,37 +180,6 @@ int symmetric_ciphers::AES::encrpyt(
 
 }
 
-/* Test code 
-int main() {
-    symmetric_ciphers::__aes_u8 key[17] = "HELLO_THIS_IS_65";
-    symmetric_ciphers::__aes_u8 exp_key[176] {0};
-    __aes_expand_key(key, exp_key, 16, 176);
-    for(int i = 0; i < 176; i++)
-        std::printf("%02x", exp_key[i]);
-        //std::cout << std::hex << static_cast<int>(exp_key[i]);
-    std::cout << std::endl;
-    std::cout << std::strlen((char *)exp_key) << std::endl;
-
-    symmetric_ciphers::__aes_u8 key2[25] = "HELLO_THIS_XS_6512345678";
-    symmetric_ciphers::__aes_u8 exp_key2[208] {0};
-    __aes_expand_key(key2, exp_key2, 24, 208);
-    for(int i = 0; i < 208; i++)
-        std::printf("%02x", exp_key2[i]);
-        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
-    std::cout << std::endl;
-    std::cout << std::strlen((char *)exp_key2) << std::endl;
-
-    symmetric_ciphers::__aes_u8 key3[33] = "HELLO_THIS_XS_651234567812345678";
-    symmetric_ciphers::__aes_u8 exp_key3[240] {0};
-    __aes_expand_key(key3, exp_key3, 32, 240);
-    for(int i = 0; i < 240; i++)
-        std::printf("%02x", exp_key3[i]);
-        //std::cout << std::hex << static_cast<int>(exp_key2[i]);
-    std::cout << std::endl;
-    std::cout << std::strlen((char *)exp_key3) << std::endl;
-
-}
-*/
 
 namespace {
 
