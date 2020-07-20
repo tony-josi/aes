@@ -328,6 +328,14 @@ namespace {
                 cur_state[i][j] ^= round_key[i][j];
     }
 
+    void __aes_substitue_bytes(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    ) {
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            for(int j = 0; j < AES_WORD_SIZE; ++j) 
+                cur_state[i][j] = AES_S_BOX[ cur_state[i][j] ];
+    }
+
 } /* End of anonymous namespace */
 
 
