@@ -89,7 +89,7 @@ namespace {
         const symmetric_ciphers::   __aes_u16   act_key_len  
     );
 
-    void __aes_256_key_scheduler_5th_word(
+    void __aes_key_scheduler_4th_word(
         symmetric_ciphers::         __aes_u8    exp_key[],
         symmetric_ciphers::         __aes_u8   &exp_offset,
         const symmetric_ciphers::   __aes_u16   exp_key_len,
@@ -198,7 +198,7 @@ namespace {
             
             if(actual_key_len == 32) {
                 /* Do special key schedule if i >= N & (i % n) == 4 */
-                __aes_256_key_scheduler_5th_word(expand_key, cur_exp_key_offset, \
+                __aes_key_scheduler_4th_word(expand_key, cur_exp_key_offset, \
                 expand_key_len, actual_key_len);
                 
                 __aes_compute_remaining_words(3, expand_key, cur_exp_key_offset, \
@@ -272,7 +272,7 @@ namespace {
         }
     }
 
-    void __aes_256_key_scheduler_5th_word(
+    void __aes_key_scheduler_4th_word(
         symmetric_ciphers::         __aes_u8    exp_key[],
         symmetric_ciphers::         __aes_u8   &exp_offset,
         const symmetric_ciphers::   __aes_u16   exp_key_len,
