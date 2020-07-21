@@ -395,6 +395,24 @@ namespace {
     /* Lookup how to implement Galois feild values and do computation of 
      * mix columns step
      */
+    void __aes_mix_columns(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    ) {
+        for(int i = 0; i < AES_WORD_SIZE; ++i) {
+            
+            symmetric_ciphers::__aes_u8 column[4] = { cur_state[0][i],
+                                                      cur_state[1][i],
+                                                      cur_state[2][i],
+                                                      cur_state[3][i],
+            };
+
+            cur_state[0][i] = MUL_2[ column[0] ] ^ MUL_3[ column[1] ] ^ column[2] ^ column[3];
+            cur_state[1][i] = column[0] ^ MUL_2[ column[1] ] ^ MUL_3[ column[2] ] ^ column[3];
+            cur_state[2][i] = column[0] ^ column[1] ^ MUL_2[ column[2] ] ^ MUL_3[ column[3] ];
+            cur_state[3][i] = MUL_3[ column[0] ] ^ column[1] ^ column[2] ^ MUL_2[ column[3] ];
+
+        }
+    }
 
 } /* End of anonymous namespace */
 
