@@ -135,6 +135,14 @@ namespace {
         const symmetric_ciphers::   __aes_u16   act_key_len  
     );
 
+    void __aes_get_round_key_block(
+        symmetric_ciphers::         __aes_u8    round_count,
+        symmetric_ciphers::         __aes_u8    block_size,
+        const symmetric_ciphers::   __aes_u8    exp_key[],
+        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        symmetric_ciphers::         __aes_u8    op_key[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
     void __aes_add_round_key(
         symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
         symmetric_ciphers::         __aes_u8    round_key[AES_WORD_SIZE][AES_WORD_SIZE]
@@ -197,13 +205,30 @@ int symmetric_ciphers::AES::encrpyt(
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
     __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
 
-    for(int i = 0; i < this->expanded_key_len; i++)
-        std::printf("%02x", exp_key[i]);
-    std::cout << std::endl;
+    symmetric_ciphers::__aes_u8 cur_state[4][4] = {
+        {input[0], input[4], input[8], input[12]},
+        {input[1], input[5], input[9], input[13]},
+        {input[2], input[6], input[10], input[14]},
+        {input[3], input[7], input[11], input[15]},
+    };
 
-    
-    (void)input;
-    (void)output;
+    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+    __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
+    __aes_add_round_key(cur_state, round_key);
+
+    for(symmetric_ciphers::__aes_u8 i = 1; i <= this->round_num; ++i) {
+        __aes_add_round_key(cur_state, round_key);
+        __aes_substitue_bytes(cur_state);
+        __aes_shift_rows(cur_state);
+        if(i != this->round_num)
+            __aes_mix_columns(cur_state);
+        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+    }
+
+    for(int i = 0; i < AES_WORD_SIZE; ++i)
+        for(int j = 0; j < AES_WORD_SIZE; ++j)
+            std::printf("%02x", cur_state[i][j]);
+    std::cout << std::endl;
 
     delete[] exp_key;
     return 0;
@@ -355,6 +380,19 @@ namespace {
             exp_offset += AES_WORD_SIZE;
         }
 
+    }
+
+    void __aes_get_round_key_block(
+        symmetric_ciphers::         __aes_u8    round_count,
+        symmetric_ciphers::         __aes_u8    block_size,
+        const symmetric_ciphers::   __aes_u8    exp_key[],
+        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        symmetric_ciphers::         __aes_u8    op_key[AES_WORD_SIZE][AES_WORD_SIZE]
+    ) {
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            for(int j = 0; \
+            (j < AES_WORD_SIZE) && ((round_count * block_size + ((j * 4) + i)) < exp_key_len); ++j) 
+                op_key[i][j] = exp_key[(round_count * block_size + ((j * 4) + i))];
     }
 
     void __aes_add_round_key(
