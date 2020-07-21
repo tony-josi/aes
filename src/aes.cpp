@@ -191,10 +191,6 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 }
 
 
-/* Test Headers*/
-#include <iostream>
-#include <cstdio>
-
 /* Function to encrypt unsigned char array using AES */
 int symmetric_ciphers::AES::encrpyt(
     const symmetric_ciphers::   __aes_u8    input[], 
@@ -227,8 +223,7 @@ int symmetric_ciphers::AES::encrpyt(
 
     for(int i = 0; i < AES_WORD_SIZE; ++i)
         for(int j = 0; j < AES_WORD_SIZE; ++j)
-            std::printf("%02x", cur_state[i][j]);
-    std::cout << std::endl;
+            output[(j * 4) + i] = cur_state[i][j];
 
     delete[] exp_key;
     return 0;
