@@ -392,9 +392,6 @@ namespace {
         }
     }
 
-    /* Lookup how to implement Galois feild values and do computation of 
-     * mix columns step
-     */
     void __aes_mix_columns(
         symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
