@@ -379,7 +379,7 @@ namespace {
             symmetric_ciphers::__aes_u8 column[4] = { cur_state[0][i],
                                                       cur_state[1][i],
                                                       cur_state[2][i],
-                                                      cur_state[3][i],
+                                                      cur_state[3][i]
             };
 
             cur_state[0][i] = MUL_2[ column[0] ] ^ MUL_3[ column[1] ] ^ column[2] ^ column[3];
