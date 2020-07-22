@@ -293,12 +293,12 @@ int symmetric_ciphers::AES::encrpyt(
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
     __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
 
-    symmetric_ciphers::__aes_u8 cur_state[4][4] = {
-        {input[0], input[4], input[8], input[12]},
-        {input[1], input[5], input[9], input[13]},
-        {input[2], input[6], input[10], input[14]},
-        {input[3], input[7], input[11], input[15]},
-    };
+    symmetric_ciphers::__aes_u8 cur_state[4][4];
+
+    /* Transposition bytes to matrix form - column major */
+    for(int i = 0; i < AES_WORD_SIZE; ++i)
+        for(int j = 0; j < AES_WORD_SIZE; ++j)
+            cur_state[i][j] = input[(j * 4) + i];
 
     symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
     __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
@@ -314,6 +314,7 @@ int symmetric_ciphers::AES::encrpyt(
         
     }
 
+    /* Transposition bytes from matrix (column major) back to output array */
     for(int i = 0; i < AES_WORD_SIZE; ++i)
         for(int j = 0; j < AES_WORD_SIZE; ++j)
             output[(j * 4) + i] = cur_state[i][j];
