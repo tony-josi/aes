@@ -15,7 +15,7 @@
 #include <string>
 #include <algorithm>
 
-
+/* Test headers */
 #include "iostream"
 #include "cstdio"
 
@@ -237,6 +237,18 @@ namespace {
     );
 
     void __aes_mix_columns(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
+    void __aes_inv_substitue_bytes(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
+    void __aes_inv_shift_rows(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    );
+
+    void __aes_inv_mix_columns(
         symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
