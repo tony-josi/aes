@@ -15,6 +15,10 @@
 #include <string>
 #include <algorithm>
 
+
+#include "iostream"
+#include "cstdio"
+
 namespace {
 
     constexpr static symmetric_ciphers::__aes_u8 AES_S_BOX[256] = {
@@ -213,12 +217,13 @@ int symmetric_ciphers::AES::encrpyt(
     __aes_add_round_key(cur_state, round_key);
 
     for(symmetric_ciphers::__aes_u8 i = 1; i <= this->round_num; ++i) {
-        __aes_add_round_key(cur_state, round_key);
+        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
         __aes_substitue_bytes(cur_state);
         __aes_shift_rows(cur_state);
         if(i != this->round_num)
             __aes_mix_columns(cur_state);
-        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_add_round_key(cur_state, round_key);
+        
     }
 
     for(int i = 0; i < AES_WORD_SIZE; ++i)
@@ -387,7 +392,7 @@ namespace {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
             for(int j = 0; \
             (j < AES_WORD_SIZE) && ((round_count * block_size + ((j * 4) + i)) < exp_key_len); ++j) 
-                op_key[i][j] = exp_key[(round_count * block_size + ((j * 4) + i))];
+                op_key[i][j] = exp_key[((round_count * block_size) + ((j * 4) + i))];
     }
 
     void __aes_add_round_key(

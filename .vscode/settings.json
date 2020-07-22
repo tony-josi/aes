@@ -21,6 +21,7 @@
         "vector": "cpp",
         "*.tcc": "cpp",
         "string": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "cstdio": "cpp"
     }
 }
