@@ -13,6 +13,7 @@ int main() {
     /* Test for copy constructor & copy assignment with 128 bits */
     symmetric_ciphers::AES my_aes_copy_cons(my_aes);
     my_aes_copy_cons.encrpyt(my_ip, my_key, my_op);
+    
     symmetric_ciphers::AES my_aes_copy = my_aes;
     my_aes_copy.encrpyt(my_ip, my_key, my_op);
 
