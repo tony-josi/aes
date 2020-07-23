@@ -436,9 +436,9 @@ namespace {
                 t_col[j] = cur_state[j][i];
 
             cur_state[0][i] = MUL_14[t_col[0]] ^ MUL_11[t_col[1]] ^ MUL_13[t_col[2]] ^ MUL_9[t_col[3]];
-            cur_state[1][i] = MUL_9[t_col[0]] ^ MUL_14[t_col[1]] ^ MUL_11[t_col[2]] ^ MUL_13[t_col[3]];
-            cur_state[2][i] = MUL_13[t_col[0]] ^ MUL_9[t_col[1]] ^ MUL_14[t_col[2]] ^ MUL_11[t_col[3]];
-            cur_state[3][i] = MUL_11[t_col[0]] ^ MUL_13[t_col[1]] ^ MUL_9[t_col[2]] ^ MUL_14[t_col[3]];
+            cur_state[1][i] = MUL_9[t_col[0]]  ^ MUL_14[t_col[1]] ^ MUL_11[t_col[2]] ^ MUL_13[t_col[3]];
+            cur_state[2][i] = MUL_13[t_col[0]] ^ MUL_9[t_col[1]]  ^ MUL_14[t_col[2]] ^ MUL_11[t_col[3]];
+            cur_state[3][i] = MUL_11[t_col[0]] ^ MUL_13[t_col[1]] ^ MUL_9[t_col[2]]  ^ MUL_14[t_col[3]];
         }
     }
 
