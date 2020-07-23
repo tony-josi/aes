@@ -426,6 +426,22 @@ namespace {
         }
     }
 
+    void __aes_inv_mix_columns(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+    ) {
+        for (int i = 0; i < AES_WORD_SIZE; ++i) {
+
+            symmetric_ciphers::__aes_u8 t_col[AES_WORD_SIZE];
+            for(int j = 0; j < AES_WORD_SIZE; ++j)
+                t_col[j] = cur_state[j][i];
+
+            cur_state[0][i] = MUL_14[t_col[0]] ^ MUL_11[t_col[1]] ^ MUL_13[t_col[2]] ^ MUL_9[t_col[3]];
+            cur_state[1][i] = MUL_9[t_col[0]] ^ MUL_14[t_col[1]] ^ MUL_11[t_col[2]] ^ MUL_13[t_col[3]];
+            cur_state[2][i] = MUL_13[t_col[0]] ^ MUL_9[t_col[1]] ^ MUL_14[t_col[2]] ^ MUL_11[t_col[3]];
+            cur_state[3][i] = MUL_11[t_col[0]] ^ MUL_13[t_col[1]] ^ MUL_9[t_col[2]] ^ MUL_14[t_col[3]];
+        }
+    }
+
     symmetric_ciphers::__aes_u8 AES_S_BOX[256] = {
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
