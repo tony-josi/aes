@@ -390,7 +390,7 @@ namespace {
         }
     }
 
-    void __aes_inv_shift_rows(
+    void __aes_inv_substitue_bytes(
         symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
@@ -414,6 +414,15 @@ namespace {
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i) {
 
+            if(i > 0) {
+                symmetric_ciphers::__aes_u8 t_row[AES_WORD_SIZE];
+
+                for(int j = 0; j < AES_WORD_SIZE; ++j)
+                    t_row[j] = cur_state[i][j];
+
+                for(int j = (AES_WORD_SIZE - 1); j >= 0; ++j)
+                    cur_state[i][j] = t_row[ ((j + (AES_WORD_SIZE - i)) % AES_WORD_SIZE) ];
+            }
         }
     }
 
