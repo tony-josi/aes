@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <string>
 #include <algorithm>
+#include <cstring>
 
 /* Test headers */
 #include "iostream"
