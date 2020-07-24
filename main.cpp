@@ -7,6 +7,7 @@ int main() {
     symmetric_ciphers::__aes_u8 my_key[] = "HELLO_THIS_XS_65";
     symmetric_ciphers::__aes_u8 my_ip[] = "2234567812345678";
     symmetric_ciphers::__aes_u8 my_op[17];
+    symmetric_ciphers::__aes_u8 my_plain[17];
     
     /* Test for constructor with 128 bits */
     symmetric_ciphers::AES my_aes(symmetric_ciphers::key_size::AES_128);
@@ -14,6 +15,12 @@ int main() {
 
     for(int i = 0; i < 16; ++i)
         std::printf("%0x", my_op[i]);
+    std::cout << std::endl;
+
+    my_aes.decrpyt(my_op, my_key, my_plain);
+
+    for(int i = 0; i < 16; ++i)
+        std::printf("%0x", my_plain[i]);
     std::cout << std::endl;
 
     /* Test for constructor with 192 bits */

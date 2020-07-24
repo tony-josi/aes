@@ -176,6 +176,47 @@ int symmetric_ciphers::AES::encrpyt(
 
 }
 
+int symmetric_ciphers::AES::decrpyt(
+    const symmetric_ciphers::       __aes_u8 input[], 
+    const symmetric_ciphers::       __aes_u8 key[], 
+    symmetric_ciphers::             __aes_u8 output[]
+    ) const {
+
+    auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
+    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+
+    symmetric_ciphers::__aes_u8 cur_state[4][4];
+
+    /* Transposition bytes to matrix form - column major */
+    for(int i = 0; i < AES_WORD_SIZE; ++i)
+        for(int j = 0; j < AES_WORD_SIZE; ++j)
+            cur_state[i][j] = input[(j * 4) + i];
+    
+    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+    __aes_get_round_key_block(this->round_num, this->block_size, exp_key, this->expanded_key_len, round_key);
+    __aes_add_round_key(cur_state, round_key);
+
+    for(symmetric_ciphers::__aes_u8 i = (this->round_num - 1); i >= 0; --i) {
+
+        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_inv_shift_rows(cur_state);
+        __aes_inv_substitue_bytes(cur_state);
+        __aes_add_round_key(cur_state, round_key);
+        if(i != 0)
+            __aes_inv_mix_columns(cur_state);        
+
+    }
+
+    /* Transposition bytes from matrix (column major) back to output array */
+    for(int i = 0; i < AES_WORD_SIZE; ++i)
+        for(int j = 0; j < AES_WORD_SIZE; ++j)
+            output[(j * 4) + i] = cur_state[i][j];
+
+    delete[] exp_key;
+    return 0;
+
+}
+
 
 namespace {
 
