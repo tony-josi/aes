@@ -1,6 +1,17 @@
+/** 
+ *  @file   main.cpp
+ *  @brief  AES Test File
+ *
+ *  This file tests AES Implementation 128/192/256 bit modes.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2020 Tony Josi
+ *  @bug            No known bugs.
+ */
+
 #include "inc/aes.hpp"
-#include "iostream"
-#include "cstdio"
+#include <iostream>
+#include <cstdio>
 
 int main() {
     
