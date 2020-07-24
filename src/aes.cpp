@@ -17,7 +17,7 @@
 
 /* Test headers */
 #include "iostream"
-#include "cstdio"
+
 
 namespace {
 
@@ -34,15 +34,15 @@ namespace {
 
     /* Forward declarations for helper functions */
 
-    int __aes_expand_key(
+    size_t __aes_expand_key(
         const symmetric_ciphers::   __aes_u8    key[], 
         symmetric_ciphers::         __aes_u8    expand_key[], 
-        const symmetric_ciphers::   __aes_u16   actual_key_len,
-        const symmetric_ciphers::   __aes_u16   expand_key_len
+        const size_t                            actual_key_len,
+        const size_t                            expand_key_len
     );
 
     int __aes_key_scheduler(
-        symmetric_ciphers::         __aes_u8    round,
+        int                                     round,
         const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
         symmetric_ciphers::         __aes_u8    out[AES_WORD_SIZE]
     );
@@ -53,25 +53,25 @@ namespace {
     );
 
     void __aes_compute_remaining_words(
-        symmetric_ciphers::         __aes_u8    words_required,
+        int                                     words_required,
         symmetric_ciphers::         __aes_u8    exp_key[],
-        symmetric_ciphers::         __aes_u8   &exp_offset,
-        const symmetric_ciphers::   __aes_u16   exp_key_len,
-        const symmetric_ciphers::   __aes_u16   act_key_len  
+        size_t                                 &exp_offset,
+        const size_t                            exp_key_len,
+        const size_t                            act_key_len  
     );
 
     void __aes_key_scheduler_4th_word(
         symmetric_ciphers::         __aes_u8    exp_key[],
-        symmetric_ciphers::         __aes_u8   &exp_offset,
-        const symmetric_ciphers::   __aes_u16   exp_key_len,
-        const symmetric_ciphers::   __aes_u16   act_key_len  
+        size_t                                 &exp_offset,
+        const size_t                            exp_key_len,
+        const size_t                            act_key_len  
     );
 
     void __aes_get_round_key_block(
-        symmetric_ciphers::         __aes_u8    round_count,
-        symmetric_ciphers::         __aes_u8    block_size,
+        int                                     round_count,
+        int                                     block_size,
         const symmetric_ciphers::   __aes_u8    exp_key[],
-        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        size_t                                  exp_key_len,
         symmetric_ciphers::         __aes_u8    op_key[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
@@ -156,7 +156,7 @@ int symmetric_ciphers::AES::encrpyt(
     __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
-    for(symmetric_ciphers::__aes_u8 i = 1; i <= this->round_num; ++i) {
+    for(int i = 1; i <= this->round_num; ++i) {
         __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
         __aes_substitue_bytes(cur_state);
         __aes_shift_rows(cur_state);
@@ -198,7 +198,7 @@ int symmetric_ciphers::AES::decrpyt(
 
     for(int i = (this->round_num - 1); i >= 0; --i) {
 
-        __aes_get_round_key_block((symmetric_ciphers::__aes_u8)i, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
         __aes_inv_shift_rows(cur_state);
         __aes_inv_substitue_bytes(cur_state);
         __aes_add_round_key(cur_state, round_key);
@@ -220,11 +220,11 @@ int symmetric_ciphers::AES::decrpyt(
 
 namespace {
 
-    int __aes_expand_key(
+    size_t __aes_expand_key(
         const symmetric_ciphers::   __aes_u8    key[], 
         symmetric_ciphers::         __aes_u8    expand_key[], 
-        const symmetric_ciphers::   __aes_u16   actual_key_len,
-        const symmetric_ciphers::   __aes_u16   expand_key_len
+        const size_t                            actual_key_len,
+        const size_t                            expand_key_len
     ) {
         /* Clear the expanded key output array & copy initial key */
         memset(expand_key, 0, expand_key_len);
@@ -232,7 +232,7 @@ namespace {
 
         /* Increment an offset to the current filled 
            position in the expanded key output array */
-        symmetric_ciphers::__aes_u8     cur_exp_key_offset = 0;
+        size_t cur_exp_key_offset = 0;
         cur_exp_key_offset += actual_key_len;
 
         for(symmetric_ciphers::__aes_u8 round_key_index = 1; \
@@ -276,7 +276,7 @@ namespace {
     }
 
     int __aes_key_scheduler(
-        symmetric_ciphers::         __aes_u8    round,
+        int                                     round,
         const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
         symmetric_ciphers::         __aes_u8    out[AES_WORD_SIZE]
     ) {
@@ -291,7 +291,7 @@ namespace {
             out[i] = AES_S_BOX[ out[i] ];
 
         /* XOR Round Constant to least significant byte */
-        if(round < sizeof(AES_RCON))
+        if(round < static_cast<int>(sizeof(AES_RCON)))
             out[0] ^= AES_RCON[round];
         else
             throw std::out_of_range("AES_RCON index out of range"); 
@@ -311,11 +311,11 @@ namespace {
     }
 
     void __aes_compute_remaining_words(
-        symmetric_ciphers::         __aes_u8    words_required,
+        int                                     words_required,
         symmetric_ciphers::         __aes_u8    exp_key[],
-        symmetric_ciphers::         __aes_u8   &exp_offset,
-        const symmetric_ciphers::   __aes_u16   exp_key_len,
-        const symmetric_ciphers::   __aes_u16   act_key_len  
+        size_t                                 &exp_offset,
+        const size_t                            exp_key_len,
+        const size_t                            act_key_len  
     ) {
         symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
         symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
@@ -337,9 +337,9 @@ namespace {
 
     void __aes_key_scheduler_4th_word(
         symmetric_ciphers::         __aes_u8    exp_key[],
-        symmetric_ciphers::         __aes_u8   &exp_offset,
-        const symmetric_ciphers::   __aes_u16   exp_key_len,
-        const symmetric_ciphers::   __aes_u16   act_key_len  
+        size_t                                 &exp_offset,
+        const size_t                            exp_key_len,
+        const size_t                            act_key_len  
     ) {
 
         symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
@@ -365,15 +365,16 @@ namespace {
     }
 
     void __aes_get_round_key_block(
-        symmetric_ciphers::         __aes_u8    round_count,
-        symmetric_ciphers::         __aes_u8    block_size,
+        int                                     round_count,
+        int                                     block_size,
         const symmetric_ciphers::   __aes_u8    exp_key[],
-        const symmetric_ciphers::   __aes_u16   exp_key_len,
+        size_t                                  exp_key_len,
         symmetric_ciphers::         __aes_u8    op_key[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
             for(int j = 0; \
-            (j < AES_WORD_SIZE) && ((round_count * block_size + ((j * 4) + i)) < exp_key_len); ++j) 
+            (j < AES_WORD_SIZE) && \
+            ((round_count * block_size + ((j * 4) + i)) < static_cast<int>(exp_key_len)); ++j) 
                 op_key[i][j] = exp_key[((round_count * block_size) + ((j * 4) + i))];
     }
 
