@@ -1,5 +1,16 @@
 ## Advanced Encryption Standard
 
+```
+
+           ______  _____ 
+     /\   |  ____|/ ____|
+    /  \  | |__  | (___  
+   / /\ \ |  __|  \___ \ 
+  / ____ \| |____ ____) |
+ /_/    \_\______|_____/ 
+                         
+```
+
 The Advanced Encryption Standard (AES), also known by its original name Rijndael is a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST).
 
 This implementation currently supports Electronic codebook mode with support for 128/192/256 bit keys.
