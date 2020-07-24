@@ -196,9 +196,9 @@ int symmetric_ciphers::AES::decrpyt(
     __aes_get_round_key_block(this->round_num, this->block_size, exp_key, this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
-    for(symmetric_ciphers::__aes_u8 i = (this->round_num - 1); i >= 0; --i) {
+    for(int i = (this->round_num - 1); i >= 0; --i) {
 
-        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_get_round_key_block((symmetric_ciphers::__aes_u8)i, this->block_size, exp_key, this->expanded_key_len, round_key);
         __aes_inv_shift_rows(cur_state);
         __aes_inv_substitue_bytes(cur_state);
         __aes_add_round_key(cur_state, round_key);

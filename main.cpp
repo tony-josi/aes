@@ -20,7 +20,7 @@ int main() {
     my_aes.decrpyt(my_op, my_key, my_plain);
 
     for(int i = 0; i < 16; ++i)
-        std::printf("%0x", my_plain[i]);
+        std::printf("%c", my_plain[i]);
     std::cout << std::endl;
 
     /* Test for constructor with 192 bits */
