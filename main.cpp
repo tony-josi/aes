@@ -5,7 +5,7 @@
 int main() {
     
     symmetric_ciphers::__aes_u8 my_key[] = "HELLO_THIS_XS_65";
-    symmetric_ciphers::__aes_u8 my_ip[] = "2234567812345678";
+    symmetric_ciphers::__aes_u8 my_ip[] = "**CHRIST_ALONE**"; //"2234567812345678";
     symmetric_ciphers::__aes_u8 my_op[17];
     symmetric_ciphers::__aes_u8 my_plain[17];
     
