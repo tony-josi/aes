@@ -420,7 +420,7 @@ namespace {
                 for(int j = 0; j < AES_WORD_SIZE; ++j)
                     t_row[j] = cur_state[i][j];
 
-                for(int j = (AES_WORD_SIZE - 1); j >= 0; ++j)
+                for(int j = (AES_WORD_SIZE - 1); j >= 0; --j)
                     cur_state[i][j] = t_row[ ((j + (AES_WORD_SIZE - i)) % AES_WORD_SIZE) ];
             }
         }
