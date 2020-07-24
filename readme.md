@@ -2,6 +2,8 @@
 
 The Advanced Encryption Standard (AES), also known by its original name Rijndael is a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST).
 
+
+
 ### High-level description of the algorithm
 1. `KeyExpansion` – round keys are derived from the cipher key using the AES key schedule. AES requires a separate 128-bit round key block for each round plus one more.
 2. Initial round key addition:
@@ -22,3 +24,5 @@ The Advanced Encryption Standard (AES), also known by its original name Rijndael
 #### To Do:
 * Use pointer based XOR operation instead of loop - individual bytes & XOR
 * Implement more API functions for encrypting larger chunks of data
+* Implement other encryption modes - Cipher block chaining, Output feedback, Counter modes
+* Implement algorithm for mix column & inverse mix column instead of lookup table for learning
