@@ -106,7 +106,7 @@ namespace {
 /* Constructor */
 symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 
-    this->block_size = 16;
+    this->block_size = AES_WORD_SIZE * AES_WORD_SIZE;
     switch(ks) {
     case key_size::AES_128:
         this->key_len_bits = 128;
@@ -233,7 +233,7 @@ int symmetric_ciphers::AES::encrpyt_ecb(
 
     symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE];
 
-    for(int ip_iter = 0; ip_iter < ip_size; ip_iter += this->block_size) {
+    for(int ip_iter = 0; static_cast<size_t>(ip_iter) < ip_size; ip_iter += this->block_size) {
 
         /* Transposition bytes to matrix form - column major */
         for(int i = 0; i < AES_WORD_SIZE; ++i)
