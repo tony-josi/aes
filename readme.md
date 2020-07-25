@@ -39,7 +39,7 @@ API provides 4 functions - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpy
 
 `encrpyt_block_ecb` & `decrpyt_block_ecb` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0).
 
-The library uses input data type as arrays of `__aes_u8`, which is a `typedef`ed to **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
+The library uses input data type as arrays of `__aes_u8`, which is a `typedef` to **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
 
 #### Example for 16 bytes encrypt/decrypt
 
@@ -91,7 +91,8 @@ int main() {
     AES aes256(AES_256);
     
     /* Input plain text */
-    __aes_u8 block_ip_test[128] = "And above all these put on love, which binds everything together in perfect harmony. [Colossians 3:14]"; 
+    __aes_u8 block_ip_test[128] = "And above all these put on love, "
+    "which binds everything together in perfect harmony. [Colossians 3:14]"; 
     
     /* 32 byte key array */
     __aes_u8 block_ip_test_key[32] {0};
