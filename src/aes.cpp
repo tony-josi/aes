@@ -214,6 +214,58 @@ int symmetric_ciphers::AES::decrpyt(
 
 }
 
+/* Function to encrypt unsigned char array using AES ECB */
+int symmetric_ciphers::AES::encrpyt_ecb(
+    const symmetric_ciphers::       __aes_u8    input[], 
+    const symmetric_ciphers::       __aes_u8    key[], 
+    symmetric_ciphers::             __aes_u8    output[], 
+    const size_t                                ip_size,
+    const size_t                                key_size
+    ) const {
+
+    if((ip_size % (AES_WORD_SIZE * AES_WORD_SIZE)) != 0)
+        throw std::invalid_argument("encrpyt_ecb() - argument ip_size should be 16 byte aligned");
+    if(key_size != this->actual_key_len)
+        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes depending on AES - 128/192/256 bit modes");
+
+    auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
+    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+
+    symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE];
+
+    for(int ip_iter = 0; ip_iter < ip_size; ip_iter += this->block_size) {
+
+        /* Transposition bytes to matrix form - column major */
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            for(int j = 0; j < AES_WORD_SIZE; ++j)
+                cur_state[i][j] = input[ (ip_iter * this->block_size) + (j * 4) + i ];
+
+        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+        __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_add_round_key(cur_state, round_key);
+
+        for(int i = 1; i <= this->round_num; ++i) {
+            __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+            __aes_substitue_bytes(cur_state);
+            __aes_shift_rows(cur_state);
+            if(i != this->round_num)
+                __aes_mix_columns(cur_state);
+            __aes_add_round_key(cur_state, round_key);
+            
+        }
+
+        /* Transposition bytes from matrix (column major) back to output array */
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            for(int j = 0; j < AES_WORD_SIZE; ++j)
+                output[ (ip_iter * this->block_size) + (j * 4) + i ] = cur_state[i][j];
+    
+    }
+
+    delete[] exp_key;
+    return 0;
+
+}
+
 
 namespace {
 

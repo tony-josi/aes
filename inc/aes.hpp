@@ -46,6 +46,12 @@ namespace symmetric_ciphers {
 
         /* Function to decrypt unsigned char array using AES */
         int decrpyt(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
+
+        /* Function to encrypt unsigned char array using AES ECB */
+        int encrpyt_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
+
+        /* Function to encrypt unsigned char array using AES ECB */
+        int decrpyt_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size) const;
     };
 
 } /* namespace symmetric_ciphers */
