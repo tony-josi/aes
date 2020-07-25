@@ -122,6 +122,5 @@ int main() {
 
 #### To Do:
 * Use pointer based XOR operation instead of loop - individual bytes & XOR
-* Implement more API functions for encrypting larger chunks of data
 * Implement other encryption modes - Cipher block chaining, Output feedback, Counter modes
 * Implement algorithm for mix column & inverse mix column instead of lookup table for learning
