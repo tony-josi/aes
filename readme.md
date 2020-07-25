@@ -29,7 +29,50 @@ This implementation currently supports Electronic codebook mode with support for
     3. `AddRoundKey`
 
 
-[src](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+[refer](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+
+## Usage
+
+API provides 4 functions - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpyt_block_ecb`, `decrpyt_block_ecb`. 
+
+`encrpyt_16bytes_ecb` & `decrpyt_16bytes_ecb` encrypts/decrypts 16 bytes of data.
+
+`encrpyt_block_ecb` & `decrpyt_block_ecb` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0).
+
+The library uses input data type as arrays of `__aes_u8` which is `typedef`ed to `uint8_t` - Unsigned Integer type with a width of exactly 8 bits.
+
+``` C++
+#include "inc/aes.hpp"
+
+using namespace symmetric_ciphers;
+
+int main() {
+
+    /* Input plain text */
+    __aes_u8 ip_text_128[16] = "testing aes 128";
+
+    /* 16 byte key */
+    __aes_u8 key_128[16] = "123456781234567";
+    
+    /* Arrays to hold cipher text and decrypted plain text */
+    __aes_u8 cipher_128[16];
+    __aes_u8 plain_128[16];
+
+    /* AES 128 bit key object creation */
+    AES aes128(AES_128);
+
+    /* Encrypt plain text (ip_text_128) to cipher_128 array */
+    aes128.encrpyt_16bytes_ecb(ip_text_128, key_128, cipher_128);
+
+    /* Decrypt cipher text (cipher_128) to plain_128 array */
+    aes128.decrpyt_16bytes_ecb(cipher_128, key_128, plain_128);
+
+    /* Display decrypted plain text */
+    for(size_t i = 0; i < sizeof(plain_128); ++i)
+        std::printf("%c", plain_128[i]);
+    std::cout << std::endl;
+}
+``` 
 
 **Note:** The project objective was more of a way to learn C++, hence the efficiency and security side of this AES implementation may not be perfect.
 
