@@ -133,7 +133,7 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 
 
 /* Function to encrypt unsigned char array using AES */
-int symmetric_ciphers::AES::encrpyt(
+int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     const symmetric_ciphers::   __aes_u8    input[], 
     const symmetric_ciphers::   __aes_u8    key[], 
     symmetric_ciphers::         __aes_u8    output[]
@@ -173,7 +173,7 @@ int symmetric_ciphers::AES::encrpyt(
 
 }
 
-int symmetric_ciphers::AES::decrpyt(
+int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     const symmetric_ciphers::       __aes_u8 input[], 
     const symmetric_ciphers::       __aes_u8 key[], 
     symmetric_ciphers::             __aes_u8 output[]
@@ -215,7 +215,7 @@ int symmetric_ciphers::AES::decrpyt(
 }
 
 /* Function to encrypt unsigned char array using AES ECB */
-int symmetric_ciphers::AES::encrpyt_ecb(
+int symmetric_ciphers::AES::encrpyt_block_ecb(
     const symmetric_ciphers::       __aes_u8    input[], 
     const symmetric_ciphers::       __aes_u8    key[], 
     symmetric_ciphers::             __aes_u8    output[], 
@@ -266,7 +266,7 @@ int symmetric_ciphers::AES::encrpyt_ecb(
 
 }
 
-int symmetric_ciphers::AES::decrpyt_ecb(
+int symmetric_ciphers::AES::decrpyt_block_ecb(
     const symmetric_ciphers::       __aes_u8    input[], 
     const symmetric_ciphers::       __aes_u8    key[], 
     symmetric_ciphers::             __aes_u8    output[], 
