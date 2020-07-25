@@ -13,71 +13,51 @@
 #include <iostream>
 #include <cstdio>
 
+using namespace symmetric_ciphers;
+
 int main() {
-    
-    symmetric_ciphers::__aes_u8 my_key[] = "HELLO_THIS_XS_65";
-    symmetric_ciphers::__aes_u8 my_ip[] = "IN_CHRIST_ALONE&"; //"2234567812345678";
-    symmetric_ciphers::__aes_u8 my_op[17];
-    symmetric_ciphers::__aes_u8 my_plain[17];
-    
-    /* Test for constructor with 128 bits */
-    symmetric_ciphers::AES my_aes(symmetric_ciphers::key_size::AES_128);
-    my_aes.encrpyt_16bytes_ecb(my_ip, my_key, my_op);
 
-    for(int i = 0; i < 16; ++i)
-        std::printf("%02X", my_op[i]);
+    __aes_u8 ip_text_128[16] = "testing aes 128";
+    __aes_u8 key_128[16] = "123456781234567";
+    __aes_u8 cipher_128[16];
+    __aes_u8 plain_128[16];
+    AES aes128(AES_128);
+    aes128.encrpyt_16bytes_ecb(ip_text_128, key_128,cipher_128);
+    aes128.decrpyt_16bytes_ecb(cipher_128, key_128, plain_128);
+    for(size_t i = 0; i < sizeof(plain_128); ++i)
+        std::printf("%c", plain_128[i]);
     std::cout << std::endl;
 
-    my_aes.decrpyt_16bytes_ecb(my_op, my_key, my_plain);
-
-    for(int i = 0; i < 16; ++i)
-        std::printf("%c", my_plain[i]);
+    __aes_u8 ip_text_192[16] = "testing aes 192";
+    __aes_u8 key_192[24] = "12345678123456781234567";
+    __aes_u8 cipher_192[16];
+    __aes_u8 plain_192[16];
+    AES aes192(AES_192);
+    aes192.encrpyt_16bytes_ecb(ip_text_192, key_192,cipher_192);
+    aes192.decrpyt_16bytes_ecb(cipher_192, key_192, plain_192);
+    for(size_t i = 0; i < sizeof(plain_192); ++i)
+        std::printf("%c", plain_192[i]);
     std::cout << std::endl;
 
-    /* Test for constructor with 192 bits */
-    symmetric_ciphers::__aes_u8 my_ip2[] = "IN_CHRIST_ALONE|"; 
-    symmetric_ciphers::AES my_aes_copy2(symmetric_ciphers::key_size::AES_192);
-    symmetric_ciphers::__aes_u8 my_key2[33] = "HELLO_THIS_XS_651234567";
-    my_aes_copy2.encrpyt_16bytes_ecb(my_ip2, my_key2, my_op);
-
-    for(int i = 0; i < 16; ++i)
-        std::printf("%02X", my_op[i]);
+    __aes_u8 ip_text_256[16] = "testing aes 256";
+    __aes_u8 key_256[32] = "1234567812345678123456781234567";
+    __aes_u8 cipher_256[16];
+    __aes_u8 plain_256[16];
+    AES aes256(AES_256);
+    aes256.encrpyt_16bytes_ecb(ip_text_256, key_256,cipher_256);
+    aes256.decrpyt_16bytes_ecb(cipher_256, key_256, plain_256);
+    for(size_t i = 0; i < sizeof(plain_256); ++i)
+        std::printf("%c", plain_256[i]);
     std::cout << std::endl;
 
-    my_aes_copy2.decrpyt_16bytes_ecb(my_op, my_key2, my_plain);
-    for(int i = 0; i < 16; ++i)
-        std::printf("%c", my_plain[i]);
-    std::cout << std::endl;
-
-    /* Test for constructor with 256 bits */
-    symmetric_ciphers::__aes_u8 my_ip3[] = "IN_CHRIST_ALONE#"; 
-    symmetric_ciphers::AES my_aes_copy3(symmetric_ciphers::key_size::AES_256);
-    symmetric_ciphers::__aes_u8 my_key3[33] = "12345678123456781234567812345678";
-    my_aes_copy3.encrpyt_16bytes_ecb(my_ip3, my_key3, my_op);
-
-    for(int i = 0; i < 16; ++i)
-        std::printf("%02X", my_op[i]);
-    std::cout << std::endl;
-
-    my_aes_copy3.decrpyt_16bytes_ecb(my_op, my_key3, my_plain);
-    for(int i = 0; i < 16; ++i)
-        std::printf("%c", my_plain[i]);
-    std::cout << std::endl;
-
-    symmetric_ciphers::__aes_u8 block_ip_test[128] = "What, then, shall we say in response to these things? If God is for us, who can be against us?"; 
-    symmetric_ciphers::AES my_aes_copy4(symmetric_ciphers::key_size::AES_256);
-    symmetric_ciphers::__aes_u8 block_ip_test_key[32] {0};
-    symmetric_ciphers::__aes_u8 block_op_test[128] {0};
-    symmetric_ciphers::__aes_u8 block_op_plain[128] {0};
+    __aes_u8 block_ip_test[128] = "What, then, shall we say in response to these things? If God is for us, who can be against us?"; 
+    __aes_u8 block_ip_test_key[32] {0};
+    __aes_u8 block_op_test[128] {0};
+    __aes_u8 block_op_plain[128] {0};
     char pass[] = "my_password1";
     memcpy(block_ip_test_key, pass, sizeof(pass));
-    my_aes_copy4.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
-
-    for(size_t i = 0; i < sizeof(block_ip_test); ++i)
-        std::printf("%02X", block_op_test[i]);
-    std::cout << std::endl;
-
-    my_aes_copy4.decrpyt_block_ecb(block_op_test, block_ip_test_key, block_op_plain, sizeof(block_op_test), sizeof(block_ip_test_key));
+    aes256.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
+    aes256.decrpyt_block_ecb(block_op_test, block_ip_test_key, block_op_plain, sizeof(block_op_test), sizeof(block_ip_test_key));
     for(size_t i = 0; i < sizeof(block_ip_test); ++i)
         std::printf("%c", block_op_plain[i]);
     std::cout << std::endl;
