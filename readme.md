@@ -39,7 +39,9 @@ API provides 4 functions - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpy
 
 `encrpyt_block_ecb` & `decrpyt_block_ecb` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0).
 
-The library uses input data type as arrays of `__aes_u8` which is `typedef`ed to `uint8_t` - Unsigned Integer type with a width of exactly 8 bits.
+The library uses input data type as arrays of `__aes_u8`, which is a `typedef`ed to **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
+
+#### Example for 16 bytes encrypt/decrypt
 
 ``` C++
 #include "inc/aes.hpp"
@@ -71,8 +73,49 @@ int main() {
     for(size_t i = 0; i < sizeof(plain_128); ++i)
         std::printf("%c", plain_128[i]);
     std::cout << std::endl;
+
+    return 0;
 }
 ``` 
+
+#### Example for block data encrypt/decrypt
+
+``` C++
+#include "inc/aes.hpp"
+
+using namespace symmetric_ciphers;
+
+int main() {
+    
+    /* AES 256 bit key object creation */
+    AES aes256(AES_256);
+    
+    /* Input plain text */
+    __aes_u8 block_ip_test[128] = "And above all these put on love, which binds everything together in perfect harmony. [Colossians 3:14]"; 
+    
+    /* 32 byte key array */
+    __aes_u8 block_ip_test_key[32] {0};
+    char pass[] = "my_password1";
+    memcpy(block_ip_test_key, pass, sizeof(pass));
+
+    /* Arrays to hold cipher text and decrypted plain text */
+    __aes_u8 block_op_test[128] {0};
+    __aes_u8 block_op_plain[128] {0};
+
+    /* Encrypt plain text (block_ip_test) to block_op_test array */
+    aes256.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
+    
+    /* Decrypt cipher text (block_op_test) to block_op_plain array */
+    aes256.decrpyt_block_ecb(block_op_test, block_ip_test_key, block_op_plain, sizeof(block_op_test), sizeof(block_ip_test_key));
+    
+    /* Display decrypted plain text */
+    for(size_t i = 0; i < sizeof(block_ip_test); ++i)
+        std::printf("%c", block_op_plain[i]);
+    std::cout << std::endl;
+
+    return 0;
+}
+```
 
 **Note:** The project objective was more of a way to learn C++, hence the efficiency and security side of this AES implementation may not be perfect.
 
