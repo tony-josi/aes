@@ -49,6 +49,18 @@ namespace {
         const symmetric_ciphers::   __aes_u8    operand[AES_WORD_SIZE]
     );
 
+    inline void __aes_transposition(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        const symmetric_ciphers::   __aes_u8    ip[],
+        const int                               offset
+    );
+
+    inline void __aes_rev_transposition(
+        const symmetric_ciphers::   __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8    op[],
+        const int                               offset
+    );
+
     void __aes_compute_remaining_words(
         int                                     words_required,
         symmetric_ciphers::         __aes_u8    exp_key[],
@@ -145,9 +157,7 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     symmetric_ciphers::__aes_u8 cur_state[4][4];
 
     /* Transposition bytes to matrix form - column major */
-    for(int i = 0; i < AES_WORD_SIZE; ++i)
-        for(int j = 0; j < AES_WORD_SIZE; ++j)
-            cur_state[i][j] = input[(j * 4) + i];
+    __aes_transposition(cur_state, input, 0);
 
     symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
     __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
@@ -164,9 +174,7 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     }
 
     /* Transposition bytes from matrix (column major) back to output array */
-    for(int i = 0; i < AES_WORD_SIZE; ++i)
-        for(int j = 0; j < AES_WORD_SIZE; ++j)
-            output[(j * 4) + i] = cur_state[i][j];
+    __aes_rev_transposition(cur_state, output, 0);
 
     delete[] exp_key;
     return 0;
@@ -185,9 +193,7 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     symmetric_ciphers::__aes_u8 cur_state[4][4];
 
     /* Transposition bytes to matrix form - column major */
-    for(int i = 0; i < AES_WORD_SIZE; ++i)
-        for(int j = 0; j < AES_WORD_SIZE; ++j)
-            cur_state[i][j] = input[(j * 4) + i];
+    __aes_transposition(cur_state, input, 0);
     
     symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
     __aes_get_round_key_block(this->round_num, this->block_size, exp_key, this->expanded_key_len, round_key);
@@ -205,9 +211,7 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     }
 
     /* Transposition bytes from matrix (column major) back to output array */
-    for(int i = 0; i < AES_WORD_SIZE; ++i)
-        for(int j = 0; j < AES_WORD_SIZE; ++j)
-            output[(j * 4) + i] = cur_state[i][j];
+    __aes_rev_transposition(cur_state, output, 0);
 
     delete[] exp_key;
     return 0;
@@ -236,9 +240,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
         symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE];
 
         /* Transposition bytes to matrix form - column major */
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; j < AES_WORD_SIZE; ++j)
-                cur_state[i][j] = input[ (ip_iter * this->block_size) + (j * 4) + i ];
+        __aes_transposition(cur_state, input, (ip_iter * this->block_size));
 
         symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
         __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
@@ -255,9 +257,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
         }
 
         /* Transposition bytes from matrix (column major) back to output array */
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; j < AES_WORD_SIZE; ++j)
-                output[ (ip_iter * this->block_size) + (j * 4) + i ] = cur_state[i][j];
+        __aes_rev_transposition(cur_state, output, (ip_iter * this->block_size));
     
     }
 
@@ -287,9 +287,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
         symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE];
 
         /* Transposition bytes to matrix form - column major */
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; j < AES_WORD_SIZE; ++j)
-                cur_state[i][j] = input[ (ip_iter * this->block_size) + (j * 4) + i ];
+        __aes_transposition(cur_state, input, (ip_iter * this->block_size));
         
         symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
         __aes_get_round_key_block(this->round_num, this->block_size, exp_key, this->expanded_key_len, round_key);
@@ -307,9 +305,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
         }
 
         /* Transposition bytes from matrix (column major) back to output array */
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; j < AES_WORD_SIZE; ++j)
-                output[ (ip_iter * this->block_size) + (j * 4) + i ] = cur_state[i][j];
+        __aes_rev_transposition(cur_state, output, (ip_iter * this->block_size));
 
     }
 
@@ -408,6 +404,30 @@ namespace {
 
         for(int i = 0; i < AES_WORD_SIZE; ++i) 
             target[i] ^= operand[i];
+
+    }
+
+    inline void __aes_transposition(
+        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        const symmetric_ciphers::   __aes_u8    ip[],
+        const int                               offset
+    ) {
+        /* Transposition bytes to matrix form - column major */
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            for(int j = 0; j < AES_WORD_SIZE; ++j)
+                cur_state[i][j] = ip[ offset + (j * 4) + i ];
+
+    }
+
+    inline void __aes_rev_transposition(
+        const symmetric_ciphers::   __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        symmetric_ciphers::         __aes_u8    op[],
+        const int                               offset
+    ) {
+        /* Transposition bytes from matrix (column major) back to output array */
+        for(int i = 0; i < AES_WORD_SIZE; ++i)
+            for(int j = 0; j < AES_WORD_SIZE; ++j)
+                op[ offset + (j * 4) + i ] = cur_state[i][j];
 
     }
 
