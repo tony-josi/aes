@@ -231,9 +231,9 @@ int symmetric_ciphers::AES::encrpyt_ecb(
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
     __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
 
-    symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE];
+    for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
-    for(int ip_iter = 0; static_cast<size_t>(ip_iter) < ip_size; ip_iter += this->block_size) {
+        symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE];
 
         /* Transposition bytes to matrix form - column major */
         for(int i = 0; i < AES_WORD_SIZE; ++i)

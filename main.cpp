@@ -64,6 +64,17 @@ int main() {
         std::printf("%c", my_plain[i]);
     std::cout << std::endl;
 
+    symmetric_ciphers::__aes_u8 block_ip_test[128] = "What, then, shall we say in response to these things? If God is for us, who can be against us?"; 
+    symmetric_ciphers::AES my_aes_copy4(symmetric_ciphers::key_size::AES_256);
+    symmetric_ciphers::__aes_u8 block_ip_test_key[32] {0};
+    symmetric_ciphers::__aes_u8 block_op_test[128] {0};
+    strcpy((char *)block_ip_test_key, "my_password");
+    my_aes_copy4.encrpyt_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
+
+    for(size_t i = 0; i < sizeof(block_ip_test); ++i)
+        std::printf("%02X", block_op_test[i]);
+    std::cout << std::endl;
+
 #if 0
     /* Test for copy constructor & copy assignment with 128 bits */
     symmetric_ciphers::AES my_aes_copy_cons(my_aes);
