@@ -28,7 +28,6 @@ This implementation currently supports Electronic codebook mode with support for
     2. `ShiftRows`
     3. `AddRoundKey`
 
-
 [refer](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 
 ## Usage
@@ -39,7 +38,7 @@ API provides 4 functions - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpy
 
 `encrpyt_block_ecb` & `decrpyt_block_ecb` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0).
 
-The library uses input data type as arrays of `__aes_u8`, which is a `typedef` to **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
+The library uses input data type as arrays of type `__aes_u8`, which is a `typedef` to **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
 
 #### Example for 16 bytes encrypt/decrypt
 
@@ -117,8 +116,6 @@ int main() {
     return 0;
 }
 ```
-
-**Note:** The project objective was more of a way to learn C++, hence the efficiency and security side of this AES implementation may not be perfect.
 
 #### To Do:
 * Use pointer based XOR operation instead of loop - individual bytes & XOR
