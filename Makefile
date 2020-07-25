@@ -22,7 +22,7 @@ CXXFLAGS = -std=c++11 -Ofast -ggdb3 -pedantic -Wall -Wextra -Wcast-align -Wcast-
 -Wlong-long \
 -Wmissing-field-initializers -Wmissing-format-attribute   \
 -Wmissing-include-dirs -Wmissing-noreturn \
--Wpacked  -Wpadded -Wpointer-arith \
+-Wpacked -Wpointer-arith \
 -Wredundant-decls \
 -Wshadow -Wstack-protector \
 -Wstrict-aliasing=2 -Wswitch-default \

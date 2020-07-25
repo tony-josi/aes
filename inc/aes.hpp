@@ -14,6 +14,7 @@
 #define _AES_MAIN_HEADER_TJ__
 
 #include <cstdint>
+#include <cstdio>
 
 namespace symmetric_ciphers {
 
@@ -30,11 +31,11 @@ namespace symmetric_ciphers {
     class AES {
 
     private:
-        __aes_u16   key_len_bits;                    /* Stores the length of the Key used in AES */
-        __aes_u16   actual_key_len;                  /* Stores the actual length of key in bytes */
-        __aes_u16   expanded_key_len;                /* Stores the expanded length of key in bytes */
-        __aes_u8    block_size;                      /* Size of the data block used */
-        __aes_u8    round_num;                       /* Number of rounds performed */
+        size_t       actual_key_len;                  /* Stores the actual length of key in bytes */
+        size_t       expanded_key_len;                /* Stores the expanded length of key in bytes */
+        int          key_len_bits;                    /* Stores the length of the Key used in AES */
+        int          block_size;                      /* Size of the data block used */
+        int          round_num;                       /* Number of rounds performed */
 
     public:
         /* Constructor */
