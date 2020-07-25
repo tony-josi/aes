@@ -51,7 +51,7 @@ namespace symmetric_ciphers {
         int encrpyt_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
 
         /* Function to encrypt unsigned char array using AES ECB */
-        int decrpyt_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size) const;
+        int decrpyt_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
     };
 
 } /* namespace symmetric_ciphers */
