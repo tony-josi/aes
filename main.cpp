@@ -50,7 +50,7 @@ int main() {
         std::printf("%c", plain_256[i]);
     std::cout << std::endl;
 
-    __aes_u8 block_ip_test[128] = "What, then, shall we say in response to these things? If God is for us, who can be against us?"; 
+    __aes_u8 block_ip_test[128] = "And above all these put on love, which binds everything together in perfect harmony. [Colossians 3:14]"; 
     __aes_u8 block_ip_test_key[32] {0};
     __aes_u8 block_op_test[128] {0};
     __aes_u8 block_op_plain[128] {0};
