@@ -38,19 +38,33 @@ namespace symmetric_ciphers {
         int          round_num;                       /* Number of rounds performed */
 
     public:
-        /* Constructor */
+        /**
+         * @brief  Constructor
+         */
         AES(key_size ks);
 
-        /* Function to encrypt unsigned char array of size 16 bytes using AES ECB mode*/
+        /**
+         * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
         int encrpyt_16bytes_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
 
-        /* Function to decrypt unsigned char array of size 16 bytes using AES ECB mode */
+        /**
+         * @brief  Function to decrypt 16 bytes of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
         int decrpyt_16bytes_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
 
-        /* Function to encrypt unsigned char array using AES ECB mode */
+        /**
+         * @brief  Function to encrypt given block of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
         int encrpyt_block_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
 
-        /* Function to encrypt unsigned char array using AES ECB mode */
+        /**
+         * @brief  Function to decrypt given block of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
         int decrpyt_block_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
     };
 
