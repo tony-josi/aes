@@ -156,7 +156,7 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 
 /**
   * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
-  *         using AES.
+  *         using AES ECB.
   * 
   * @param  [in]  input      Input plain text array.
   * @param  [in]  key        AES Key for encryption.
@@ -212,7 +212,7 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
 
 /**
   * @brief  Function to decrypt 16 bytes of unsigned integer 8 bit type
-  *         using AES.
+  *         using AES ECB.
   * 
   * @param  [in]  input      Input plain text array.
   * @param  [in]  key        AES Key for encryption.
@@ -266,7 +266,26 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
 
 }
 
-/* Function to encrypt unsigned char array using AES ECB */
+
+/**
+  * @brief  Function to encrypt given block of unsigned integer 8 bit type
+  *         using AES ECB.
+  * 
+  * @param  [in]  input      Input plain text array.
+  * @param  [in]  key        AES Key for encryption.
+  * @param  [out] output     Output cipher text array.
+  * @param  [in]  ip_size    Input plain text array size.
+  * @param  [in]  key_size   Key array size.
+  * 
+  * @note   This method encrypts the given plain text input array of using
+  *         the given #key and outputs it to the output cipher text array.
+  * 
+  * @note   The input & output array should be of same size and should be 16 byte 
+  *         aligned, ie. ip_size % 16 == 0.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
 int symmetric_ciphers::AES::encrpyt_block_ecb(
     const symmetric_ciphers::       __aes_u8    input[], 
     const symmetric_ciphers::       __aes_u8    key[], 
@@ -321,6 +340,26 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
 
 }
 
+
+/**
+  * @brief  Function to decrypt given block of unsigned integer 8 bit type
+  *         using AES ECB.
+  * 
+  * @param  [in]  input      Input cipher text array.
+  * @param  [in]  key        AES Key for encryption.
+  * @param  [out] output     Output plain text array.
+  * @param  [in]  ip_size    Input cipher text array size.
+  * @param  [in]  key_size   Key array size.
+  * 
+  * @note   This method decrypts the given cipher text input array of using
+  *         the given #key and outputs it to the output plain text array.
+  * 
+  * @note   The input & output array should be of same size and should be 16 byte 
+  *         aligned, ie. ip_size % 16 == 0.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
 int symmetric_ciphers::AES::decrpyt_block_ecb(
     const symmetric_ciphers::       __aes_u8    input[], 
     const symmetric_ciphers::       __aes_u8    key[], 
@@ -372,7 +411,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     delete[] exp_key;
     return 0;
     
-    }
+}
 
 
 namespace {
