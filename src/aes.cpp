@@ -301,7 +301,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
     __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
 
-    /* Loop through the input plain text array, processing 16 bytes of data every loop */
+    /* Loop through the input cipher text array, processing 16 bytes of data every loop */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
         /* 2D - Array (matrix) to hold the current round state */
