@@ -115,7 +115,17 @@ namespace {
 
 } /* End of anonymous namespace */
 
-/* Constructor */
+/**
+  * @brief  Constructor
+  * 
+  * @param  [in] ks      Preferred key size, the argument should be a member of the enum
+  *                      #key_size. 
+  * 
+  * @note   The constructor method initialises the class private variables with default values
+  *         depending on the #key_size argument.
+  *         
+  * @retval None
+  */
 symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 
     this->block_size = AES_WORD_SIZE * AES_WORD_SIZE;
@@ -144,7 +154,20 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
 }
 
 
-/* Function to encrypt unsigned char array using AES */
+/**
+  * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
+  *         using AES.
+  * 
+  * @param  [in]  input      Input plain text array.
+  * @param  [in]  key        AES Key for encryption.
+  * @param  [out] output     Output cipher text array.
+  * 
+  * @note   This method encrypts the given plain text array of size 16 bytes using
+  *         the given #key and outputs it to the output cipher text array.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
 int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     const symmetric_ciphers::   __aes_u8    input[], 
     const symmetric_ciphers::   __aes_u8    key[], 
@@ -186,6 +209,21 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
 
 }
 
+
+/**
+  * @brief  Function to decrypt 16 bytes of unsigned integer 8 bit type
+  *         using AES.
+  * 
+  * @param  [in]  input      Input plain text array.
+  * @param  [in]  key        AES Key for encryption.
+  * @param  [out] output     Output cipher text array.
+  * 
+  * @note   This method decrypts the given cipher text input array of size 16 bytes using
+  *         the given #key and outputs it to the output plain text array.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
 int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     const symmetric_ciphers::       __aes_u8 input[], 
     const symmetric_ciphers::       __aes_u8 key[], 
