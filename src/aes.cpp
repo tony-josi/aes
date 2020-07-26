@@ -23,7 +23,7 @@ namespace {
     constexpr   symmetric_ciphers::__aes_u8     AES_WORD_SIZE = 4;
 
 
-    /* Forward declarations Lookup tables */
+    /* Forward declarations for Lookup tables */
 
     extern      symmetric_ciphers::__aes_u8     AES_S_BOX[256];
     extern      symmetric_ciphers::__aes_u8     AES_INV_S_BOX[256];
@@ -129,8 +129,8 @@ namespace {
   * @param  [in] ks      Preferred key size, the argument should be a member of the enum
   *                      #key_size. 
   * 
-  * @note   The constructor method initialises the class private variables with default values
-  *         depending on the #key_size argument.
+  * @note   The constructor method initialises the class private variables with 
+  *         default values depending on the #key_size argument.
   *         
   * @retval None
   */
@@ -306,7 +306,8 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
     if((ip_size % (AES_WORD_SIZE * AES_WORD_SIZE)) != 0)
         throw std::invalid_argument("encrpyt_ecb() - argument ip_size should be 16 byte aligned");
     if(key_size != this->actual_key_len)
-        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes depending on AES - 128/192/256 bit modes");
+        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes");
 
     /* Expand keys to exp_key[] */
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
@@ -380,7 +381,8 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     if((ip_size % (AES_WORD_SIZE * AES_WORD_SIZE)) != 0)
         throw std::invalid_argument("encrpyt_ecb() - argument ip_size should be 16 byte aligned");
     if(key_size != this->actual_key_len)
-        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes depending on AES - 128/192/256 bit modes");
+        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes");
 
     /* Expand keys to exp_key[] */
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
