@@ -18,6 +18,13 @@
 
 namespace {
 
+    /* AES Word size */
+
+    constexpr   symmetric_ciphers::__aes_u8     AES_WORD_SIZE = 4;
+
+
+    /* Forward declarations Lookup tables */
+
     extern      symmetric_ciphers::__aes_u8     AES_S_BOX[256];
     extern      symmetric_ciphers::__aes_u8     AES_INV_S_BOX[256];
     extern      symmetric_ciphers::__aes_u8     MUL_2[256];
@@ -27,7 +34,7 @@ namespace {
     extern      symmetric_ciphers::__aes_u8     MUL_13[256];
     extern      symmetric_ciphers::__aes_u8     MUL_14[256];
     extern      symmetric_ciphers::__aes_u8     AES_RCON[11];
-    constexpr   symmetric_ciphers::__aes_u8     AES_WORD_SIZE = 4;
+
 
     /* Forward declarations for helper functions */
 
@@ -114,6 +121,7 @@ namespace {
     );
 
 } /* End of anonymous namespace */
+
 
 /**
   * @brief  Constructor
