@@ -38,6 +38,8 @@ This implementation currently supports Electronic codebook mode with support for
 
 ``` sh
 git clone git@github.com:TonyJosi97/aes.git
+OR
+git clone https://github.com/TonyJosi97/aes.git
 ```
 
 2. Build project
