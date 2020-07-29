@@ -35,7 +35,11 @@ set (CMAKE_CXX_FLAGS "-Ofast -ggdb3 -pedantic -Wall -Wextra -Wcast-align -Wcast-
 -Wwrite-strings")
 
 include_directories(inc)
+add_subdirectory(src)
 
-file(GLOB SOURCES "src/*.cpp" "*.cpp")
+set(SOURCES test_main.cpp)
 
+# add_library(aes_exe STATIC ${SOURCES})
 add_executable(aes_exe ${SOURCES})
+
+target_link_libraries(aes_exe aes_lib)
