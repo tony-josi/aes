@@ -38,7 +38,9 @@ This implementation currently supports Electronic codebook mode with support for
 
 ``` sh
 git clone git@github.com:TonyJosi97/aes.git
+```
 OR
+``` sh
 git clone https://github.com/TonyJosi97/aes.git
 ```
 
