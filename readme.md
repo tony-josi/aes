@@ -34,6 +34,8 @@ This implementation currently supports Electronic codebook mode with support for
 
 ### Build & Run
 
+Requires [cmake](https://cmake.org/) to build.
+
 1. Clone
 
 ``` sh
