@@ -32,7 +32,33 @@ This implementation currently supports Electronic codebook mode with support for
 
 ## Usage
 
-API provides 4 functions - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpyt_block_ecb`, `decrpyt_block_ecb`. 
+### Build & Run
+
+1. Clone
+
+``` sh
+git clone git@github.com:TonyJosi97/aes.git
+```
+
+2. Build project
+
+``` sh
+cd aes
+mkdir build
+cd build
+cmake ..
+make
+```
+
+3. Run
+
+``` sh
+./aes_exe
+```
+
+### AES Methods
+
+AES Class provides 4 methods - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpyt_block_ecb`, `decrpyt_block_ecb`. 
 
 `encrpyt_16bytes_ecb` & `decrpyt_16bytes_ecb` encrypts/decrypts 16 bytes of data.
 
