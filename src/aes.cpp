@@ -304,10 +304,10 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
 
     /* Check whether the given arguments are of required size */
     if((ip_size % (AES_WORD_SIZE * AES_WORD_SIZE)) != 0)
-        throw std::invalid_argument("encrpyt_ecb() - argument ip_size should be 16 byte aligned");
+        throw std::invalid_argument("encrpyt_block_ecb() - argument ip_size should be 16 byte aligned");
     if(key_size != this->actual_key_len)
-        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes "
-        "depending on AES - 128/192/256 bit modes");
+        throw std::invalid_argument("encrpyt_block_ecb() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes used");
 
     /* Expand keys to exp_key[] */
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
@@ -379,10 +379,10 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
 
     /* Check whether the given arguments are of required size */
     if((ip_size % (AES_WORD_SIZE * AES_WORD_SIZE)) != 0)
-        throw std::invalid_argument("encrpyt_ecb() - argument ip_size should be 16 byte aligned");
+        throw std::invalid_argument("decrpyt_block_ecb() - argument ip_size should be 16 byte aligned");
     if(key_size != this->actual_key_len)
-        throw std::invalid_argument("encrpyt_ecb() - key size should be 16/24/32 bytes "
-        "depending on AES - 128/192/256 bit modes");
+        throw std::invalid_argument("decrpyt_block_ecb() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes used");
 
     /* Expand keys to exp_key[] */
     auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
