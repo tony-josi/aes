@@ -63,5 +63,21 @@ int main() {
         std::printf("%c", block_op_plain[i]);
     std::cout << std::endl;
 
+    AES copy_aes256(aes256);        /* testing default copy constructor */
+    memcpy(block_ip_test_key, pass, sizeof(pass));
+    copy_aes256.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
+    copy_aes256.decrpyt_block_ecb(block_op_test, block_ip_test_key, block_op_plain, sizeof(block_op_test), sizeof(block_ip_test_key));
+    for(size_t i = 0; i < sizeof(block_ip_test); ++i)
+        std::printf("%c", block_op_plain[i]);
+    std::cout << std::endl;
+
+    aes192 = copy_aes256;           /* testing default copy assignment constructor */
+    memcpy(block_ip_test_key, pass, sizeof(pass));
+    aes192.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
+    aes192.decrpyt_block_ecb(block_op_test, block_ip_test_key, block_op_plain, sizeof(block_op_test), sizeof(block_ip_test_key));
+    for(size_t i = 0; i < sizeof(block_ip_test); ++i)
+        std::printf("%c", block_op_plain[i]);
+    std::cout << std::endl;
+
     return 0;
 }
