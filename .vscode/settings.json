@@ -22,6 +22,7 @@
         "*.tcc": "cpp",
         "string": "cpp",
         "unordered_map": "cpp",
-        "cstdio": "cpp"
+        "cstdio": "cpp",
+        "cstring": "cpp"
     }
 }

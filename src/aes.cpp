@@ -15,6 +15,7 @@
 #include <string>
 #include <algorithm>
 #include <cstring>
+#include <memory>
 
 namespace {
 

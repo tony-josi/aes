@@ -12,6 +12,7 @@
 #include "inc/aes.hpp"
 #include <iostream>
 #include <cstdio>
+#include <cstring>
 
 using namespace symmetric_ciphers;
 
