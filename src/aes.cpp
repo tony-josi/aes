@@ -183,8 +183,8 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
 ) const {
 
     /* Expand keys to exp_key[] */
-    auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
-    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* 2D - Array (matrix) to hold the current round state */
     symmetric_ciphers::__aes_u8 cur_state[4][4];
@@ -194,12 +194,12 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
 
     /* Initial round key addition */
     symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
-    __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
+    __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
     /* Remaining rounds of aes */
     for(int i = 1; i <= this->round_num; ++i) {
-        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_substitue_bytes(cur_state);
         __aes_shift_rows(cur_state);
         /* Mix column is not performed for last round */
@@ -212,7 +212,6 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     /* Transposition bytes from matrix (column major) back to output array */
     __aes_rev_transposition(cur_state, output, 0);
 
-    delete[] exp_key;
     return 0;
 
 }
@@ -239,8 +238,8 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     ) const {
 
     /* Expand keys to exp_key[] */
-    auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
-    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* 2D - Array (matrix) to hold the current round state */
     symmetric_ciphers::__aes_u8 cur_state[4][4];
@@ -250,13 +249,13 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     
     /* Initial round key addition */
     symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
-    __aes_get_round_key_block(this->round_num, this->block_size, exp_key, this->expanded_key_len, round_key);
+    __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
     /* Remaining rounds of aes */
     for(int i = (this->round_num - 1); i >= 0; --i) {
 
-        __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_inv_shift_rows(cur_state);
         __aes_inv_substitue_bytes(cur_state);
         __aes_add_round_key(cur_state, round_key);
@@ -269,7 +268,6 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     /* Transposition bytes from matrix (column major) back to output array */
     __aes_rev_transposition(cur_state, output, 0);
 
-    delete[] exp_key;
     return 0;
 
 }
@@ -310,8 +308,8 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
         "depending on AES - 128/192/256 bit modes used");
 
     /* Expand keys to exp_key[] */
-    auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
-    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input plain text array, processing 16 bytes of data every iteration */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
@@ -324,12 +322,12 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
 
         /* Initial round key addition */
         symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
-        __aes_get_round_key_block(0, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_add_round_key(cur_state, round_key);
 
         /* Remaining rounds of aes */
         for(int i = 1; i <= this->round_num; ++i) {
-            __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+            __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
             __aes_substitue_bytes(cur_state);
             __aes_shift_rows(cur_state);
             /* Mix column is not performed for last round */
@@ -344,7 +342,6 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
     
     }
 
-    delete[] exp_key;
     return 0;
 
 }
@@ -385,8 +382,8 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
         "depending on AES - 128/192/256 bit modes used");
 
     /* Expand keys to exp_key[] */
-    auto *exp_key = new symmetric_ciphers::__aes_u8[this->expanded_key_len];
-    __aes_expand_key(key, exp_key, this->actual_key_len, this->expanded_key_len);
+    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input cipher text array, processing 16 bytes of data every iteration */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
@@ -399,12 +396,12 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
         
         /* Initial round key addition */
         symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
-        __aes_get_round_key_block(this->round_num, this->block_size, exp_key, this->expanded_key_len, round_key);
+        __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_add_round_key(cur_state, round_key);
 
         /* Remaining rounds of aes */
         for(int i = (this->round_num - 1); i >= 0; --i) {
-            __aes_get_round_key_block(i, this->block_size, exp_key, this->expanded_key_len, round_key);
+            __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
             __aes_inv_shift_rows(cur_state);
             __aes_inv_substitue_bytes(cur_state);
             __aes_add_round_key(cur_state, round_key);
@@ -418,7 +415,6 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
 
     }
 
-    delete[] exp_key;
     return 0;
     
 }
