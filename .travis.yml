@@ -7,9 +7,9 @@ addons:
     sources:
     - llvm-toolchain-precise-3.8
     packages:
-    - clang-11.0
+    - clang-3.8
 install:
-- "[ $CXX = clang++ ] && export CXX=clang++-11.0 || true"
+- "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 script:
   - cmake .
   - make
