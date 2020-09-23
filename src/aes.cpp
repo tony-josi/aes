@@ -194,7 +194,7 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     __aes_transposition(cur_state, input, 0);
 
     /* Initial round key addition */
-    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
     __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
@@ -249,7 +249,7 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     __aes_transposition(cur_state, input, 0);
     
     /* Initial round key addition */
-    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
     __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
@@ -322,7 +322,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
         __aes_transposition(cur_state, input, (ip_iter * this->block_size));
 
         /* Initial round key addition */
-        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
         __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_add_round_key(cur_state, round_key);
 
@@ -396,7 +396,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
         __aes_transposition(cur_state, input, (ip_iter * this->block_size));
         
         /* Initial round key addition */
-        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE];
+        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
         __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_add_round_key(cur_state, round_key);
 
