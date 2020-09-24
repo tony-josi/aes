@@ -183,6 +183,8 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     uint8_t             output[]
 ) const {
 
+    int ret_code = 0;
+
     /* Expand keys to exp_key[] */
     std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
@@ -213,7 +215,7 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     /* Transposition bytes from matrix (column major) back to output array */
     __aes_rev_transposition(cur_state, output, 0);
 
-    return 0;
+    return ret_code;
 
 }
 
