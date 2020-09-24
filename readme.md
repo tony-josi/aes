@@ -74,7 +74,7 @@ AES Class provides 4 methods - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `en
 
 `encrpyt_block_ecb` & `decrpyt_block_ecb` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0).
 
-The library uses input data type as arrays of type `__aes_u8`, which is a `typedef` to **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
+The library uses input data type as arrays of type **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
 
 #### Example for 16 bytes encrypt/decrypt
 
@@ -86,14 +86,14 @@ using namespace symmetric_ciphers;
 int main() {
 
     /* Input plain text */
-    __aes_u8 ip_text_128[16] = "testing aes 128";
+    uint8_t ip_text_128[16] = "testing aes 128";
 
     /* 16 byte key */
-    __aes_u8 key_128[16] = "123456781234567";
+    uint8_t key_128[16] = "123456781234567";
     
     /* Arrays to hold cipher text and decrypted plain text */
-    __aes_u8 cipher_128[16];
-    __aes_u8 plain_128[16];
+    uint8_t cipher_128[16];
+    uint8_t plain_128[16];
 
     /* AES 128 bit key object creation */
     AES aes128(AES_128);
@@ -126,17 +126,17 @@ int main() {
     AES aes256(AES_256);
     
     /* Input plain text */
-    __aes_u8 block_ip_test[128] = "And above all these put on love, "
+    uint8_t block_ip_test[128] = "And above all these put on love, "
     "which binds everything together in perfect harmony. [Colossians 3:14]"; 
     
     /* 32 byte key array */
-    __aes_u8 block_ip_test_key[32] {0};
+    uint8_t block_ip_test_key[32] {0};
     char pass[] = "my_password1";
     memcpy(block_ip_test_key, pass, sizeof(pass));
 
     /* Arrays to hold cipher text and decrypted plain text */
-    __aes_u8 block_op_test[128] {0};
-    __aes_u8 block_op_plain[128] {0};
+    uint8_t block_op_test[128] {0};
+    uint8_t block_op_plain[128] {0};
 
     /* Encrypt plain text (block_ip_test) to block_op_test array */
     aes256.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));
