@@ -18,10 +18,10 @@ using namespace symmetric_ciphers;
 
 int main() {
 
-    __aes_u8 ip_text_128[16] = "testing aes 128";
-    __aes_u8 key_128[16] = "123456781234567";
-    __aes_u8 cipher_128[16];
-    __aes_u8 plain_128[16];
+    uint8_t ip_text_128[16] = "testing aes 128";
+    uint8_t key_128[16] = "123456781234567";
+    uint8_t cipher_128[16];
+    uint8_t plain_128[16];
     AES aes128(AES_128);
     aes128.encrpyt_16bytes_ecb(ip_text_128, key_128,cipher_128);
     aes128.decrpyt_16bytes_ecb(cipher_128, key_128, plain_128);
@@ -29,10 +29,10 @@ int main() {
         std::printf("%c", plain_128[i]);
     std::cout << std::endl;
 
-    __aes_u8 ip_text_192[16] = "testing aes 192";
-    __aes_u8 key_192[24] = "12345678123456781234567";
-    __aes_u8 cipher_192[16];
-    __aes_u8 plain_192[16];
+    uint8_t ip_text_192[16] = "testing aes 192";
+    uint8_t key_192[24] = "12345678123456781234567";
+    uint8_t cipher_192[16];
+    uint8_t plain_192[16];
     AES aes192(AES_192);
     aes192.encrpyt_16bytes_ecb(ip_text_192, key_192,cipher_192);
     aes192.decrpyt_16bytes_ecb(cipher_192, key_192, plain_192);
@@ -40,10 +40,10 @@ int main() {
         std::printf("%c", plain_192[i]);
     std::cout << std::endl;
 
-    __aes_u8 ip_text_256[16] = "testing aes 256";
-    __aes_u8 key_256[32] = "1234567812345678123456781234567";
-    __aes_u8 cipher_256[16];
-    __aes_u8 plain_256[16];
+    uint8_t ip_text_256[16] = "testing aes 256";
+    uint8_t key_256[32] = "1234567812345678123456781234567";
+    uint8_t cipher_256[16];
+    uint8_t plain_256[16];
     AES aes256(AES_256);
     aes256.encrpyt_16bytes_ecb(ip_text_256, key_256,cipher_256);
     aes256.decrpyt_16bytes_ecb(cipher_256, key_256, plain_256);
@@ -51,11 +51,11 @@ int main() {
         std::printf("%c", plain_256[i]);
     std::cout << std::endl;
 
-    __aes_u8 block_ip_test[128] = "And above all these put on love, "
+    uint8_t block_ip_test[128] = "And above all these put on love, "
     "which binds everything together in perfect harmony. [Colossians 3:14]"; 
-    __aes_u8 block_ip_test_key[32] {0};
-    __aes_u8 block_op_test[128] {0};
-    __aes_u8 block_op_plain[128] {0};
+    uint8_t block_ip_test_key[32] {0};
+    uint8_t block_op_test[128] {0};
+    uint8_t block_op_plain[128] {0};
     char pass[] = "my_password1";
     memcpy(block_ip_test_key, pass, sizeof(pass));
     aes256.encrpyt_block_ecb(block_ip_test, block_ip_test_key, block_op_test, sizeof(block_ip_test), sizeof(block_ip_test_key));

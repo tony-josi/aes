@@ -21,104 +21,104 @@ namespace {
 
     /* AES Word size */
 
-    constexpr   symmetric_ciphers::__aes_u8     AES_WORD_SIZE = 4;
+    constexpr   uint8_t     AES_WORD_SIZE = 4;
 
 
     /* Forward declarations for Lookup tables */
 
-    extern      symmetric_ciphers::__aes_u8     AES_S_BOX[256];
-    extern      symmetric_ciphers::__aes_u8     AES_INV_S_BOX[256];
-    extern      symmetric_ciphers::__aes_u8     MUL_2[256];
-    extern      symmetric_ciphers::__aes_u8     MUL_3[256];
-    extern      symmetric_ciphers::__aes_u8     MUL_9[256];
-    extern      symmetric_ciphers::__aes_u8     MUL_11[256];
-    extern      symmetric_ciphers::__aes_u8     MUL_13[256];
-    extern      symmetric_ciphers::__aes_u8     MUL_14[256];
-    extern      symmetric_ciphers::__aes_u8     AES_RCON[11];
+    extern      uint8_t     AES_S_BOX[256];
+    extern      uint8_t     AES_INV_S_BOX[256];
+    extern      uint8_t     MUL_2[256];
+    extern      uint8_t     MUL_3[256];
+    extern      uint8_t     MUL_9[256];
+    extern      uint8_t     MUL_11[256];
+    extern      uint8_t     MUL_13[256];
+    extern      uint8_t     MUL_14[256];
+    extern      uint8_t     AES_RCON[11];
 
 
     /* Forward declarations for helper functions */
 
     size_t __aes_expand_key(
-        const symmetric_ciphers::   __aes_u8    key[], 
-        symmetric_ciphers::         __aes_u8    expand_key[], 
-        const size_t                            actual_key_len,
-        const size_t                            expand_key_len
+        const uint8_t               key[], 
+        uint8_t                     expand_key[], 
+        const size_t                actual_key_len,
+        const size_t                expand_key_len
     );
 
     int __aes_key_scheduler(
-        int                                     round,
-        const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
-        symmetric_ciphers::         __aes_u8    out[AES_WORD_SIZE]
+        int                         round,
+        const uint8_t               in[AES_WORD_SIZE],
+        uint8_t                     out[AES_WORD_SIZE]
     );
 
     inline void __aes_xor_word(
-        symmetric_ciphers::         __aes_u8    target[AES_WORD_SIZE],
-        const symmetric_ciphers::   __aes_u8    operand[AES_WORD_SIZE]
+        uint8_t                     target[AES_WORD_SIZE],
+        const uint8_t               operand[AES_WORD_SIZE]
     );
 
     inline void __aes_transposition(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
-        const symmetric_ciphers::   __aes_u8    ip[],
-        const int                               offset
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        const uint8_t               ip[],
+        const int                   offset
     );
 
     inline void __aes_rev_transposition(
-        const symmetric_ciphers::   __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
-        symmetric_ciphers::         __aes_u8    op[],
-        const int                               offset
+        const uint8_t               cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        uint8_t                     op[],
+        const int                   offset
     );
 
     void __aes_compute_remaining_words(
-        int                                     words_required,
-        symmetric_ciphers::         __aes_u8    exp_key[],
-        size_t                                 &exp_offset,
-        const size_t                            exp_key_len,
-        const size_t                            act_key_len  
+        int                         words_required,
+        uint8_t                     exp_key[],
+        size_t                     &exp_offset,
+        const size_t                exp_key_len,
+        const size_t                act_key_len  
     );
 
     void __aes_key_scheduler_4th_word(
-        symmetric_ciphers::         __aes_u8    exp_key[],
-        size_t                                 &exp_offset,
-        const size_t                            exp_key_len,
-        const size_t                            act_key_len  
+        uint8_t                     exp_key[],
+        size_t                     &exp_offset,
+        const size_t                exp_key_len,
+        const size_t                act_key_len  
     );
 
     void __aes_get_round_key_block(
-        int                                     round_count,
-        int                                     block_size,
-        const symmetric_ciphers::   __aes_u8    exp_key[],
-        size_t                                  exp_key_len,
-        symmetric_ciphers::         __aes_u8    op_key[AES_WORD_SIZE][AES_WORD_SIZE]
+        int                         round_count,
+        int                         block_size,
+        const uint8_t               exp_key[],
+        size_t                      exp_key_len,
+        uint8_t                     op_key[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_add_round_key(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
-        symmetric_ciphers::         __aes_u8    round_key[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        uint8_t                     round_key[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_substitue_bytes(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_shift_rows(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_mix_columns(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_inv_substitue_bytes(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_inv_shift_rows(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
     void __aes_inv_mix_columns(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
 } /* End of anonymous namespace */
@@ -178,23 +178,23 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
   *             - 0         Success.
   */
 int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
-    const symmetric_ciphers::   __aes_u8    input[], 
-    const symmetric_ciphers::   __aes_u8    key[], 
-    symmetric_ciphers::         __aes_u8    output[]
+    const uint8_t       input[], 
+    const uint8_t       key[], 
+    uint8_t             output[]
 ) const {
 
     /* Expand keys to exp_key[] */
-    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* 2D - Array (matrix) to hold the current round state */
-    symmetric_ciphers::__aes_u8 cur_state[4][4] = {{0}};
+    uint8_t cur_state[4][4] = {{0}};
 
     /* Transposition bytes to matrix form - column major */
     __aes_transposition(cur_state, input, 0);
 
     /* Initial round key addition */
-    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+    uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
     __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
@@ -233,23 +233,23 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
   *             - 0         Success.
   */
 int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
-    const symmetric_ciphers::       __aes_u8 input[], 
-    const symmetric_ciphers::       __aes_u8 key[], 
-    symmetric_ciphers::             __aes_u8 output[]
+    const uint8_t           input[], 
+    const uint8_t           key[], 
+    uint8_t                 output[]
     ) const {
 
     /* Expand keys to exp_key[] */
-    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* 2D - Array (matrix) to hold the current round state */
-    symmetric_ciphers::__aes_u8 cur_state[4][4] = {{0}};
+    uint8_t cur_state[4][4] = {{0}};
 
     /* Transposition bytes to matrix form - column major */
     __aes_transposition(cur_state, input, 0);
     
     /* Initial round key addition */
-    symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+    uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
     __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
     __aes_add_round_key(cur_state, round_key);
 
@@ -294,11 +294,11 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
   *             - 0         Success.
   */
 int symmetric_ciphers::AES::encrpyt_block_ecb(
-    const symmetric_ciphers::       __aes_u8    input[], 
-    const symmetric_ciphers::       __aes_u8    key[], 
-    symmetric_ciphers::             __aes_u8    output[], 
-    const size_t                                ip_size,
-    const size_t                                key_size
+    const uint8_t           input[], 
+    const uint8_t           key[], 
+    uint8_t                 output[], 
+    const size_t            ip_size,
+    const size_t            key_size
     ) const {
 
     /* Check whether the given arguments are of required size */
@@ -309,20 +309,20 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
         "depending on AES - 128/192/256 bit modes used");
 
     /* Expand keys to exp_key[] */
-    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input plain text array, processing 16 bytes of data every iteration */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
         /* 2D - Array (matrix) to hold the current round state */
-        symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+        uint8_t cur_state[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
 
         /* Transposition bytes to matrix form - column major */
         __aes_transposition(cur_state, input, (ip_iter * this->block_size));
 
         /* Initial round key addition */
-        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+        uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
         __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_add_round_key(cur_state, round_key);
 
@@ -368,11 +368,11 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
   *             - 0         Success.
   */
 int symmetric_ciphers::AES::decrpyt_block_ecb(
-    const symmetric_ciphers::       __aes_u8    input[], 
-    const symmetric_ciphers::       __aes_u8    key[], 
-    symmetric_ciphers::             __aes_u8    output[], 
-    const size_t                                ip_size,
-    const size_t                                key_size
+    const uint8_t               input[], 
+    const uint8_t               key[], 
+    uint8_t                     output[], 
+    const size_t                ip_size,
+    const size_t                key_size
     ) const {
 
     /* Check whether the given arguments are of required size */
@@ -383,20 +383,20 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
         "depending on AES - 128/192/256 bit modes used");
 
     /* Expand keys to exp_key[] */
-    std::unique_ptr<symmetric_ciphers::__aes_u8[]> exp_key(new symmetric_ciphers::__aes_u8[this->expanded_key_len]);
+    std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input cipher text array, processing 16 bytes of data every iteration */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
         /* 2D - Array (matrix) to hold the current round state */
-        symmetric_ciphers::__aes_u8 cur_state[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+        uint8_t cur_state[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
 
         /* Transposition bytes to matrix form - column major */
         __aes_transposition(cur_state, input, (ip_iter * this->block_size));
         
         /* Initial round key addition */
-        symmetric_ciphers::__aes_u8 round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+        uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
         __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
         __aes_add_round_key(cur_state, round_key);
 
@@ -424,10 +424,10 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
 namespace {
 
     size_t __aes_expand_key(
-        const symmetric_ciphers::   __aes_u8    key[], 
-        symmetric_ciphers::         __aes_u8    expand_key[], 
-        const size_t                            actual_key_len,
-        const size_t                            expand_key_len
+        const uint8_t           key[], 
+        uint8_t                 expand_key[], 
+        const size_t            actual_key_len,
+        const size_t            expand_key_len
     ) {
         /* Clear the expanded key output array & copy initial key */
         memset(expand_key, 0, expand_key_len);
@@ -438,15 +438,15 @@ namespace {
         size_t cur_exp_key_offset = 0;
         cur_exp_key_offset += actual_key_len;
 
-        for(symmetric_ciphers::__aes_u8 round_key_index = 1; \
+        for(uint8_t round_key_index = 1; \
         cur_exp_key_offset < expand_key_len; ++round_key_index) {
 
             /* Process the last 4 bytes */
-            symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
+            uint8_t     temp_key_buff_1[AES_WORD_SIZE];
             memcpy(temp_key_buff_1, \
             (expand_key + (cur_exp_key_offset - AES_WORD_SIZE)), AES_WORD_SIZE);
             
-            symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
+            uint8_t     temp_key_buff_2[AES_WORD_SIZE];
             __aes_key_scheduler(round_key_index, temp_key_buff_1, temp_key_buff_2);
 
             /* XOR the pre - processed last 4 bytes with corresponding word from 
@@ -480,8 +480,8 @@ namespace {
 
     int __aes_key_scheduler(
         int                                     round,
-        const symmetric_ciphers::   __aes_u8    in[AES_WORD_SIZE],
-        symmetric_ciphers::         __aes_u8    out[AES_WORD_SIZE]
+        const uint8_t    in[AES_WORD_SIZE],
+        uint8_t    out[AES_WORD_SIZE]
     ) {
 
         /* Rotate word */
@@ -504,8 +504,8 @@ namespace {
     }
 
     inline void __aes_xor_word(
-        symmetric_ciphers::         __aes_u8    target[AES_WORD_SIZE],
-        const symmetric_ciphers::   __aes_u8    operand[AES_WORD_SIZE]
+        uint8_t             target[AES_WORD_SIZE],
+        const uint8_t       operand[AES_WORD_SIZE]
     ) {
 
         for(int i = 0; i < AES_WORD_SIZE; ++i) 
@@ -514,9 +514,9 @@ namespace {
     }
 
     inline void __aes_transposition(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
-        const symmetric_ciphers::   __aes_u8    ip[],
-        const int                               offset
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        const uint8_t       ip[],
+        const int           offset
     ) {
         /* Transposition bytes to matrix form - column major */
         for(int i = 0; i < AES_WORD_SIZE; ++i)
@@ -526,9 +526,9 @@ namespace {
     }
 
     inline void __aes_rev_transposition(
-        const symmetric_ciphers::   __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
-        symmetric_ciphers::         __aes_u8    op[],
-        const int                               offset
+        const uint8_t       cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        uint8_t             op[],
+        const int           offset
     ) {
         /* Transposition bytes from matrix (column major) back to output array */
         for(int i = 0; i < AES_WORD_SIZE; ++i)
@@ -538,14 +538,14 @@ namespace {
     }
 
     void __aes_compute_remaining_words(
-        int                                     words_required,
-        symmetric_ciphers::         __aes_u8    exp_key[],
-        size_t                                 &exp_offset,
-        const size_t                            exp_key_len,
-        const size_t                            act_key_len  
+        int                 words_required,
+        uint8_t             exp_key[],
+        size_t             &exp_offset,
+        const size_t        exp_key_len,
+        const size_t        act_key_len  
     ) {
-        symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
-        symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
+        uint8_t     temp_key_buff_1[AES_WORD_SIZE];
+        uint8_t     temp_key_buff_2[AES_WORD_SIZE];
 
         for(int i = 0; (i < words_required) && (exp_offset < exp_key_len); ++i) {
             
@@ -563,14 +563,14 @@ namespace {
     }
 
     void __aes_key_scheduler_4th_word(
-        symmetric_ciphers::         __aes_u8    exp_key[],
-        size_t                                 &exp_offset,
-        const size_t                            exp_key_len,
-        const size_t                            act_key_len  
+        uint8_t             exp_key[],
+        size_t             &exp_offset,
+        const size_t        exp_key_len,
+        const size_t        act_key_len  
     ) {
 
-        symmetric_ciphers::__aes_u8     temp_key_buff_1[AES_WORD_SIZE];
-        symmetric_ciphers::__aes_u8     temp_key_buff_2[AES_WORD_SIZE];
+        uint8_t     temp_key_buff_1[AES_WORD_SIZE];
+        uint8_t     temp_key_buff_2[AES_WORD_SIZE];
 
         if(exp_offset < exp_key_len) {
 
@@ -592,11 +592,11 @@ namespace {
     }
 
     void __aes_get_round_key_block(
-        int                                     round_count,
-        int                                     block_size,
-        const symmetric_ciphers::   __aes_u8    exp_key[],
-        size_t                                  exp_key_len,
-        symmetric_ciphers::         __aes_u8    op_key[AES_WORD_SIZE][AES_WORD_SIZE]
+        int                 round_count,
+        int                 block_size,
+        const uint8_t       exp_key[],
+        size_t              exp_key_len,
+        uint8_t             op_key[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
             for(int j = 0; \
@@ -606,8 +606,8 @@ namespace {
     }
 
     void __aes_add_round_key(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
-        symmetric_ciphers::         __aes_u8    round_key[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
+        uint8_t             round_key[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
             for(int j = 0; j < AES_WORD_SIZE; ++j) 
@@ -615,7 +615,7 @@ namespace {
     }
 
     void __aes_substitue_bytes(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
             for(int j = 0; j < AES_WORD_SIZE; ++j) 
@@ -623,14 +623,14 @@ namespace {
     }
 
     void __aes_shift_rows(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
 
         for(int i = 0; i < AES_WORD_SIZE; ++i) {
 
             if(i > 0) {   
 
-                symmetric_ciphers::__aes_u8 cur_row[AES_WORD_SIZE]; 
+                uint8_t cur_row[AES_WORD_SIZE]; 
                 for(int j = 0; j < AES_WORD_SIZE; ++j) 
                     cur_row[j] = cur_state[i][j];
                 
@@ -641,11 +641,11 @@ namespace {
     }
 
     void __aes_mix_columns(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i) {
             
-            symmetric_ciphers::__aes_u8 column[4] = { cur_state[0][i],
+            uint8_t column[4] = { cur_state[0][i],
                                                       cur_state[1][i],
                                                       cur_state[2][i],
                                                       cur_state[3][i]
@@ -660,7 +660,7 @@ namespace {
     }
 
     void __aes_inv_substitue_bytes(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i)
             for(int j = 0; j < AES_WORD_SIZE;++j)
@@ -679,12 +679,12 @@ namespace {
      */
 
     void __aes_inv_shift_rows(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for(int i = 0; i < AES_WORD_SIZE; ++i) {
 
             if(i > 0) {
-                symmetric_ciphers::__aes_u8 t_row[AES_WORD_SIZE];
+                uint8_t t_row[AES_WORD_SIZE];
 
                 for(int j = 0; j < AES_WORD_SIZE; ++j)
                     t_row[j] = cur_state[i][j];
@@ -696,11 +696,11 @@ namespace {
     }
 
     void __aes_inv_mix_columns(
-        symmetric_ciphers::         __aes_u8    cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
+        uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
         for (int i = 0; i < AES_WORD_SIZE; ++i) {
 
-            symmetric_ciphers::__aes_u8 t_col[AES_WORD_SIZE];
+            uint8_t t_col[AES_WORD_SIZE];
             for(int j = 0; j < AES_WORD_SIZE; ++j)
                 t_col[j] = cur_state[j][i];
 
@@ -711,7 +711,7 @@ namespace {
         }
     }
 
-    symmetric_ciphers::__aes_u8 AES_S_BOX[256] = {
+    uint8_t AES_S_BOX[256] = {
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
         0xB7, 0xFD, 0x93, 0x26, 0x36, 0x3F, 0xF7, 0xCC, 0x34, 0xA5, 0xE5, 0xF1, 0x71, 0xD8, 0x31, 0x15,
@@ -730,7 +730,7 @@ namespace {
         0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
     };
 
-    symmetric_ciphers::__aes_u8 AES_INV_S_BOX[256] = {
+    uint8_t AES_INV_S_BOX[256] = {
         0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
         0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
         0x54, 0x7B, 0x94, 0x32, 0xA6, 0xC2, 0x23, 0x3D, 0xEE, 0x4C, 0x95, 0x0B, 0x42, 0xFA, 0xC3, 0x4E,
@@ -749,7 +749,7 @@ namespace {
         0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
     };
 
-    symmetric_ciphers::__aes_u8 MUL_2[256] = {
+    uint8_t MUL_2[256] = {
         0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E,
         0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C, 0x3E,
         0x40, 0x42, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E, 0x50, 0x52, 0x54, 0x56, 0x58, 0x5A, 0x5C, 0x5E,
@@ -768,7 +768,7 @@ namespace {
         0xFB, 0xF9, 0xFF, 0xFD, 0xF3, 0xF1, 0xF7, 0xF5, 0xEB, 0xE9, 0xEF, 0xED, 0xE3, 0xE1, 0xE7, 0xE5
     };
 
-    symmetric_ciphers::__aes_u8 MUL_3[256] = {
+    uint8_t MUL_3[256] = {
         0x00, 0x03, 0x06, 0x05, 0x0C, 0x0F, 0x0A, 0x09, 0x18, 0x1B, 0x1E, 0x1D, 0x14, 0x17, 0x12, 0x11,
         0x30, 0x33, 0x36, 0x35, 0x3C, 0x3F, 0x3A, 0x39, 0x28, 0x2B, 0x2E, 0x2D, 0x24, 0x27, 0x22, 0x21,
         0x60, 0x63, 0x66, 0x65, 0x6C, 0x6F, 0x6A, 0x69, 0x78, 0x7B, 0x7E, 0x7D, 0x74, 0x77, 0x72, 0x71,
@@ -787,7 +787,7 @@ namespace {
         0x0B, 0x08, 0x0D, 0x0E, 0x07, 0x04, 0x01, 0x02, 0x13, 0x10, 0x15, 0x16, 0x1F, 0x1C, 0x19, 0x1A
     }; 
 
-    symmetric_ciphers::__aes_u8 MUL_9[256] = {
+    uint8_t MUL_9[256] = {
         0x00, 0x09, 0x12, 0x1B, 0x24, 0x2D, 0x36, 0x3F, 0x48, 0x41, 0x5A, 0x53, 0x6C, 0x65, 0x7E, 0x77,
         0x90, 0x99, 0x82, 0x8B, 0xB4, 0xBD, 0xA6, 0xAF, 0xD8, 0xD1, 0xCA, 0xC3, 0xFC, 0xF5, 0xEE, 0xE7,
         0x3B, 0x32, 0x29, 0x20, 0x1F, 0x16, 0x0D, 0x04, 0x73, 0x7A, 0x61, 0x68, 0x57, 0x5E, 0x45, 0x4C,
@@ -806,7 +806,7 @@ namespace {
         0x31, 0x38, 0x23, 0x2A, 0x15, 0x1C, 0x07, 0x0E, 0x79, 0x70, 0x6B, 0x62, 0x5D, 0x54, 0x4F, 0x46
     };
 
-    symmetric_ciphers::__aes_u8 MUL_11[256] = {
+    uint8_t MUL_11[256] = {
         0x00, 0x0B, 0x16, 0x1D, 0x2C, 0x27, 0x3A, 0x31, 0x58, 0x53, 0x4E, 0x45, 0x74, 0x7F, 0x62, 0x69,
         0xB0, 0xBB, 0xA6, 0xAD, 0x9C, 0x97, 0x8A, 0x81, 0xE8, 0xE3, 0xFE, 0xF5, 0xC4, 0xCF, 0xD2, 0xD9,
         0x7B, 0x70, 0x6D, 0x66, 0x57, 0x5C, 0x41, 0x4A, 0x23, 0x28, 0x35, 0x3E, 0x0F, 0x04, 0x19, 0x12,
@@ -825,7 +825,7 @@ namespace {
         0xCA, 0xC1, 0xDC, 0xD7, 0xE6, 0xED, 0xF0, 0xFB, 0x92, 0x99, 0x84, 0x8F, 0xBE, 0xB5, 0xA8, 0xA3
     };
 
-    symmetric_ciphers::__aes_u8 MUL_13[256] = {
+    uint8_t MUL_13[256] = {
         0x00, 0x0D, 0x1A, 0x17, 0x34, 0x39, 0x2E, 0x23, 0x68, 0x65, 0x72, 0x7F, 0x5C, 0x51, 0x46, 0x4B,
         0xD0, 0xDD, 0xCA, 0xC7, 0xE4, 0xE9, 0xFE, 0xF3, 0xB8, 0xB5, 0xA2, 0xAF, 0x8C, 0x81, 0x96, 0x9B,
         0xBB, 0xB6, 0xA1, 0xAC, 0x8F, 0x82, 0x95, 0x98, 0xD3, 0xDE, 0xC9, 0xC4, 0xE7, 0xEA, 0xFD, 0xF0,
@@ -844,7 +844,7 @@ namespace {
         0xDC, 0xD1, 0xC6, 0xCB, 0xE8, 0xE5, 0xF2, 0xFF, 0xB4, 0xB9, 0xAE, 0xA3, 0x80, 0x8D, 0x9A, 0x97
     };
 
-    symmetric_ciphers::__aes_u8 MUL_14[256] = {
+    uint8_t MUL_14[256] = {
         0x00, 0x0e, 0x1c, 0x12, 0x38, 0x36, 0x24, 0x2a, 0x70, 0x7e, 0x6c, 0x62, 0x48, 0x46, 0x54, 0x5a,
         0xe0, 0xee, 0xfc, 0xf2, 0xd8, 0xd6, 0xc4, 0xca, 0x90, 0x9e, 0x8c, 0x82, 0xa8, 0xa6, 0xb4, 0xba,
         0xdb, 0xd5, 0xc7, 0xc9, 0xe3, 0xed, 0xff, 0xf1, 0xab, 0xa5, 0xb7, 0xb9, 0x93, 0x9d, 0x8f, 0x81,
@@ -863,7 +863,7 @@ namespace {
         0xd7, 0xd9, 0xcb, 0xc5, 0xef, 0xe1, 0xf3, 0xfd, 0xa7, 0xa9, 0xbb, 0xb5, 0x9f, 0x91, 0x83, 0x8d
     };
 
-    symmetric_ciphers::__aes_u8 AES_RCON[11] = {
+    uint8_t AES_RCON[11] = {
         0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36
     };
 

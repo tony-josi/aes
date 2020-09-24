@@ -18,10 +18,6 @@
 
 namespace symmetric_ciphers {
 
-    typedef uint8_t     __aes_u8;
-    typedef uint16_t    __aes_u16;
-    typedef uint32_t    __aes_u32;
-
     enum key_size {          /* Enum to handle different AES Modes */
       AES_128,               /* AES 128 bit key mode */
       AES_192,               /* AES 192 bit key mode */
@@ -47,25 +43,25 @@ namespace symmetric_ciphers {
          * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
          *         using AES ECB.
          */ 
-        int encrpyt_16bytes_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
+        int encrpyt_16bytes_ecb(const uint8_t input[], const uint8_t key[], uint8_t output[]) const;
 
         /**
          * @brief  Function to decrypt 16 bytes of unsigned integer 8 bit type
          *         using AES ECB.
          */ 
-        int decrpyt_16bytes_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[]) const;
+        int decrpyt_16bytes_ecb(const uint8_t input[], const uint8_t key[], uint8_t output[]) const;
 
         /**
          * @brief  Function to encrypt given block of unsigned integer 8 bit type
          *         using AES ECB.
          */ 
-        int encrpyt_block_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
+        int encrpyt_block_ecb(const uint8_t input[], const uint8_t key[], uint8_t output[], const size_t ip_size, const size_t key_size) const;
 
         /**
          * @brief  Function to decrypt given block of unsigned integer 8 bit type
          *         using AES ECB.
          */ 
-        int decrpyt_block_ecb(const __aes_u8 input[], const __aes_u8 key[], __aes_u8 output[], const size_t ip_size, const size_t key_size) const;
+        int decrpyt_block_ecb(const uint8_t input[], const uint8_t key[], uint8_t output[], const size_t ip_size, const size_t key_size) const;
     };
 
 } /* namespace symmetric_ciphers */
