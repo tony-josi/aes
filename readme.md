@@ -1,8 +1,8 @@
 ## Advanced Encryption Standard 
 
-[![Build Status](https://travis-ci.org/TonyJosi97/aes.svg?branch=master)](https://travis-ci.org/TonyJosi97/aes)
+#### Builds Status:
 
-_______
+[![Build Status](https://travis-ci.org/TonyJosi97/aes.svg?branch=master)](https://travis-ci.org/TonyJosi97/aes)
 
 ``` 
  █████╗     ███████╗    ███████╗
