@@ -42,7 +42,7 @@ Requires [cmake](https://cmake.org/) to build. Optional - Google Test
 
 Uses Google Test for unit testing.
 
-1. Clone - use `git submodule update --init --recursive` to clone google test for running test cases (not required if not running tests).
+1. Clone - use `git submodule update --init --recursive` to clone [google test](https://en.wikipedia.org/wiki/Google_Test) for running test cases (not required if not running tests).
 
 2. Build project
 
