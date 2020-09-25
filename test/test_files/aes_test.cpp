@@ -1,6 +1,9 @@
 #include "../inc/aes.hpp"
 #include <iostream>
 
+#include "gtest/gtest.h"
+
+
 using namespace symmetric_ciphers;
 
 int compare_bytes(uint8_t *a, uint8_t *b, size_t sz) {
@@ -44,3 +47,14 @@ int main() {
 }
 
 #endif /* if 0 */
+
+TEST(blaTest, test1) {
+
+    EXPECT_EQ(test_1_aes_128(), 0);
+
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

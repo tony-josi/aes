@@ -8,5 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(gtest)
 
+add_subdirectory(test_files)
+
+
 # add_subdirectory(../src)
 
