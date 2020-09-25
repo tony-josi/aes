@@ -37,7 +37,7 @@ int test_1_aes_128() {
 int test_1_aes_192() {
 
     AES aes_128(AES_192);
-    uint8_t plaint[16] = "AES 128 Test";
+    uint8_t plaint[16] = "AES libgmockd";
     uint8_t passwd[24] = "AES128821!$";
     uint8_t op[16] = {0};
     uint8_t ciphert[16] = {0};
@@ -55,7 +55,7 @@ int test_1_aes_256() {
 
     AES aes_128(AES_256);
     uint8_t plaint[16] = "AES 128 Test";
-    uint8_t passwd[32] = "AES128821!$";
+    uint8_t passwd[32] = "libgmockd!$";
     uint8_t op[16] = {0};
     uint8_t ciphert[16] = {0};
     aes_128.encrpyt_16bytes_ecb(plaint, passwd, ciphert);
@@ -73,11 +73,45 @@ int test_2_aes_128() {
     AES aes_128(AES_128);
     uint8_t plaint[128] = "And above all these put on love, "
     "which binds everything together in perfect harmony. [Colossians 3:14]"; 
-    uint8_t passwd[16] = "AES128821!$";
+    uint8_t passwd[16] = "Building!$";
     uint8_t op[128] = {0};
     uint8_t ciphert[128] = {0};
     aes_128.encrpyt_block_ecb(plaint, passwd, ciphert, 128, 16);
     aes_128.decrpyt_block_ecb(ciphert, passwd, op, 128, 16);
+
+    if(compare_bytes(plaint, op, 128))
+        return 1;
+
+    return 0;
+}
+
+int test_2_aes_192() {
+
+    AES aes_128(AES_192);
+    uint8_t plaint[128] = "And above all these put on love, "
+    "which binds everything together in perfect harmony. [Colossians 3:14]"; 
+    uint8_t passwd[24] = "dependencies!$";
+    uint8_t op[128] = {0};
+    uint8_t ciphert[128] = {0};
+    aes_128.encrpyt_block_ecb(plaint, passwd, ciphert, 128, 24);
+    aes_128.decrpyt_block_ecb(ciphert, passwd, op, 128, 24);
+
+    if(compare_bytes(plaint, op, 128))
+        return 1;
+
+    return 0;
+}
+
+int test_2_aes_256() {
+
+    AES aes_128(AES_256);
+    uint8_t plaint[128] = "And above all these put on love, "
+    "which binds everything together in perfect harmony. [Colossians 3:14]"; 
+    uint8_t passwd[32] = "libgtest_maind!$";
+    uint8_t op[128] = {0};
+    uint8_t ciphert[128] = {0};
+    aes_128.encrpyt_block_ecb(plaint, passwd, ciphert, 128, 32);
+    aes_128.decrpyt_block_ecb(ciphert, passwd, op, 128, 32);
 
     if(compare_bytes(plaint, op, 128))
         return 1;
@@ -120,6 +154,18 @@ TEST(Test_16bytes_ecb_256, encrypt_decrypt) {
 TEST(Test_16block_ecb_128, encrypt_decrypt) {
 
     EXPECT_EQ(test_2_aes_128(), 0);
+
+}
+
+TEST(Test_16block_ecb_192, encrypt_decrypt) {
+
+    EXPECT_EQ(test_2_aes_192(), 0);
+
+}
+
+TEST(Test_16block_ecb_256, encrypt_decrypt) {
+
+    EXPECT_EQ(test_2_aes_256(), 1);
 
 }
 
