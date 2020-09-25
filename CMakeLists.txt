@@ -19,14 +19,16 @@ endif()
 
 include_directories(inc)
 
+enable_testing()
+
 add_subdirectory(src)
 
 add_subdirectory(test)
 
 # add_subdirectory(test/test_files)
 
-# set(SOURCES test_main.cpp)
+set(SOURCES test_main.cpp)
 
-# add_executable(aes_exe ${SOURCES})
+add_executable(aes_exe ${SOURCES})
 
-# target_link_libraries(aes_exe aes_lib)
+target_link_libraries(aes_exe aes_lib)
