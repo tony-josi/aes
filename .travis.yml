@@ -14,3 +14,4 @@ script:
   - cmake .
   - make
   - ./aes_exe
+  - ./test/test_files/test_aes
