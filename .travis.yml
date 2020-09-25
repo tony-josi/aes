@@ -11,7 +11,7 @@ addons:
 install:
 - "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 script:
-  - cmake .
+  - cmake . -DTEST_EN=True
   - make
   - ./aes_exe
   - ./test/test_files/test_aes

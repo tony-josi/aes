@@ -23,9 +23,11 @@ enable_testing()
 
 add_subdirectory(src)
 
-add_subdirectory(test)
-
-# add_subdirectory(test/test_files)
+message("TEST_EN=${TEST_EN}")
+if( TEST_EN ) 
+    message("Testing Enabled")
+    add_subdirectory(test)
+endif()
 
 set(SOURCES test_main.cpp)
 

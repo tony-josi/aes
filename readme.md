@@ -1,6 +1,6 @@
 ## Advanced Encryption Standard 
 
-#### Builds Status:
+#### Build Status:
 
 [![Build Status](https://travis-ci.org/TonyJosi97/aes.svg?branch=master)](https://travis-ci.org/TonyJosi97/aes)
 
@@ -38,17 +38,11 @@ This implementation currently supports Electronic codebook mode with support for
 
 ### Build & Run
 
-Requires [cmake](https://cmake.org/) to build.
+Requires [cmake](https://cmake.org/) to build. Optional - Google Test
 
-1. Clone
+Uses Google Test for unit testing.
 
-``` sh
-git clone git@github.com:TonyJosi97/aes.git
-```
-OR
-``` sh
-git clone https://github.com/TonyJosi97/aes.git
-```
+1. Clone - use `git submodule update --init --recursive` to clone google test for running test cases (not required if not running tests).
 
 2. Build project
 
@@ -56,7 +50,7 @@ git clone https://github.com/TonyJosi97/aes.git
 cd aes
 mkdir build
 cd build
-cmake ..
+cmake .. -DTEST_EN=False    # Disable testing; use -DTEST_EN=True to build test version.
 make
 ```
 
