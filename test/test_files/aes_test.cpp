@@ -165,7 +165,7 @@ TEST(Test_16block_ecb_192, encrypt_decrypt) {
 
 TEST(Test_16block_ecb_256, encrypt_decrypt) {
 
-    EXPECT_EQ(test_2_aes_256(), 1);
+    EXPECT_EQ(test_2_aes_256(), 0);
 
 }
 
