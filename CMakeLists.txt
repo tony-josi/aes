@@ -4,7 +4,7 @@ project(aes VERSION 1.0)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-set(CMAKE_CXX_COMPILER "g++")
+# set(CMAKE_CXX_COMPILER "clang")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -32,8 +32,10 @@ include_directories(inc)
 
 add_subdirectory(src)
 
-set(SOURCES test_main.cpp)
+add_subdirectory(test)
 
-add_executable(aes_exe ${SOURCES})
+# set(SOURCES test_main.cpp)
 
-target_link_libraries(aes_exe aes_lib)
+# add_executable(aes_exe ${SOURCES})
+
+# target_link_libraries(aes_exe aes_lib)
