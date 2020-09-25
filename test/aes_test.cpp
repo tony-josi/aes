@@ -1,5 +1,5 @@
 #include "../inc/aes.hpp"
-#include <string.h>
+#include <iostream>
 
 using namespace symmetric_ciphers;
 
@@ -23,10 +23,24 @@ int test_1_aes_128() {
     uint8_t ciphert[16] = {0};
     aes_128.encrpyt_16bytes_ecb(plaint, passwd, ciphert);
     aes_128.decrpyt_16bytes_ecb(ciphert, passwd, op);
-    
+
     if(compare_bytes(plaint, op, 16))
         return 1;
 
     return 0;
 
 }
+
+#if 0
+
+int main() {
+
+    if(test_1_aes_128())
+        std::cout<<"Fail\n";
+    else
+        std::cout<<"Pass\n";
+
+    return 0;
+}
+
+#endif /* if 0 */
