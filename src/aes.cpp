@@ -186,7 +186,7 @@ int symmetric_ciphers::AES::encrpyt_16bytes_ecb(
     std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
-    this->__perform_encrypt__(input, exp_key, output);
+    this->__perform_encryption__(input, exp_key, output, 0);
 
     return 0;
 
@@ -290,31 +290,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
     /* Loop through the input plain text array, processing 16 bytes of data every iteration */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
-        /* 2D - Array (matrix) to hold the current round state */
-        uint8_t cur_state[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
-
-        /* Transposition bytes to matrix form - column major */
-        __aes_transposition(cur_state, input, (ip_iter * this->block_size));
-
-        /* Initial round key addition */
-        uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
-        __aes_get_round_key_block(0, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
-        __aes_add_round_key(cur_state, round_key);
-
-        /* Remaining rounds of aes */
-        for(int i = 1; i <= this->round_num; ++i) {
-            __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
-            __aes_substitue_bytes(cur_state);
-            __aes_shift_rows(cur_state);
-            /* Mix column is not performed for last round */
-            if(i != this->round_num)
-                __aes_mix_columns(cur_state);
-            __aes_add_round_key(cur_state, round_key);
-            
-        }
-
-        /* Transposition bytes from matrix (column major) back to output array */
-        __aes_rev_transposition(cur_state, output, (ip_iter * this->block_size));
+        this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
     
     }
 
@@ -395,16 +371,17 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     
 }
 
-int symmetric_ciphers::AES::__perform_encrypt__(
+int symmetric_ciphers::AES::__perform_encryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
-    uint8_t                         output[]
+    uint8_t                         output[],
+    const int                       ip_ptr
     ) const {
 
     uint8_t cur_state[4][4] = {{0}};
 
     /* Transposition bytes to matrix form - column major */
-    __aes_transposition(cur_state, input, 0);
+    __aes_transposition(cur_state, input, ip_ptr);
 
     /* Initial round key addition */
     uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
@@ -424,7 +401,7 @@ int symmetric_ciphers::AES::__perform_encrypt__(
     }
 
     /* Transposition bytes from matrix (column major) back to output array */
-    __aes_rev_transposition(cur_state, output, 0);
+    __aes_rev_transposition(cur_state, output, ip_ptr);
 
     return 0;
 }
