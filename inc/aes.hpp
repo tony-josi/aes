@@ -40,6 +40,12 @@ namespace symmetric_ciphers {
          */ 
         int __perform_encryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
 
+        /**
+         * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
+        int __perform_decryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
+
 
     public:
         /**

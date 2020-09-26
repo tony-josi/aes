@@ -217,32 +217,7 @@ int symmetric_ciphers::AES::decrpyt_16bytes_ecb(
     std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
-    /* 2D - Array (matrix) to hold the current round state */
-    uint8_t cur_state[4][4] = {{0}};
-
-    /* Transposition bytes to matrix form - column major */
-    __aes_transposition(cur_state, input, 0);
-    
-    /* Initial round key addition */
-    uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
-    __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
-    __aes_add_round_key(cur_state, round_key);
-
-    /* Remaining rounds of aes */
-    for(int i = (this->round_num - 1); i >= 0; --i) {
-
-        __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
-        __aes_inv_shift_rows(cur_state);
-        __aes_inv_substitue_bytes(cur_state);
-        __aes_add_round_key(cur_state, round_key);
-        /* Mix column is not performed for last round */
-        if(i != 0)
-            __aes_inv_mix_columns(cur_state);        
-
-    }
-
-    /* Transposition bytes from matrix (column major) back to output array */
-    __aes_rev_transposition(cur_state, output, 0);
+    this->__perform_decryption__(input, exp_key, output, 0);
 
     return 0;
 
@@ -406,6 +381,42 @@ int symmetric_ciphers::AES::__perform_encryption__(
     return 0;
 }
 
+int symmetric_ciphers::AES::__perform_decryption__(
+    const uint8_t                   input[], 
+    std::unique_ptr<uint8_t []>    &exp_key, 
+    uint8_t                         output[],
+    const int                       ip_ptr
+    ) const {
+
+    /* 2D - Array (matrix) to hold the current round state */
+    uint8_t cur_state[4][4] = {{0}};
+
+    /* Transposition bytes to matrix form - column major */
+    __aes_transposition(cur_state, input, ip_ptr);
+    
+    /* Initial round key addition */
+    uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
+    __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
+    __aes_add_round_key(cur_state, round_key);
+
+    /* Remaining rounds of aes */
+    for(int i = (this->round_num - 1); i >= 0; --i) {
+
+        __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
+        __aes_inv_shift_rows(cur_state);
+        __aes_inv_substitue_bytes(cur_state);
+        __aes_add_round_key(cur_state, round_key);
+        /* Mix column is not performed for last round */
+        if(i != 0)
+            __aes_inv_mix_columns(cur_state);        
+
+    }
+
+    /* Transposition bytes from matrix (column major) back to output array */
+    __aes_rev_transposition(cur_state, output, ip_ptr);
+
+    return 0;
+}
 
 
 namespace {
