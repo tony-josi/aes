@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <memory>
 
 namespace symmetric_ciphers {
 
@@ -32,6 +33,13 @@ namespace symmetric_ciphers {
         int          key_len_bits;                    /* Stores the length of the Key used in AES */
         int          block_size;                      /* Size of the data block used */
         int          round_num;                       /* Number of rounds performed */
+
+        /**
+         * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
+        int __perform_encrypt__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[]) const;
+
 
     public:
         /**
