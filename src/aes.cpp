@@ -315,30 +315,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     /* Loop through the input cipher text array, processing 16 bytes of data every iteration */
     for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
-        /* 2D - Array (matrix) to hold the current round state */
-        uint8_t cur_state[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
-
-        /* Transposition bytes to matrix form - column major */
-        __aes_transposition(cur_state, input, (ip_iter * this->block_size));
-        
-        /* Initial round key addition */
-        uint8_t round_key[AES_WORD_SIZE][AES_WORD_SIZE] = {{0}};
-        __aes_get_round_key_block(this->round_num, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
-        __aes_add_round_key(cur_state, round_key);
-
-        /* Remaining rounds of aes */
-        for(int i = (this->round_num - 1); i >= 0; --i) {
-            __aes_get_round_key_block(i, this->block_size, exp_key.get(), this->expanded_key_len, round_key);
-            __aes_inv_shift_rows(cur_state);
-            __aes_inv_substitue_bytes(cur_state);
-            __aes_add_round_key(cur_state, round_key);
-            /* Mix column is not performed for last round */
-            if(i != 0)
-                __aes_inv_mix_columns(cur_state);        
-        }
-
-        /* Transposition bytes from matrix (column major) back to output array */
-        __aes_rev_transposition(cur_state, output, (ip_iter * this->block_size));
+        this->__perform_decryption__(input, exp_key, output, (ip_iter * this->block_size));
 
     }
 
