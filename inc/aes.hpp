@@ -35,14 +35,18 @@ namespace symmetric_ciphers {
         int          round_num;                       /* Number of rounds performed */
 
         /**
-         * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
-         *         using AES ECB.
+         * @brief  Internal function to encrypt 16 bytes of data pointed to by ip_ptr
+         *         thefrom the input[] using the expanded key, exp_key and copy the result
+         *         to the output[] pointed to by ip_ptr.
+         *         
          */ 
         int __perform_encryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
 
         /**
-         * @brief  Function to encrypt 16 bytes of unsigned integer 8 bit type
-         *         using AES ECB.
+         * @brief  Internal function to decrypt 16 bytes of data pointed to by ip_ptr
+         *         thefrom the input[] using the expanded key, exp_key and copy the result
+         *         to the output[] pointed to by ip_ptr.
+         *         
          */ 
         int __perform_decryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
 
