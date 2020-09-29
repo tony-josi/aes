@@ -14,4 +14,4 @@ script:
   - cmake . -DTEST_EN=True
   - make
   - ./aes_exe
-  - ./test/test_files/test_aes
+  - ctest -V

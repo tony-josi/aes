@@ -19,14 +19,17 @@ endif()
 
 include_directories(inc)
 
-enable_testing()
-
 add_subdirectory(src)
 
 message("TEST_EN=${TEST_EN}")
 if( TEST_EN ) 
     message("Testing Enabled")
+    enable_testing()
     add_subdirectory(test)
+    add_test(
+        NAME AES_ENC_DEC_TESTS
+        COMMAND test_aes
+    )
 endif()
 
 set(SOURCES test_main.cpp)
