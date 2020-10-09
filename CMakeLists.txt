@@ -26,8 +26,10 @@ if( TEST_EN )
     )
 endif()
 
+find_package (Threads)
+
 set(SOURCES test_main.cpp)
 
 add_executable(aes_exe ${SOURCES})
 
-target_link_libraries(aes_exe aes_lib)
+target_link_libraries(aes_exe aes_lib ${CMAKE_THREAD_LIBS_INIT})
