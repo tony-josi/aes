@@ -15,6 +15,11 @@
 #include <string>
 #include <algorithm>
 #include <cstring>
+#include <vector>
+#include <mutex>
+#include <functional>
+#include <thread>
+#include <cstdio>
 
 namespace {
 
@@ -22,6 +27,7 @@ namespace {
 
     constexpr   uint8_t     AES_WORD_SIZE = 4;
 
+    constexpr   int         AES_PER_THREAD_DATA = 128;
 
     /* Forward declarations for Lookup tables */
 
@@ -272,6 +278,116 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
     return 0;
 
 }
+
+/**
+  * @brief  Function to encrypt given block of unsigned integer 8 bit type
+  *         using AES ECB.
+  * 
+  * @param  [in]  input      Input plain text array.
+  * @param  [in]  key        AES Key for encryption.
+  * @param  [out] output     Output cipher text array.
+  * @param  [in]  ip_size    Input plain text array size.
+  * @param  [in]  key_size   Key array size.
+  * 
+  * @note   This method encrypts the given plain text input array of using
+  *         the given #key and outputs it to the output cipher text array.
+  * 
+  * @note   The input & output array should be of same size and should be 16 byte 
+  *         aligned, ie. ip_size % 16 == 0.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
+    const uint8_t           input[], 
+    const uint8_t           key[], 
+    uint8_t                 output[], 
+    const size_t            ip_size,
+    const size_t            key_size
+    ) const {
+
+    /* Check whether the given arguments are of required size */
+    if((ip_size % (AES_WORD_SIZE * AES_WORD_SIZE)) != 0)
+        throw std::invalid_argument("encrpyt_block_ecb() - argument ip_size should be 16 byte aligned");
+    if(key_size != this->actual_key_len)
+        throw std::invalid_argument("encrpyt_block_ecb() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes used");
+
+    /* Expand keys to exp_key[] */
+    std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
+    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
+
+    /* Loop through the input plain text array, processing 16 bytes of data every iteration */
+    for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
+
+        this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
+    
+    }
+
+    struct ip_op_SegmentInfo {
+        int start__;
+        int end__;
+    };
+
+
+    struct ip_Data_SegmentQueue {
+        std::mutex                      ipD_Mutex__;
+        size_t                          total_DataSegments__;
+        std::vector<ip_op_SegmentInfo>  segment_Queue__;
+
+        ip_Data_SegmentQueue(size_t input_Sz) {
+            for(int i = 0; i < static_cast<int>(input_Sz); i = i + AES_PER_THREAD_DATA) {
+                segment_Queue__.emplace_back\
+                (ip_op_SegmentInfo{i, std::min(i + AES_PER_THREAD_DATA, static_cast<int>(input_Sz))});
+            }
+        }
+
+        bool pop_Segment(std::function<void(const ip_op_SegmentInfo &)> __Func__) {
+            
+            std::unique_lock pop_LOCK(ipD_Mutex__);
+            if(segment_Queue__.empty())
+                return false;
+
+            ip_op_SegmentInfo cur_segment = segment_Queue__.back();
+            segment_Queue__.pop_back();
+            pop_LOCK.unlock();
+            
+            std::fprintf(stderr, "\rEncrypting: %5.2f%%", \
+            static_cast<double>(total_DataSegments__ - segment_Queue__.size()) / total_DataSegments__ * 100);
+
+            __Func__(cur_segment);
+            return true;
+        }
+    };
+
+    ip_Data_SegmentQueue encrypt_DataSegmentQueue(ip_size);
+
+    auto thread_MAIN = [&] {
+        auto primary_Worker = [&] (const ip_op_SegmentInfo &this_Segment) {
+            /* Loop through the input plain text array, 
+            processing 16 bytes of data every iteration */
+            for(int ip_iter = this_Segment.start__; \
+            (ip_iter * this->block_size) < this_Segment.end__; ++ip_iter) {
+                this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
+            }    
+        };
+        while(encrypt_DataSegmentQueue.pop_Segment(primary_Worker)) {
+            // do processing
+        }
+    }; 
+    
+    std::vector<std::thread> enc_THREADS;
+    enc_THREADS.reserve(std::thread::hardware_concurrency());
+    for(auto i = 0u; i < std::thread::hardware_concurrency(); ++i) 
+        enc_THREADS.emplace_back(thread_MAIN);
+
+    for(auto &t : enc_THREADS)
+        t.join();
+
+    return 0;
+
+}
+
 
 
 /**
