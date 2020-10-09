@@ -45,7 +45,7 @@ make
 
 ### AES Methods (API)
 
-AES Class provides 4 methods - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpyt_block_ecb`, `decrpyt_block_ecb`. 
+AES Class provides 6 methods - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpyt_block_ecb`, `decrpyt_block_ecb`, `encrpyt_block_ecb_threaded` & `decrpyt_block_ecb_threaded`. 
 
 `encrpyt_16bytes_ecb` & `decrpyt_16bytes_ecb` encrypts/decrypts 16 bytes of data.
 
