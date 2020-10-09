@@ -12,6 +12,6 @@ install:
 - "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 script:
   - cmake . -DTEST_EN=True
-  - make
+  - make VERBOSE=1
   - ./aes_exe
   - ctest -V

@@ -338,7 +338,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
 
         bool pop_Segment(std::function<void(const ip_op_SegmentInfo &)> __Func__) {
             
-            std::unique_lock pop_LOCK(ipD_Mutex__);
+            std::unique_lock<std::mutex> pop_LOCK(ipD_Mutex__);
             if(segment_Queue__.empty())
                 return false;
 
@@ -492,7 +492,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb_threaded(
 
         bool pop_Segment(std::function<void(const ip_op_SegmentInfo &)> __Func__) {
             
-            std::unique_lock pop_LOCK(ipD_Mutex__);
+            std::unique_lock<std::mutex> pop_LOCK(ipD_Mutex__);
             if(segment_Queue__.empty())
                 return false;
 

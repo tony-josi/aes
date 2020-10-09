@@ -14,10 +14,13 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <chrono>
 
 using namespace symmetric_ciphers;
 
 int main() {
+
+    auto t1 = std::chrono::high_resolution_clock::now();
 
     uint8_t ip_text_128[16] = "testing aes 128";
     uint8_t key_128[16] = "123456781234567";
@@ -106,5 +109,9 @@ int main() {
         std::printf("%c", aes128_op_TRD[i]);
     std::cout << std::endl;
     
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>\
+    ( std::chrono::high_resolution_clock::now() - t1 ).count();
+    std::cout<<"\nDuration: "<<duration<<"\n";
+
     return 0;
 }
