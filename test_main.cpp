@@ -83,17 +83,28 @@ int main() {
 
     uint8_t key_128_TRD[16] = "123456781234567";
     AES aes128_TRD(AES_128);
-    const size_t test_sz = 128000000;
+    const size_t test_sz = 1280000;     // 1.28 MB
     uint8_t *aes128_plain_TRD = static_cast<uint8_t *>(std::malloc(test_sz));
     uint8_t *aes128_cipher_TRD = static_cast<uint8_t *>(std::malloc(test_sz));
-    for(size_t i = 0; i < test_sz; ++i)
-        aes128_plain_TRD[i] = 'J';
-    for(size_t i = 0; i < test_sz; ++i)
-        aes128_cipher_TRD[i] = 0;
+    uint8_t *aes128_op_TRD = static_cast<uint8_t *>(std::malloc(test_sz));
+
+    aes128_plain_TRD[0] = 'J';
+    aes128_plain_TRD[1] = 'E';
+    aes128_plain_TRD[2] = 'S';
+    aes128_plain_TRD[3] = 'U';
+    aes128_plain_TRD[4] = 'S';
+    aes128_plain_TRD[5] = ' ';
+
+    for(size_t i = 6; i < test_sz; ++i)
+        aes128_plain_TRD[i] = 0x4A;
 
     aes128_TRD.encrpyt_block_ecb_threaded(aes128_plain_TRD, key_128_TRD, aes128_cipher_TRD, test_sz, 16);
-
-    //for(size_t i = 0; i < test_sz; ++i)
-    //    std::printf("%X", aes128_cipher_TRD[i]);
+    aes128_TRD.decrpyt_block_ecb_threaded(aes128_cipher_TRD, key_128_TRD, aes128_op_TRD, test_sz, 16);
+    
+    std::cout << std::endl;
+    for(size_t i = 0; i < 1280; ++i)
+        std::printf("%c", aes128_op_TRD[i]);
+    std::cout << std::endl;
+    
     return 0;
 }

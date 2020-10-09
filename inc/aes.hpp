@@ -87,6 +87,12 @@ namespace symmetric_ciphers {
          */ 
         int encrpyt_block_ecb_threaded(const uint8_t input[], const uint8_t key[], uint8_t output[], const size_t ip_size, const size_t key_size) const;
 
+        /**
+         * @brief  Function to encrypt given block of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
+        int decrpyt_block_ecb_threaded(const uint8_t input[], const uint8_t key[], uint8_t output[], const size_t ip_size, const size_t key_size) const;
+
     };
 
 } /* namespace symmetric_ciphers */
