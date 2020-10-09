@@ -16,7 +16,7 @@
 
 The Advanced Encryption Standard (AES), also known by its original name Rijndael is a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST).
 
-This implementation currently supports Electronic codebook mode with support for 128/192/256 bit keys.
+This implementation currently supports Electronic codebook mode with support for **128/192/256 bit keys** and option for **multi threading** that spawns upto `std::thread::hardware_concurrency()` threads.
 
 ### High-level description of the algorithm
 1. `KeyExpansion` – round keys are derived from the cipher key using the AES key schedule. AES requires a separate 128-bit round key block for each round plus one more.
@@ -67,6 +67,8 @@ AES Class provides 4 methods - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `en
 `encrpyt_16bytes_ecb` & `decrpyt_16bytes_ecb` encrypts/decrypts 16 bytes of data.
 
 `encrpyt_block_ecb` & `decrpyt_block_ecb` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0).
+
+`encrpyt_block_ecb_threaded` & `decrpyt_block_ecb_threaded` encrypts/decrypts given block of data which should be 16 bytes aligned (ie, input size % 16 == 0) with multithread support.
 
 The library uses input data type as arrays of type **`uint8_t`** - Unsigned Integer type with a width of exactly 8 bits.
 
