@@ -32,9 +32,8 @@ Uses Google Test for unit testing.
 
 ``` sh
 cd aes
-mkdir build
-cd build
-cmake .. -DTEST_EN=False    # Disable testing; use -DTEST_EN=True to build test version.
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DTEST_EN=False # Disables testing; use -DTEST_EN=True to build test cases executable.
 make
 ```
 
