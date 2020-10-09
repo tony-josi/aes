@@ -317,13 +317,6 @@ int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
     std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
-    /* Loop through the input plain text array, processing 16 bytes of data every iteration */
-    for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
-
-        this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
-    
-    }
-
     struct ip_op_SegmentInfo {
         int start__;
         int end__;
@@ -340,6 +333,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
                 segment_Queue__.emplace_back\
                 (ip_op_SegmentInfo{i, std::min(i + AES_PER_THREAD_DATA, static_cast<int>(input_Sz))});
             }
+            total_DataSegments__ = segment_Queue__.size();
         }
 
         bool pop_Segment(std::function<void(const ip_op_SegmentInfo &)> __Func__) {
@@ -366,8 +360,8 @@ int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
         auto primary_Worker = [&] (const ip_op_SegmentInfo &this_Segment) {
             /* Loop through the input plain text array, 
             processing 16 bytes of data every iteration */
-            for(int ip_iter = this_Segment.start__; \
-            (ip_iter * this->block_size) < this_Segment.end__; ++ip_iter) {
+            for(int ip_iter = (this_Segment.start__ / this->block_size); \
+            (ip_iter) < (this_Segment.end__ / this->block_size); ++ip_iter) {
                 this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
             }    
         };

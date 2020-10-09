@@ -13,6 +13,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
 
 using namespace symmetric_ciphers;
 
@@ -80,5 +81,19 @@ int main() {
         std::printf("%c", block_op_plain[i]);
     std::cout << std::endl;
 
+    uint8_t key_128_TRD[16] = "123456781234567";
+    AES aes128_TRD(AES_128);
+    const size_t test_sz = 128000000;
+    uint8_t *aes128_plain_TRD = static_cast<uint8_t *>(std::malloc(test_sz));
+    uint8_t *aes128_cipher_TRD = static_cast<uint8_t *>(std::malloc(test_sz));
+    for(size_t i = 0; i < test_sz; ++i)
+        aes128_plain_TRD[i] = 'J';
+    for(size_t i = 0; i < test_sz; ++i)
+        aes128_cipher_TRD[i] = 0;
+
+    aes128_TRD.encrpyt_block_ecb_threaded(aes128_plain_TRD, key_128_TRD, aes128_cipher_TRD, test_sz, 16);
+
+    //for(size_t i = 0; i < test_sz; ++i)
+    //    std::printf("%X", aes128_cipher_TRD[i]);
     return 0;
 }
