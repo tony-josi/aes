@@ -25,6 +25,11 @@ namespace symmetric_ciphers {
       AES_256                /* AES 256 bit key mode */
     };
 
+    enum aes_Action {
+        _ENCRYPT_0__ = 0,
+        _DECRYPT_1__
+    };
+
     class AES {
 
     private:
@@ -50,6 +55,11 @@ namespace symmetric_ciphers {
          */ 
         int __perform_decryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
 
+        /**
+         * @brief  Function to encrypt given block of unsigned integer 8 bit type
+         *         using AES ECB.
+         */ 
+        int __ECB_threaded__(const uint8_t input[], const uint8_t key[], uint8_t output[], const size_t ip_size, const size_t key_size, const aes_Action action) const;
 
     public:
         /**
