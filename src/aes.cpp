@@ -427,7 +427,7 @@ int symmetric_ciphers::AES::encrpyt_file(
     fread(pt_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
 
     std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
-    this->encrpyt_block_ecb_threaded(pt_file_Buff.get(), key, ct_file_Buff.get(), file_Size, 16);
+    this->encrpyt_block_ecb_threaded(pt_file_Buff.get(), key, ct_file_Buff.get(), file_Size, this->actual_key_len);
 
     // TODO: change op file name
     std::unique_ptr<FILE, decltype(&fclose)> ct_file_Ptr(fopen("ct.txt", "wb"), &fclose);
@@ -472,7 +472,7 @@ int symmetric_ciphers::AES::decrpyt_file(
     fread(ct_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
 
     std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
-    this->decrpyt_block_ecb_threaded(ct_file_Buff.get(), key, op_file_Buff.get(), file_Size, 16);
+    this->decrpyt_block_ecb_threaded(ct_file_Buff.get(), key, op_file_Buff.get(), file_Size, this->actual_key_len);
 
     // TODO: change op file name
     std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen("op.txt", "wb"), &fclose);

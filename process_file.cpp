@@ -20,7 +20,7 @@ using namespace symmetric_ciphers;
 
 namespace {
 
-    constexpr uint8_t key_128_TRD[16] = "123456781234567";
+    constexpr uint8_t key_128_TRD[24] = "12345678123456781234567";
 
     size_t get_File_Size(std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr) {
         size_t file_Size = 0;
@@ -72,15 +72,15 @@ namespace {
 
 int main(int argc, char *argv[]) {
 
-    AES file_tests(AES_128);
+    AES file_tests(AES_192);
     std::cout<<argv[1]<<std::endl;
     if(argc > 2) {
         if(strcmp(argv[1], "s") == 0)
             std::cout<<get_FSize(argv[2])<<std::endl;
         else if(strcmp(argv[1], "e") == 0)
-            file_tests.encrpyt_file(argv[2], key_128_TRD, 16);
+            file_tests.encrpyt_file(argv[2], key_128_TRD, 24);
         else if(strcmp(argv[1], "d") == 0)
-            file_tests.decrpyt_file(argv[2], key_128_TRD, 16);
+            file_tests.decrpyt_file(argv[2], key_128_TRD, 24);
         else
             std::cout<<"Invalid option\n";
     }
