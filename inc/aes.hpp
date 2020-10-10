@@ -107,6 +107,18 @@ namespace symmetric_ciphers {
         int decrpyt_block_ecb_threaded(const uint8_t input[], const uint8_t key[], uint8_t output[], \
         const size_t ip_size, const size_t key_size) const;
 
+        /**
+         * @brief  Function to encrypt given file
+         *         with AES ECB using threads.
+         */ 
+        int encrpyt_file(const std::string &f_Name, const uint8_t key[]) const;
+
+        /**
+         * @brief  Function to decrypt given file
+         *         with AES ECB using threads.
+         */ 
+        int decrpyt_file(const std::string &f_Name, const uint8_t key[]) const;
+
     };
 
 } /* namespace symmetric_ciphers */
