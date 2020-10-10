@@ -152,3 +152,9 @@ int main() {
 * Use pointer based XOR operation instead of loop - individual bytes & XOR
 * Implement other encryption modes - Cipher block chaining, Output feedback, Counter modes
 * Implement algorithm for mix column & inverse mix column instead of lookup table for learning
+
+###### File TODO:
+* Complete todo
+* Make common code single func for enc/dec
+* add padding for ip file and key
+* remove padding while storing pt op file
