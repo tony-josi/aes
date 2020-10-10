@@ -111,13 +111,13 @@ namespace symmetric_ciphers {
          * @brief  Function to encrypt given file
          *         with AES ECB using threads.
          */ 
-        int encrpyt_file(const std::string &f_Name, const uint8_t key[]) const;
+        int encrpyt_file(const std::string &f_Name, const uint8_t key[], const size_t key_size) const;
 
         /**
          * @brief  Function to decrypt given file
          *         with AES ECB using threads.
          */ 
-        int decrpyt_file(const std::string &f_Name, const uint8_t key[]) const;
+        int decrpyt_file(const std::string &f_Name, const uint8_t key[], const size_t key_size) const;
 
     };
 

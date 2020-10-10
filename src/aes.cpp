@@ -126,6 +126,10 @@ namespace {
         uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE]
     );
 
+    size_t __get_File_Size(
+        std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr
+    );
+
 } /* End of anonymous namespace */
 
 
@@ -388,6 +392,95 @@ int symmetric_ciphers::AES::decrpyt_block_ecb_threaded(
 
     return this->__ECB_threaded__(input, key, output, ip_size, key_size, _DECRYPT_1__);
 
+}
+
+/**
+  * @brief  Function to encrypt given file with AES ECB using threads.
+  * 
+  * @param  [in]  f_Name     File name to encrypt.
+  * @param  [in]  input      Input cipher text array.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::encrpyt_file(
+    const std::string          &f_Name,
+    const uint8_t               key[],
+    const size_t                key_size 
+    ) const {
+
+    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
+    if(ip_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("encrpyt_file() - Error opening input file");
+
+    if(key_size < this->actual_key_len) {
+        // TODO: padding 
+        throw std::invalid_argument("encrpyt_block_ecb() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes used");
+    }
+    
+    size_t file_Size = __get_File_Size(ip_file_Ptr);
+
+    /* read data from file to buffer */
+    // TODO: padding
+    std::unique_ptr<uint8_t []> pt_file_Buff(new uint8_t[file_Size]);
+    fread(pt_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+
+    std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
+    this->encrpyt_block_ecb_threaded(pt_file_Buff.get(), key, ct_file_Buff.get(), file_Size, 16);
+
+    // TODO: change op file name
+    std::unique_ptr<FILE, decltype(&fclose)> ct_file_Ptr(fopen("ct.txt", "wb"), &fclose);
+    if(ct_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("encrpyt_file() - Error opening output file");
+    fwrite(ct_file_Buff.get(), 1, file_Size, ct_file_Ptr.get());
+
+    return 0;
+    
+}
+
+/**
+  * @brief  Function to decrypt given file with AES ECB using threads.
+  * 
+  * @param  [in]  f_Name     File name to decrypt.
+  * @param  [in]  input      Input cipher text array.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::decrpyt_file(
+    const std::string          &f_Name,
+    const uint8_t               key[],
+    const size_t                key_size 
+    ) const {
+
+    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
+    if(ip_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("decrpyt_file() - Error opening input file");
+
+    if(key_size < this->actual_key_len) {
+        // TODO: padding 
+        throw std::invalid_argument("decrpyt_file() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes used");
+    }
+    
+    size_t file_Size = __get_File_Size(ip_file_Ptr);
+
+    /* read data from file to buffer */
+    // TODO: padding
+    std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
+    fread(ct_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+
+    std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
+    this->decrpyt_block_ecb_threaded(ct_file_Buff.get(), key, op_file_Buff.get(), file_Size, 16);
+
+    // TODO: change op file name
+    std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen("op.txt", "wb"), &fclose);
+    if(op_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("encrpyt_file() - Error opening output file");
+    fwrite(op_file_Buff.get(), 1, file_Size, op_file_Ptr.get());
+
+    return 0;    
 }
 
 int symmetric_ciphers::AES::__perform_encryption__(
@@ -868,6 +961,14 @@ namespace {
             cur_state[2][i] = MUL_13[t_col[0]] ^ MUL_9[t_col[1]]  ^ MUL_14[t_col[2]] ^ MUL_11[t_col[3]];
             cur_state[3][i] = MUL_11[t_col[0]] ^ MUL_13[t_col[1]] ^ MUL_9[t_col[2]]  ^ MUL_14[t_col[3]];
         }
+    }
+
+    size_t __get_File_Size(std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr) {
+        size_t file_Size = 0;
+        fseek(file_Ptr.get(), 0, SEEK_END);             
+        file_Size = static_cast<size_t>(ftell(file_Ptr.get()));              
+        rewind(file_Ptr.get());     
+        return file_Size;
     }
 
     uint8_t AES_S_BOX[256] = {
