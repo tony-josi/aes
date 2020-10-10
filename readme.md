@@ -155,6 +155,5 @@ int main() {
 
 ###### File TODO:
 * Complete todo
-* Make common code single func for enc/dec
 * add padding for ip file and key
 * remove padding while storing pt op file
