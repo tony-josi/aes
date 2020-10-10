@@ -73,7 +73,7 @@ namespace {
 int main(int argc, char *argv[]) {
 
     AES file_tests(AES_192);
-    std::cout<<argv[1]<<std::endl;
+
     if(argc > 2) {
         if(strcmp(argv[1], "s") == 0)
             std::cout<<get_FSize(argv[2])<<std::endl;

@@ -409,33 +409,7 @@ int symmetric_ciphers::AES::encrpyt_file(
     const size_t                key_size 
     ) const {
 
-    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
-    if(ip_file_Ptr.get() == nullptr)
-        throw std::invalid_argument("encrpyt_file() - Error opening input file");
-
-    if(key_size < this->actual_key_len) {
-        // TODO: padding 
-        throw std::invalid_argument("encrpyt_block_ecb() - key size should be 16/24/32 bytes "
-        "depending on AES - 128/192/256 bit modes used");
-    }
-    
-    size_t file_Size = __get_File_Size(ip_file_Ptr);
-
-    /* read data from file to buffer */
-    // TODO: padding
-    std::unique_ptr<uint8_t []> pt_file_Buff(new uint8_t[file_Size]);
-    fread(pt_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
-
-    std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
-    this->encrpyt_block_ecb_threaded(pt_file_Buff.get(), key, ct_file_Buff.get(), file_Size, this->actual_key_len);
-
-    // TODO: change op file name
-    std::unique_ptr<FILE, decltype(&fclose)> ct_file_Ptr(fopen("ct.txt", "wb"), &fclose);
-    if(ct_file_Ptr.get() == nullptr)
-        throw std::invalid_argument("encrpyt_file() - Error opening output file");
-    fwrite(ct_file_Buff.get(), 1, file_Size, ct_file_Ptr.get());
-
-    return 0;
+    return this->__process_File__(f_Name, key, key_size, _ENCRYPT_0__);
     
 }
 
@@ -454,33 +428,8 @@ int symmetric_ciphers::AES::decrpyt_file(
     const size_t                key_size 
     ) const {
 
-    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
-    if(ip_file_Ptr.get() == nullptr)
-        throw std::invalid_argument("decrpyt_file() - Error opening input file");
+    return this->__process_File__(f_Name, key, key_size, _DECRYPT_1__);
 
-    if(key_size < this->actual_key_len) {
-        // TODO: padding 
-        throw std::invalid_argument("decrpyt_file() - key size should be 16/24/32 bytes "
-        "depending on AES - 128/192/256 bit modes used");
-    }
-    
-    size_t file_Size = __get_File_Size(ip_file_Ptr);
-
-    /* read data from file to buffer */
-    // TODO: padding
-    std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
-    fread(ct_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
-
-    std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
-    this->decrpyt_block_ecb_threaded(ct_file_Buff.get(), key, op_file_Buff.get(), file_Size, this->actual_key_len);
-
-    // TODO: change op file name
-    std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen("op.txt", "wb"), &fclose);
-    if(op_file_Ptr.get() == nullptr)
-        throw std::invalid_argument("encrpyt_file() - Error opening output file");
-    fwrite(op_file_Buff.get(), 1, file_Size, op_file_Ptr.get());
-
-    return 0;    
 }
 
 int symmetric_ciphers::AES::__perform_encryption__(
@@ -667,6 +616,63 @@ int symmetric_ciphers::AES::__ECB_threaded__(
 
     for(auto &t : enc_THREADS)
         t.join();
+
+    return 0;
+
+}
+
+/**
+  * @brief  Function to process (encrypt/decrypt) given data of unsigned integer 8 bit type
+  *         using AES ECB.
+  * 
+  * @param  [in]  f_Name     Input plain text array.
+  * @param  [in]  key        AES Key for encryption/decryption.
+  * @param  [in]  key_size   Key array size.
+  * @param  [in]  action     Encrypt or Decrypt.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::__process_File__(
+    const std::string      &f_Name, 
+    const uint8_t           key[], 
+    const size_t            key_size, 
+    const aes_Action        action
+    ) const {
+
+    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
+    if(ip_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("__process_File__() - Error opening input file");
+
+    if(key_size < this->actual_key_len) {
+        // TODO: padding 
+        throw std::invalid_argument("__process_File__() - key size should be 16/24/32 bytes "
+        "depending on AES - 128/192/256 bit modes used");
+    }
+    
+    size_t file_Size = __get_File_Size(ip_file_Ptr);
+    /* read data from file to buffer */
+    // TODO: padding
+    std::unique_ptr<uint8_t []> ip_file_Buff(new uint8_t[file_Size]);
+    fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+
+    std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
+
+    std::string op_file_name;
+    if(action == _ENCRYPT_0__) {
+        this->encrpyt_block_ecb_threaded(ip_file_Buff.get(), key, op_file_Buff.get(), file_Size, this->actual_key_len);
+        op_file_name = f_Name + ".enc";
+    }
+    else if(action == _DECRYPT_1__) {
+        this->decrpyt_block_ecb_threaded(ip_file_Buff.get(), key, op_file_Buff.get(), file_Size, this->actual_key_len);
+        op_file_name = f_Name + ".dec";
+    } else 
+        return 1;
+    
+    std::unique_ptr<FILE, decltype(&fclose)> ct_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
+    if(ct_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("encrpyt_file() - Error opening output file");
+    fwrite(op_file_Buff.get(), 1, file_Size, ct_file_Ptr.get());
 
     return 0;
 
