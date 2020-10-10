@@ -17,7 +17,6 @@
 #include <chrono>
 
 using namespace symmetric_ciphers;
-
 namespace {
 
     constexpr uint8_t key_128_TRD[24] = "12345678123456781234567";
@@ -35,43 +34,11 @@ namespace {
         return get_File_Size(ip_file_Ptr);
     }
 
-    void encrypt_File(const char *f_Name){
-
-        std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name, "rb"), &fclose);
-        size_t file_Size = get_File_Size(ip_file_Ptr);
-
-        /* read data from file to buffer */
-        std::unique_ptr<uint8_t []> pt_file_Buff(new uint8_t[file_Size]);
-        fread(pt_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
-    
-        std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
-        AES file_enc(AES_128);
-        file_enc.encrpyt_block_ecb_threaded(pt_file_Buff.get(), key_128_TRD, ct_file_Buff.get(), file_Size, 16);
-
-        std::unique_ptr<FILE, decltype(&fclose)> ct_file_Ptr(fopen("ct.txt", "wb"), &fclose);
-        fwrite(ct_file_Buff.get(), 1, file_Size, ct_file_Ptr.get());
-    }
-
-    void decrypt_File(const char *f_Name){
-
-        std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name, "rb"), &fclose);
-        size_t file_Size = get_File_Size(ip_file_Ptr);
-
-        /* read data from file to buffer */
-        std::unique_ptr<uint8_t []> ct_file_Buff(new uint8_t[file_Size]);
-        fread(ct_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
-    
-        std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
-        AES file_enc(AES_128);
-        file_enc.decrpyt_block_ecb_threaded(ct_file_Buff.get(), key_128_TRD, op_file_Buff.get(), file_Size, 16);
-
-        std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen("op.txt", "wb"), &fclose);
-        fwrite(op_file_Buff.get(), 1, file_Size, op_file_Ptr.get());
-    }
 }
 
 int main(int argc, char *argv[]) {
 
+    auto t1 = std::chrono::high_resolution_clock::now();
     AES file_tests(AES_192);
 
     if(argc > 2) {
@@ -84,6 +51,10 @@ int main(int argc, char *argv[]) {
         else
             std::cout<<"Invalid option\n";
     }
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>\
+    ( std::chrono::high_resolution_clock::now() - t1 ).count();
+    std::cout<<"\nDuration: "<<duration<<"\n";
 
     return 0;
 }

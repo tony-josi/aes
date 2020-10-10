@@ -27,7 +27,7 @@ namespace {
 
     constexpr   uint8_t     AES_WORD_SIZE = 4;
 
-    constexpr   int         AES_PER_THREAD_DATA = 128;
+    constexpr   int         AES_PER_THREAD_PER_LOOP_DATA = 12800;    /* 12.8 KB per thread per loop. */
 
     /* Forward declarations for Lookup tables */
 
@@ -550,9 +550,9 @@ int symmetric_ciphers::AES::__ECB_threaded__(
         std::vector<ip_op_SegmentInfo>  segment_Queue__;
 
         ip_Data_SegmentQueue(size_t input_Sz) {
-            for(int i = 0; i < static_cast<int>(input_Sz); i = i + AES_PER_THREAD_DATA) {
+            for(int i = 0; i < static_cast<int>(input_Sz); i = i + AES_PER_THREAD_PER_LOOP_DATA) {
                 segment_Queue__.emplace_back\
-                (ip_op_SegmentInfo{i, std::min(i + AES_PER_THREAD_DATA, static_cast<int>(input_Sz))});
+                (ip_op_SegmentInfo{i, std::min(i + AES_PER_THREAD_PER_LOOP_DATA, static_cast<int>(input_Sz))});
             }
             total_DataSegments__ = segment_Queue__.size();
         }
@@ -566,10 +566,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
             ip_op_SegmentInfo cur_segment = segment_Queue__.back();
             segment_Queue__.pop_back();
             pop_LOCK.unlock();
-            
-            std::fprintf(stderr, "\rEncrypting: %5.2f%%", \
-            static_cast<double>(total_DataSegments__ - segment_Queue__.size()) / total_DataSegments__ * 100);
-
+        
             __Func__(cur_segment);
             return true;
         }
