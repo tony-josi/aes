@@ -28,7 +28,7 @@ endif()
 
 find_package (Threads)
 
-set(SOURCES test_main.cpp)
+set(SOURCES process_file.cpp)
 
 add_executable(aes_exe ${SOURCES})
 
