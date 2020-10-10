@@ -72,14 +72,15 @@ namespace {
 
 int main(int argc, char *argv[]) {
 
+    AES file_tests(AES_128);
     std::cout<<argv[1]<<std::endl;
     if(argc > 2) {
         if(strcmp(argv[1], "s") == 0)
             std::cout<<get_FSize(argv[2])<<std::endl;
         else if(strcmp(argv[1], "e") == 0)
-            encrypt_File(argv[2]);
+            file_tests.encrpyt_file(argv[2], key_128_TRD, 16);
         else if(strcmp(argv[1], "d") == 0)
-            decrypt_File(argv[2]);
+            file_tests.decrpyt_file(argv[2], key_128_TRD, 16);
         else
             std::cout<<"Invalid option\n";
     }
