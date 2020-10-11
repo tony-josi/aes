@@ -645,9 +645,7 @@ int symmetric_ciphers::AES::__process_File__(
     memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
 
     if(key_size < this->actual_key_len) {
-        // TODO: padding 
-        //throw std::invalid_argument("__process_File__() - key size should be 16/24/32 bytes "
-        //"depending on AES - 128/192/256 bit modes used");
+        /* Padd with zero's if key size is less than expected. */
         memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
     }
     
