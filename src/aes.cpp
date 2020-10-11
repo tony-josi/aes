@@ -641,10 +641,14 @@ int symmetric_ciphers::AES::__process_File__(
     if(ip_file_Ptr.get() == nullptr)
         throw std::invalid_argument("__process_File__() - Error opening input file");
 
+    std::unique_ptr<uint8_t []> padded_Key(new uint8_t[this->actual_key_len]);
+    memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
+
     if(key_size < this->actual_key_len) {
         // TODO: padding 
-        throw std::invalid_argument("__process_File__() - key size should be 16/24/32 bytes "
-        "depending on AES - 128/192/256 bit modes used");
+        //throw std::invalid_argument("__process_File__() - key size should be 16/24/32 bytes "
+        //"depending on AES - 128/192/256 bit modes used");
+        memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
     }
     
     size_t file_Size = __get_File_Size(ip_file_Ptr);
@@ -657,11 +661,11 @@ int symmetric_ciphers::AES::__process_File__(
 
     std::string op_file_name;
     if(action == _ENCRYPT_0__) {
-        this->encrpyt_block_ecb_threaded(ip_file_Buff.get(), key, op_file_Buff.get(), file_Size, this->actual_key_len);
+        this->encrpyt_block_ecb_threaded(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), file_Size, this->actual_key_len);
         op_file_name = f_Name + ".enc";
     }
     else if(action == _DECRYPT_1__) {
-        this->decrpyt_block_ecb_threaded(ip_file_Buff.get(), key, op_file_Buff.get(), file_Size, this->actual_key_len);
+        this->decrpyt_block_ecb_threaded(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), file_Size, this->actual_key_len);
         op_file_name = f_Name + ".dec";
     } else 
         return 1;
