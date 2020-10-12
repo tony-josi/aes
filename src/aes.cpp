@@ -289,37 +289,6 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
 }
 
 /**
-  * @brief  Function to encrypt given block of unsigned integer 8 bit type
-  *         wiht AES ECB, using multiple threads.
-  * 
-  * @param  [in]  input      Input cipher text array.
-  * @param  [in]  key        AES Key for encryption.
-  * @param  [out] output     Output plain text array.
-  * @param  [in]  ip_size    Input cipher text array size.
-  * @param  [in]  key_size   Key array size.
-  * 
-  * @note   This method encrypts the given cipher text input array of using
-  *         the given #key and outputs it to the output plain text array.
-  * 
-  * @note   The input & output array should be of same size and should be 16 byte 
-  *         aligned, ie. ip_size % 16 == 0.
-  *         
-  * @retval Status:
-  *             - 0         Success.
-  */
-int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
-    const uint8_t               input[], 
-    const uint8_t               key[], 
-    uint8_t                     output[], 
-    const size_t                ip_size,
-    const size_t                key_size
-    ) const {
-
-    return this->__ECB_threaded__(input, key, output, ip_size, key_size, _ENCRYPT_0__);
-
-}
-
-/**
   * @brief  Function to decrypt given block of unsigned integer 8 bit type
   *         using AES ECB.
   * 
@@ -366,6 +335,37 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
 
     return 0;
     
+}
+
+/**
+  * @brief  Function to encrypt given block of unsigned integer 8 bit type
+  *         wiht AES ECB, using multiple threads.
+  * 
+  * @param  [in]  input      Input cipher text array.
+  * @param  [in]  key        AES Key for encryption.
+  * @param  [out] output     Output plain text array.
+  * @param  [in]  ip_size    Input cipher text array size.
+  * @param  [in]  key_size   Key array size.
+  * 
+  * @note   This method encrypts the given cipher text input array of using
+  *         the given #key and outputs it to the output plain text array.
+  * 
+  * @note   The input & output array should be of same size and should be 16 byte 
+  *         aligned, ie. ip_size % 16 == 0.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
+    const uint8_t               input[], 
+    const uint8_t               key[], 
+    uint8_t                     output[], 
+    const size_t                ip_size,
+    const size_t                key_size
+    ) const {
+
+    return this->__ECB_threaded__(input, key, output, ip_size, key_size, _ENCRYPT_0__);
+
 }
 
 /**
