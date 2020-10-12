@@ -39,7 +39,7 @@ namespace {
 int main(int argc, char *argv[]) {
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    AES file_tests(AES_192);
+    AES file_tests(AES_256);
 
     if(argc > 2) {
         if(strcmp(argv[1], "s") == 0)
