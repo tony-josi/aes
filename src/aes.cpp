@@ -542,12 +542,14 @@ int symmetric_ciphers::AES::__ECB_threaded__(
     std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
+    /* Data structure to store range of input data buffer being processed
+    by a thread at any given instance. */
     struct ip_op_SegmentInfo {
         int start__;
         int end__;
     };
 
-
+    /* Data structure handling threading, holds mutex & queue of input data segments. */
     struct ip_Data_SegmentQueue {
         std::mutex                      ipD_Mutex__;
         size_t                          total_DataSegments__;
@@ -555,22 +557,26 @@ int symmetric_ciphers::AES::__ECB_threaded__(
 
         ip_Data_SegmentQueue(size_t input_Sz) {
             for(int i = 0; i < static_cast<int>(input_Sz); i = i + AES_PER_THREAD_PER_LOOP_DATA) {
+
+                /* Slice the input buffer into segments. */
                 segment_Queue__.emplace_back\
                 (ip_op_SegmentInfo{i, std::min(i + AES_PER_THREAD_PER_LOOP_DATA, static_cast<int>(input_Sz))});
             }
             total_DataSegments__ = segment_Queue__.size();
         }
 
+        /* Feeds each data segment to input function without data races, until
+        segment queue is empty. */
         bool pop_Segment(std::function<void(const ip_op_SegmentInfo &)> __Func__) {
             
             std::unique_lock<std::mutex> pop_LOCK(ipD_Mutex__);
             if(segment_Queue__.empty())
                 return false;
-
             ip_op_SegmentInfo cur_segment = segment_Queue__.back();
             segment_Queue__.pop_back();
             pop_LOCK.unlock();
         
+            /* Process the data segment. */
             __Func__(cur_segment);
             return true;
         }
@@ -578,6 +584,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
 
     ip_Data_SegmentQueue encrypt_DataSegmentQueue(ip_size);
 
+    /* Encryption thread function. */
     auto thread_MAIN_ENC = [&] {
         auto primary_Worker = [&] (const ip_op_SegmentInfo &this_Segment) {
             /* Loop through the input plain text array, 
@@ -587,11 +594,13 @@ int symmetric_ciphers::AES::__ECB_threaded__(
                 this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
             }    
         };
+
         while(encrypt_DataSegmentQueue.pop_Segment(primary_Worker)) {
             // do processing
         }
     }; 
     
+    /* Decryption thread function. */
     auto thread_MAIN_DEC = [&] {
         auto primary_Worker = [&] (const ip_op_SegmentInfo &this_Segment) {
             /* Loop through the input plain text array, 
@@ -601,6 +610,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
                 this->__perform_decryption__(input, exp_key, output, (ip_iter * this->block_size));
             }    
         };
+
         while(encrypt_DataSegmentQueue.pop_Segment(primary_Worker)) {
             // do processing
         }
@@ -684,7 +694,7 @@ int symmetric_ciphers::AES::__process_File__(
         | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|15|
         -------------------------------------------------
 
-        [0]     -> Padding size, accepted values ranging from [0, 15].
+        [0]     -> Padding size, reasonable values ranging from [0, 15].
         [1:15]  -> Reserved.
 
         */
