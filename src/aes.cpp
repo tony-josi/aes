@@ -20,14 +20,18 @@
 #include <functional>
 #include <thread>
 #include <cstdio>
+#include <iostream>
 
 namespace {
 
     /* AES Word size */
 
-    constexpr   uint8_t     AES_WORD_SIZE = 4;
+    constexpr   uint8_t     AES_WORD_SIZE =                4;
 
     constexpr   int         AES_PER_THREAD_PER_LOOP_DATA = 12800;    /* 12.8 KB per thread per loop. */
+
+    constexpr   size_t      META_DATA_SIZE =               AES_WORD_SIZE * AES_WORD_SIZE;  /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE)*/ 
+    constexpr   size_t      META_DATA_PADD_SIZE_OFFSET =   0; 
 
     /* Forward declarations for Lookup tables */
 
@@ -649,27 +653,46 @@ int symmetric_ciphers::AES::__process_File__(
         memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
     }
     
-    size_t file_Size = __get_File_Size(ip_file_Ptr);
-    /* read data from file to buffer */
-    // TODO: padding
-    std::unique_ptr<uint8_t []> ip_file_Buff(new uint8_t[file_Size]);
-    fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+    const size_t file_Size = __get_File_Size(ip_file_Ptr);
+    
+    std::unique_ptr<uint8_t []> ip_file_Buff;
+    std::unique_ptr<uint8_t []> op_file_Buff;
+    size_t ip_Total_PaddedBufferSize = file_Size;
+    if(action == _ENCRYPT_0__) {
+        size_t pad_Diff = file_Size % (AES_WORD_SIZE * AES_WORD_SIZE);
+        pad_Diff = pad_Diff ? ((AES_WORD_SIZE * AES_WORD_SIZE) - pad_Diff) : 0;
+        ip_Total_PaddedBufferSize += META_DATA_SIZE + pad_Diff;
+        ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
+        fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+        op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
+        memset(ip_file_Buff.get() + file_Size, 0, ip_Total_PaddedBufferSize - file_Size);
+        ip_file_Buff[file_Size + pad_Diff + META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
 
-    std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
+    } else if(action == _DECRYPT_1__) {
+        ip_file_Buff = std::make_unique<uint8_t []>(file_Size);
+        fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+        op_file_Buff = std::make_unique<uint8_t []>(file_Size);
+    } else 
+        return 1;
 
-    this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), file_Size, this->actual_key_len, action);
+    this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, action);
     std::string op_file_name;
     if(action == _ENCRYPT_0__) 
         op_file_name = f_Name + ".enc";
     else if(action == _DECRYPT_1__) 
         op_file_name = f_Name + ".dec";
-    else 
-        return 1;
+
+    size_t op_File_FinalBufferSize;
+    if(action == _ENCRYPT_0__) 
+        op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
+    else if(action == _DECRYPT_1__) {
+        op_File_FinalBufferSize = file_Size - META_DATA_SIZE - op_file_Buff[file_Size - META_DATA_SIZE + META_DATA_PADD_SIZE_OFFSET];
+    }
     
     std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
     if(op_file_Ptr.get() == nullptr)
         throw std::invalid_argument("encrpyt_file() - Error opening output file");
-    fwrite(op_file_Buff.get(), 1, file_Size, op_file_Ptr.get());
+    fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
 
     return 0;
 
