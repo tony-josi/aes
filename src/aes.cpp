@@ -654,21 +654,46 @@ int symmetric_ciphers::AES::__process_File__(
     }
     
     const size_t file_Size = __get_File_Size(ip_file_Ptr);
-    
     std::unique_ptr<uint8_t []> ip_file_Buff;
     std::unique_ptr<uint8_t []> op_file_Buff;
+    
     size_t ip_Total_PaddedBufferSize = file_Size;
+
     if(action == _ENCRYPT_0__) {
+        /* Calculate the number of bytes needed to be added to make the file size
+        a multiple of 16 bytes, ie (AES_WORD_SIZE * AES_WORD_SIZE). */
         size_t pad_Diff = file_Size % (AES_WORD_SIZE * AES_WORD_SIZE);
         pad_Diff = pad_Diff ? ((AES_WORD_SIZE * AES_WORD_SIZE) - pad_Diff) : 0;
+
+        /* Final buffer size including padding and metadata. */
         ip_Total_PaddedBufferSize += META_DATA_SIZE + pad_Diff;
+
         ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
         fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
         op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
+        
+        /* Set the area reserved for padding and metadata as 0. */
         memset(ip_file_Buff.get() + file_Size, 0, ip_Total_PaddedBufferSize - file_Size);
+
+        /* 
+        
+        Metadata Layout:
+        ----------------
+
+        ------------------------------------------------
+        | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|15|
+        ------------------------------------------------
+
+        [0]     -> Padding size ranging from [0, 15].
+        [1:15]  -> Reserved.
+
+        */
+        
+        /* Add metadata, padding size. */
         ip_file_Buff[file_Size + pad_Diff + META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
 
     } else if(action == _DECRYPT_1__) {
+        /* If decrypt, read entire .dec file. */
         ip_file_Buff = std::make_unique<uint8_t []>(file_Size);
         fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
         op_file_Buff = std::make_unique<uint8_t []>(file_Size);
@@ -686,6 +711,7 @@ int symmetric_ciphers::AES::__process_File__(
     if(action == _ENCRYPT_0__) 
         op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     else if(action == _DECRYPT_1__) {
+        /* If decryption remove metadata and padding. */
         op_File_FinalBufferSize = file_Size - META_DATA_SIZE - op_file_Buff[file_Size - META_DATA_SIZE + META_DATA_PADD_SIZE_OFFSET];
     }
     
