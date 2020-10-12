@@ -657,21 +657,19 @@ int symmetric_ciphers::AES::__process_File__(
 
     std::unique_ptr<uint8_t []> op_file_Buff(new uint8_t[file_Size]);
 
+    this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), file_Size, this->actual_key_len, action);
     std::string op_file_name;
-    if(action == _ENCRYPT_0__) {
-        this->encrpyt_block_ecb_threaded(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), file_Size, this->actual_key_len);
+    if(action == _ENCRYPT_0__) 
         op_file_name = f_Name + ".enc";
-    }
-    else if(action == _DECRYPT_1__) {
-        this->decrpyt_block_ecb_threaded(ip_file_Buff.get(), padded_Key.get(), op_file_Buff.get(), file_Size, this->actual_key_len);
+    else if(action == _DECRYPT_1__) 
         op_file_name = f_Name + ".dec";
-    } else 
+    else 
         return 1;
     
-    std::unique_ptr<FILE, decltype(&fclose)> ct_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
-    if(ct_file_Ptr.get() == nullptr)
+    std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
+    if(op_file_Ptr.get() == nullptr)
         throw std::invalid_argument("encrpyt_file() - Error opening output file");
-    fwrite(op_file_Buff.get(), 1, file_Size, ct_file_Ptr.get());
+    fwrite(op_file_Buff.get(), 1, file_Size, op_file_Ptr.get());
 
     return 0;
 
