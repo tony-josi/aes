@@ -43,6 +43,10 @@ make
 ./aes_exe
 ```
 
+###  Speed benchmark
+
+Encrypts/Decrypts 1 GB data in ~20 seconds in 1.8 GHz Dual-Core Intel Core i5.
+
 ### AES Methods (API)
 
 AES Class provides 6 methods - `encrpyt_16bytes_ecb`, `decrpyt_16bytes_ecb`, `encrpyt_block_ecb`, `decrpyt_block_ecb`, `encrpyt_block_ecb_threaded` & `decrpyt_block_ecb_threaded`. 
