@@ -437,7 +437,7 @@ int symmetric_ciphers::AES::decrpyt_file(
 
 }
 
-int symmetric_ciphers::AES::__perform_encryption__(
+inline int symmetric_ciphers::AES::__perform_encryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
     uint8_t                         output[],
@@ -476,7 +476,7 @@ int symmetric_ciphers::AES::__perform_encryption__(
     return 0;
 }
 
-int symmetric_ciphers::AES::__perform_decryption__(
+inline int symmetric_ciphers::AES::__perform_decryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
     uint8_t                         output[],
