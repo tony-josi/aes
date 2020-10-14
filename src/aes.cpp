@@ -727,7 +727,7 @@ int symmetric_ciphers::AES::__process_File__(
     else if(action == _DECRYPT_1__) 
         op_file_name = f_Name + ".dec";
 
-    size_t op_File_FinalBufferSize;
+    size_t op_File_FinalBufferSize = 0;
     if(action == _ENCRYPT_0__) 
         op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     else if(action == _DECRYPT_1__) {
