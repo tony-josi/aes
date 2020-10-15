@@ -415,11 +415,12 @@ int symmetric_ciphers::AES::decrpyt_block_ecb_threaded(
   */
 int symmetric_ciphers::AES::encrpyt_file(
     const std::string          &f_Name,
+    const std::string          &op_file_name, 
     const uint8_t               key[],
     const size_t                key_size 
     ) const {
 
-    return this->__process_File__(f_Name, key, key_size, _ENCRYPT_0__);
+    return this->__process_File__(f_Name, op_file_name, key, key_size, _ENCRYPT_0__);
     
 }
 
@@ -434,11 +435,12 @@ int symmetric_ciphers::AES::encrpyt_file(
   */
 int symmetric_ciphers::AES::decrpyt_file(
     const std::string          &f_Name,
+    const std::string          &op_file_name, 
     const uint8_t               key[],
     const size_t                key_size 
     ) const {
 
-    return this->__process_File__(f_Name, key, key_size, _DECRYPT_1__);
+    return this->__process_File__(f_Name, op_file_name, key, key_size, _DECRYPT_1__);
 
 }
 
@@ -660,6 +662,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
   */
 int symmetric_ciphers::AES::__process_File__(
     const std::string      &f_Name, 
+    const std::string      &op_file_name, 
     const uint8_t           key[], 
     const size_t            key_size, 
     const aes_Action        action
@@ -728,11 +731,6 @@ int symmetric_ciphers::AES::__process_File__(
 
     this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
     op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, action);
-    std::string op_file_name;
-    if(action == _ENCRYPT_0__) 
-        op_file_name = f_Name + ".enc";
-    else if(action == _DECRYPT_1__) 
-        op_file_name = f_Name + ".dec";
 
     size_t op_File_FinalBufferSize = 0;
     if(action == _ENCRYPT_0__) 

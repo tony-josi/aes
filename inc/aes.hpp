@@ -82,13 +82,13 @@ namespace symmetric_ciphers {
          * @brief  Function to encrypt given file
          *         with AES ECB using threads.
          */ 
-        int encrpyt_file(const std::string &f_Name, const uint8_t key[], const size_t key_size) const;
+        int encrpyt_file(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
 
         /**
          * @brief  Function to decrypt given file
          *         with AES ECB using threads.
          */ 
-        int decrpyt_file(const std::string &f_Name, const uint8_t key[], const size_t key_size) const;
+        int decrpyt_file(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
 
     private:
         size_t       actual_key_len;                  /* Stores the actual length of key in bytes */
@@ -123,7 +123,7 @@ namespace symmetric_ciphers {
          * @brief  Internal Function to encrypt/decrypt given file
          *         with AES using threads.
          */ 
-        int __process_File__(const std::string &f_Name, const uint8_t key[], const size_t key_size, const aes_Action action) const;
+        int __process_File__(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size, const aes_Action action) const;
 
     };
 
