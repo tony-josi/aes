@@ -711,8 +711,10 @@ int symmetric_ciphers::AES::__process_File__(
         | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|15|
         -------------------------------------------------
 
-        [0]     -> Padding size, reasonable values ranging from [0, 15].
-        [1:15]  -> Reserved.
+        [0]     -> Padding size, reasonable values ranging from [0, 15]. (1 byte)
+        [1:7]   -> Reserved.
+        [8:12]  -> Checksum. (4 bytes)
+        [13:15] -> Reserved.
 
         */
         
