@@ -123,7 +123,13 @@ namespace symmetric_ciphers {
          * @brief  Internal Function to encrypt/decrypt given file
          *         with AES using threads.
          */ 
-        int __process_File__(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size, const aes_Action action) const;
+        int __process_File__ENC(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
+
+        /**
+         * @brief  Internal Function to encrypt/decrypt given file
+         *         with AES using threads.
+         */ 
+        int __process_File__DEC(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
 
     };
 

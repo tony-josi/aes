@@ -420,7 +420,7 @@ int symmetric_ciphers::AES::encrpyt_file(
     const size_t                key_size 
     ) const {
 
-    return this->__process_File__(f_Name, op_file_name, key, key_size, _ENCRYPT_0__);
+    return this->__process_File__ENC(f_Name, op_file_name, key, key_size);
     
 }
 
@@ -440,7 +440,7 @@ int symmetric_ciphers::AES::decrpyt_file(
     const size_t                key_size 
     ) const {
 
-    return this->__process_File__(f_Name, op_file_name, key, key_size, _DECRYPT_1__);
+    return this->__process_File__DEC(f_Name, op_file_name, key, key_size);
 
 }
 
@@ -652,20 +652,19 @@ int symmetric_ciphers::AES::__ECB_threaded__(
   * @brief  Function to process (encrypt/decrypt) given data of unsigned integer 8 bit type
   *         using AES ECB.
   * 
-  * @param  [in]  f_Name     Input plain text array.
-  * @param  [in]  key        AES Key for encryption/decryption.
-  * @param  [in]  key_size   Key array size.
-  * @param  [in]  action     Encrypt or Decrypt.
+  * @param  [in]  f_Name            Input plain text array.
+  * @param  [in]  op_file_name      Output plain text array.
+  * @param  [in]  key               AES Key for encryption/decryption.
+  * @param  [in]  key_size          Key array size.
   *         
   * @retval Status:
   *             - 0         Success.
   */
-int symmetric_ciphers::AES::__process_File__(
+int symmetric_ciphers::AES::__process_File__ENC(
     const std::string      &f_Name, 
     const std::string      &op_file_name, 
     const uint8_t           key[], 
-    const size_t            key_size, 
-    const aes_Action        action
+    const size_t            key_size 
     ) const {
 
     std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
@@ -686,68 +685,113 @@ int symmetric_ciphers::AES::__process_File__(
     
     size_t ip_Total_PaddedBufferSize = file_Size;
 
-    if(action == _ENCRYPT_0__) {
-        /* Calculate the number of bytes needed to be added to make the file size
-        a multiple of 16 bytes, ie (AES_WORD_SIZE * AES_WORD_SIZE). */
-        size_t pad_Diff = file_Size % (AES_WORD_SIZE * AES_WORD_SIZE);
-        pad_Diff = pad_Diff ? ((AES_WORD_SIZE * AES_WORD_SIZE) - pad_Diff) : 0;
+    /* Calculate the number of bytes needed to be added to make the file size
+    a multiple of 16 bytes, ie (AES_WORD_SIZE * AES_WORD_SIZE). */
+    size_t pad_Diff = file_Size % (AES_WORD_SIZE * AES_WORD_SIZE);
+    pad_Diff = pad_Diff ? ((AES_WORD_SIZE * AES_WORD_SIZE) - pad_Diff) : 0;
 
-        /* Final buffer size including padding and metadata. */
-        ip_Total_PaddedBufferSize += AES_META_DATA_SIZE + pad_Diff;
+    /* Final buffer size including padding and metadata. */
+    ip_Total_PaddedBufferSize += AES_META_DATA_SIZE + pad_Diff;
 
-        ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
-        fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
-        op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
-        
-        /* Set the area reserved for padding and metadata as 0. */
-        memset(ip_file_Buff.get() + file_Size, 0, ip_Total_PaddedBufferSize - file_Size);
+    ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
+    fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+    op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
+    
+    /* Set the area reserved for padding and metadata as 0. */
+    memset(ip_file_Buff.get() + file_Size, 0, ip_Total_PaddedBufferSize - file_Size);
 
-        /* 
-        
-        Metadata Layout:
-        ----------------
+    /* 
+    
+    Metadata Layout:
+    ----------------
 
-        -------------------------------------------------
-        | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|15|
-        -------------------------------------------------
+    -------------------------------------------------
+    | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|15|
+    -------------------------------------------------
 
-        [0]     -> Padding size, reasonable values ranging from [0, 15]. (1 byte)
-        [1:7]   -> Reserved.
-        [8:12]  -> Checksum. (4 bytes)
-        [13:15] -> Reserved.
+    [0]     -> Padding size, reasonable values ranging from [0, 15]. (1 byte)
+    [1:7]   -> Reserved.
+    [8:12]  -> Checksum. (4 bytes)
+    [13:15] -> Reserved.
 
-        */
-        
-        /* Add metadata, padding size. */
-        ip_file_Buff[file_Size + pad_Diff + AES_META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
-        uint32_t check_sum = __aes_calculate_Cheksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
-        memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - 8, &check_sum, sizeof(uint32_t));
-
-    } else if(action == _DECRYPT_1__) {
-        /* If decrypt, read entire .dec file. */
-        ip_file_Buff = std::make_unique<uint8_t []>(file_Size);
-        fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
-        op_file_Buff = std::make_unique<uint8_t []>(file_Size);
-    } else 
-        return 1;
+    */
+    
+    /* Add metadata, padding size. */
+    ip_file_Buff[file_Size + pad_Diff + AES_META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
+    uint32_t check_sum = __aes_calculate_Cheksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
+    memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - 8, &check_sum, sizeof(uint32_t));
 
     this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
-    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, action);
+    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, _ENCRYPT_0__);
+
+    size_t op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
+    
+    std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
+    if(op_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("encrpyt_file() - Error opening output file");
+    fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
+
+    return 0;
+
+}
+
+/**
+  * @brief  Function to process (encrypt/decrypt) given data of unsigned integer 8 bit type
+  *         using AES ECB.
+  * 
+  * @param  [in]  f_Name            Input plain text array.
+  * @param  [in]  op_file_name      Output plain text array.
+  * @param  [in]  key               AES Key for encryption/decryption.
+  * @param  [in]  key_size          Key array size.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::__process_File__DEC(
+    const std::string      &f_Name, 
+    const std::string      &op_file_name, 
+    const uint8_t           key[], 
+    const size_t            key_size 
+    ) const {
+
+    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
+    if(ip_file_Ptr.get() == nullptr)
+        throw std::invalid_argument("__process_File__() - Error opening input file");
+
+    std::unique_ptr<uint8_t []> padded_Key(new uint8_t[this->actual_key_len]);
+    memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
+
+    if(key_size < this->actual_key_len) {
+        /* Padd with zero's if key size is less than expected. */
+        memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
+    }
+    
+    const size_t file_Size = __get_File_Size(ip_file_Ptr);
+    std::unique_ptr<uint8_t []> ip_file_Buff;
+    std::unique_ptr<uint8_t []> op_file_Buff;
+    
+    size_t ip_Total_PaddedBufferSize = file_Size;
+
+    /* If decrypt, read entire .dec file. */
+    ip_file_Buff = std::make_unique<uint8_t []>(file_Size);
+    fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+    op_file_Buff = std::make_unique<uint8_t []>(file_Size);
+
+
+    this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
+    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, _DECRYPT_1__);
 
     size_t op_File_FinalBufferSize = 0;
-    if(action == _ENCRYPT_0__) 
-        op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
-    else if(action == _DECRYPT_1__) {
-        /* If decryption remove metadata and padding. */
-        op_File_FinalBufferSize = file_Size - \
-        AES_META_DATA_SIZE - op_file_Buff[file_Size - AES_META_DATA_SIZE + AES_META_DATA_PADD_SIZE_OFFSET];
-        uint32_t cur_check_sum = __aes_calculate_Cheksum(op_file_Buff.get(), file_Size - AES_META_DATA_SIZE);
-        uint32_t actual_check_sum = 0;
-        memcpy(&actual_check_sum, op_file_Buff.get() + file_Size - AES_META_DATA_SIZE + 8, sizeof(uint32_t));
+    /* If decryption remove metadata and padding. */
+    op_File_FinalBufferSize = file_Size - \
+    AES_META_DATA_SIZE - op_file_Buff[file_Size - AES_META_DATA_SIZE + AES_META_DATA_PADD_SIZE_OFFSET];
+    uint32_t cur_check_sum = __aes_calculate_Cheksum(op_file_Buff.get(), file_Size - AES_META_DATA_SIZE);
+    uint32_t actual_check_sum = 0;
+    memcpy(&actual_check_sum, op_file_Buff.get() + file_Size - AES_META_DATA_SIZE + 8, sizeof(uint32_t));
 
-        if(actual_check_sum != cur_check_sum)
-            throw std::invalid_argument("encrpyt_file() - Incorrect key/invalid format");
-    }
+    if(actual_check_sum != cur_check_sum)
+        throw std::invalid_argument("encrpyt_file() - Incorrect key/invalid format");
+
     
     std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
     if(op_file_Ptr.get() == nullptr)
