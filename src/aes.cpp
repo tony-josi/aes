@@ -134,6 +134,11 @@ namespace {
         std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr
     );
 
+    uint32_t __aes_calculate_Cheksum(
+        uint8_t                     buffer[],
+        size_t                      siz_
+    );
+
 } /* End of anonymous namespace */
 
 
@@ -700,7 +705,9 @@ int symmetric_ciphers::AES::__process_File__(
         */
         
         /* Add metadata, padding size. */
-        ip_file_Buff[file_Size + pad_Diff + META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
+        ip_file_Buff[file_Size + pad_Diff + AES_META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
+        uint32_t check_sum = __aes_calculate_Cheksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
+        memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - 8, &check_sum, sizeof(uint32_t));
 
     } else if(action == _DECRYPT_1__) {
         /* If decrypt, read entire .dec file. */
@@ -722,7 +729,14 @@ int symmetric_ciphers::AES::__process_File__(
         op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     else if(action == _DECRYPT_1__) {
         /* If decryption remove metadata and padding. */
-        op_File_FinalBufferSize = file_Size - META_DATA_SIZE - op_file_Buff[file_Size - META_DATA_SIZE + META_DATA_PADD_SIZE_OFFSET];
+        op_File_FinalBufferSize = file_Size - \
+        AES_META_DATA_SIZE - op_file_Buff[file_Size - AES_META_DATA_SIZE + AES_META_DATA_PADD_SIZE_OFFSET];
+        uint32_t cur_check_sum = __aes_calculate_Cheksum(op_file_Buff.get(), file_Size - AES_META_DATA_SIZE);
+        uint32_t actual_check_sum = 0;
+        memcpy(&actual_check_sum, op_file_Buff.get() + file_Size - AES_META_DATA_SIZE + 8, sizeof(uint32_t));
+
+        if(actual_check_sum != cur_check_sum)
+            throw std::invalid_argument("encrpyt_file() - Incorrect key/invalid format");
     }
     
     std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
@@ -1031,6 +1045,19 @@ namespace {
         file_Size = static_cast<size_t>(ftell(file_Ptr.get()));              
         rewind(file_Ptr.get());     
         return file_Size;
+    }
+
+    uint32_t __aes_calculate_Cheksum(
+        uint8_t                     buffer[],
+        size_t                      siz_
+    ) {
+        uint32_t c = 0;
+        for(int i = 0; i < static_cast<int>(siz_); ++i) {
+            c += buffer[i];
+            c = c << 3 | c >> (32 - 3); 
+            c ^= 0xFFFFFFFF; 
+        }
+        return c;
     }
 
     uint8_t AES_S_BOX[256] = {
