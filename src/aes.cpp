@@ -33,9 +33,9 @@ namespace {
     /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
     constexpr   size_t      AES_META_DATA_SIZE             = AES_WORD_SIZE * AES_WORD_SIZE;  
     constexpr   size_t      AES_META_DATA_PADD_SIZE_OFFSET = 0; 
+    constexpr   size_t      AES_META_DATA_CHECK_SUM_OFFSET = 8; 
 
     /* Forward declarations for Lookup tables */
-
     extern      uint8_t     AES_S_BOX[256];
     extern      uint8_t     AES_INV_S_BOX[256];
     extern      uint8_t     MUL_2[256];
@@ -46,9 +46,7 @@ namespace {
     extern      uint8_t     MUL_14[256];
     extern      uint8_t     AES_RCON[11];
 
-
     /* Forward declarations for helper functions */
-
     size_t __aes_expand_key(
         const uint8_t               key[], 
         uint8_t                     expand_key[], 
@@ -135,7 +133,7 @@ namespace {
         std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr
     );
 
-    uint32_t __aes_calculate_Cheksum(
+    uint32_t __aes_calculate_Checksum(
         uint8_t                     buffer[],
         size_t                      siz_
     );
@@ -444,6 +442,18 @@ int symmetric_ciphers::AES::decrpyt_file(
 
 }
 
+/**
+  * @brief  Internal Function encrypt the given 16 bytes if data.
+  * 
+  * @param  [in]  input         Input array.
+  * @param  [in]  exp_key       Expanded key.
+  * @param  [in]  output        Output array.
+  * @param  [in]  ip_ptr        Offset pointing to the current section
+  *                             of data to be processed in the input array.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
 inline int symmetric_ciphers::AES::__perform_encryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
@@ -483,6 +493,18 @@ inline int symmetric_ciphers::AES::__perform_encryption__(
     return 0;
 }
 
+/**
+  * @brief  Internal Function decrypt the given 16 bytes if data.
+  * 
+  * @param  [in]  input         Input array.
+  * @param  [in]  exp_key       Expanded key.
+  * @param  [in]  output        Output array.
+  * @param  [in]  ip_ptr        Offset pointing to the current section
+  *                             of data to be processed in the input array.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
 inline int symmetric_ciphers::AES::__perform_decryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
@@ -649,12 +671,12 @@ int symmetric_ciphers::AES::__ECB_threaded__(
 }
 
 /**
-  * @brief  Function to process (encrypt/decrypt) given data of unsigned integer 8 bit type
+  * @brief  Function to encrypt given file
   *         using AES ECB.
   * 
-  * @param  [in]  f_Name            Input plain text array.
-  * @param  [in]  op_file_name      Output plain text array.
-  * @param  [in]  key               AES Key for encryption/decryption.
+  * @param  [in]  f_Name            Input file name.
+  * @param  [in]  op_file_name      Output file name.
+  * @param  [in]  key               AES Key for encryption.
   * @param  [in]  key_size          Key array size.
   *         
   * @retval Status:
@@ -718,8 +740,9 @@ int symmetric_ciphers::AES::__process_File__ENC(
     
     /* Add metadata, padding size. */
     ip_file_Buff[file_Size + pad_Diff + AES_META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
-    uint32_t check_sum = __aes_calculate_Cheksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
-    memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - 8, &check_sum, sizeof(uint32_t));
+    uint32_t check_sum = __aes_calculate_Checksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
+    memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - AES_META_DATA_CHECK_SUM_OFFSET, \
+    &check_sum, sizeof(uint32_t));
 
     this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
     op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, _ENCRYPT_0__);
@@ -736,12 +759,12 @@ int symmetric_ciphers::AES::__process_File__ENC(
 }
 
 /**
-  * @brief  Function to process (encrypt/decrypt) given data of unsigned integer 8 bit type
+  * @brief  Function to decrypt given file
   *         using AES ECB.
   * 
-  * @param  [in]  f_Name            Input plain text array.
-  * @param  [in]  op_file_name      Output plain text array.
-  * @param  [in]  key               AES Key for encryption/decryption.
+  * @param  [in]  f_Name            Input file name.
+  * @param  [in]  op_file_name      Output file name.
+  * @param  [in]  key               AES Key for decryption.
   * @param  [in]  key_size          Key array size.
   *         
   * @retval Status:
@@ -785,9 +808,10 @@ int symmetric_ciphers::AES::__process_File__DEC(
     /* If decryption remove metadata and padding. */
     op_File_FinalBufferSize = file_Size - \
     AES_META_DATA_SIZE - op_file_Buff[file_Size - AES_META_DATA_SIZE + AES_META_DATA_PADD_SIZE_OFFSET];
-    uint32_t cur_check_sum = __aes_calculate_Cheksum(op_file_Buff.get(), file_Size - AES_META_DATA_SIZE);
+    uint32_t cur_check_sum = __aes_calculate_Checksum(op_file_Buff.get(), file_Size - AES_META_DATA_SIZE);
     uint32_t actual_check_sum = 0;
-    memcpy(&actual_check_sum, op_file_Buff.get() + file_Size - AES_META_DATA_SIZE + 8, sizeof(uint32_t));
+    memcpy(&actual_check_sum, op_file_Buff.get() + file_Size - AES_META_DATA_SIZE + AES_META_DATA_CHECK_SUM_OFFSET, \
+    sizeof(uint32_t));
 
     if(actual_check_sum != cur_check_sum)
         throw std::invalid_argument("encrpyt_file() - Incorrect key/invalid format");
@@ -1101,7 +1125,7 @@ namespace {
         return file_Size;
     }
 
-    uint32_t __aes_calculate_Cheksum(
+    uint32_t __aes_calculate_Checksum(
         uint8_t                     buffer[],
         size_t                      siz_
     ) {
