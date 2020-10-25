@@ -45,7 +45,7 @@ make -j 4
 
 ###  Speed benchmark
 
-Encrypts/Decrypts 1 GB data in ~20 seconds in 1.8 GHz Dual-Core Intel Core i5.
+Encrypts/Decrypts 1 GB data in ~20 seconds on 1.8 GHz Dual-Core Intel Core i5.
 
 ### AES Methods (API)
 
