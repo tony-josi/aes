@@ -11,8 +11,10 @@ install:
   - "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 language: cpp
 script: 
-  - "cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON -DENABLE_IPO=ON"
+  - mkdir build
+  - cd build
+  - "cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON"
   - "make VERBOSE=1"
-  - ./aes_exe
+  - ./src/aes_sample_exe
   - "ctest -V"
 sudo: false
