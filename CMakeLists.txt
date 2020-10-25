@@ -18,4 +18,15 @@ include(cmake/std_compiler_warnings.cmake)
 add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
 
+if(ENABLE_TESTING)
+    enable_testing()
+    message("Building Tests.")
+    add_subdirectory(test)
+    add_test(
+        NAME AES_ENC_DEC_TESTS
+        COMMAND test_aes
+    )
+endif()
+
+add_subdirectory(src)
 
