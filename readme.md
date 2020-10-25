@@ -137,7 +137,7 @@ int main() {
 }
 ```
 
-### High-level description of the algorithm
+### Algorithm
 1. `KeyExpansion` – round keys are derived from the cipher key using the AES key schedule. AES requires a separate 128-bit round key block for each round plus one more.
 2. Initial round key addition:
     1. `AddRoundKey` – each byte of the state is combined with a byte of the round key using bitwise xor.
