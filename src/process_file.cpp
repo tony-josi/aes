@@ -9,7 +9,7 @@
  *  @bug            No known bugs.
  */
 
-#include "inc/aes.hpp"
+#include "aes.hpp"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
