@@ -9,7 +9,7 @@
  *  @bug            No known bugs.
  */
 
-#include "inc/aes.hpp"
+#include "aes.hpp"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -105,7 +105,7 @@ int main() {
     aes128_TRD.decrpyt_block_ecb_threaded(aes128_cipher_TRD, key_128_TRD, aes128_op_TRD, test_sz, 16);
     
     std::cout << std::endl;
-    for(size_t i = 0; i < 1280; ++i)
+    for(size_t i = 0; i < 10; ++i)
         std::printf("%c", aes128_op_TRD[i]);
     std::cout << std::endl;
     
