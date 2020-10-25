@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.12)
 
 project(aes VERSION 2.0 DESCRIPTION "Aes Library" HOMEPAGE_URL https://github.com/TonyJosi97/aes LANGUAGES CXX)
 
