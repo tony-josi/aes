@@ -5,6 +5,7 @@ option(PROCESS_FILE_EXE "Build exe for file enc/dec" ON)
 include_directories(../inc)
 
 add_subdirectory(aes)
+find_package (Threads)
 
 if(LOW_LEVEL_API_SAMPLE)
     message("Builds low level API sample")
