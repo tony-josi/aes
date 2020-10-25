@@ -12,7 +12,6 @@ prevent_in_source_builds()
 # Set CXX standard
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
-set(CMAKE_CXX_STANDARD 17)
 
 # Set CXX compile flags
 include(cmake/std_compiler_warnings.cmake)
