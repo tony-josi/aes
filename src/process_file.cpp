@@ -24,7 +24,7 @@ namespace {
     size_t get_File_Size(std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr) {
         size_t file_Size = 0;
         fseek(file_Ptr.get(), 0, SEEK_END);             // Jump to the end of the file
-        file_Size = ftell(file_Ptr.get());              // Get the current byte offset in the file
+        file_Size = static_cast<size_t>(ftell(file_Ptr.get()));              // Get the current byte offset in the file
         rewind(file_Ptr.get());                         // Jump back to the beginning of the file
         return file_Size;
     }
