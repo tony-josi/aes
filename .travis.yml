@@ -1,18 +1,18 @@
-sudo: false
-language: cpp
-compiler:
+
+addons: 
+  apt: 
+    packages: 
+      - clang-3.8
+    sources: 
+      - llvm-toolchain-precise-3.8
+compiler: 
   - clang
-addons:
-  apt:
-    sources:
-    - llvm-toolchain-precise-3.8
-    packages:
-    - clang-3.8
-install:
-- "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
-script:
-  - cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON -DENABLE_I
-PO=ON
-  - make VERBOSE=1
+install: 
+  - "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
+language: cpp
+script: 
+  - "cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON -DENABLE_IPO=ON"
+  - "make VERBOSE=1"
   - ./aes_exe
-  - ctest -V
+  - "ctest -V"
+sudo: false
