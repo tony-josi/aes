@@ -33,14 +33,14 @@ Uses Google Test for unit testing.
 ``` sh
 cd aes
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DTEST_EN=False # Disables testing; use -DTEST_EN=True to build test cases executable.
-make
+cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON # Test disabled; use -DENABLE_TESTING=ON to build test cases executable.
+make -j 4
 ```
 
 3. Run
 
 ``` sh
-./aes_exe
+./src/aes_exe
 ```
 
 ###  Speed benchmark
