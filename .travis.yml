@@ -11,7 +11,8 @@ addons:
 install:
 - "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 script:
-  - cmake . -DCMAKE_BUILD_TYPE=Release -DTEST_EN=True
+  - cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON -DENABLE_I
+PO=ON
   - make VERBOSE=1
   - ./aes_exe
   - ctest -V
