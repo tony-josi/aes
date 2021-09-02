@@ -4,6 +4,10 @@ option(PROCESS_FILE_EXE "Build exe for file enc/dec" ON)
 
 include_directories(../inc)
 
+if(MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 add_subdirectory(aes)
 find_package (Threads)
 
