@@ -162,3 +162,7 @@ int main() {
 * Complete todo
 * add padding for ip file and key
 * remove padding while storing pt op file
+
+#### Notes:
+
+When the file_process.exe is debugged from the Visual Studio its path will be: D:\Projects\aes\build\src
