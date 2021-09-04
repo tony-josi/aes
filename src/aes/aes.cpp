@@ -489,7 +489,7 @@ int symmetric_ciphers::AES::encrpyt_file__pybind_target(
         throw std::invalid_argument("Error parsing key");
     }
 
-    return this->__process_File__DEC(f_Name, op_file_name, initzd_key, reqd_key_len);
+    return this->__process_File__ENC(f_Name, op_file_name, initzd_key, reqd_key_len);
 
 }
 
