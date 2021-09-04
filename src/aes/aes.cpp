@@ -844,7 +844,7 @@ int symmetric_ciphers::AES::__process_File__ENC(
     
     std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
     if(op_file_Ptr.get() == nullptr)
-        throw std::invalid_argument("encrpyt_file() - Error opening output file");
+        throw std::invalid_argument("Encrypt - Error opening output file");
     fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
 
     return 0;
@@ -907,12 +907,12 @@ int symmetric_ciphers::AES::__process_File__DEC(
     sizeof(uint32_t));
 
     if(actual_check_sum != cur_check_sum)
-        throw std::invalid_argument("encrpyt_file() - Incorrect key/invalid format");
+        throw std::invalid_argument("Decrypt - Incorrect key/invalid format");
 
     
     std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
     if(op_file_Ptr.get() == nullptr)
-        throw std::invalid_argument("encrpyt_file() - Error opening output file");
+        throw std::invalid_argument("Decrypt - Error opening output file");
     fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
 
     return 0;

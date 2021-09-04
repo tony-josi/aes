@@ -1,5 +1,4 @@
 set(PYBIND_WRAPPER_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src/python_bindings")
-
 set(AES_LIB_INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 
 pybind11_add_module (
