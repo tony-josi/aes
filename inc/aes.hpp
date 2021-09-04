@@ -91,6 +91,20 @@ namespace symmetric_ciphers {
          */ 
         int decrpyt_file(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
 
+        /**
+         * @brief  Function to encrypt given file
+         *         with AES ECB using threads. This function acts as the target 
+         *         method for pybind11 bindings for encrpyt_file()
+         */ 
+        int encrpyt_file__pybind_target(const std::string &f_Name, const std::string &op_file_name, const std::string &key) const;
+
+        /**
+         * @brief  Function to decrypt given file
+         *         with AES ECB using threads. This function acts as the target 
+         *         method for pybind11 bindings for decrpyt_file()
+         */ 
+        int decrpyt_file__pybind_target(const std::string &f_Name, const std::string &op_file_name, const std::string &key) const;
+
     private:
         size_t       actual_key_len;                  /* Stores the actual length of key in bytes */
         size_t       expanded_key_len;                /* Stores the expanded length of key in bytes */

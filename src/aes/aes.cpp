@@ -35,6 +35,14 @@ namespace {
     constexpr   size_t      AES_META_DATA_PADD_SIZE_OFFSET = 0; 
     constexpr   size_t      AES_META_DATA_CHECK_SUM_OFFSET = 8; 
 
+    /* Maximum supported plain text key size. */
+    constexpr   size_t      MAX_SUPPORTED_PLAIN_KEY_SIZE   = 32;
+
+    /* Plain text key size. */
+    constexpr   size_t      AES128_PLAIN_KEY_SIZE          = 16;
+    constexpr   size_t      AES192_PLAIN_KEY_SIZE          = 24;
+    constexpr   size_t      AES256_PLAIN_KEY_SIZE          = 32;
+
     /* Forward declarations for Lookup tables */
     extern      uint8_t     AES_S_BOX[256];
     extern      uint8_t     AES_INV_S_BOX[256];
@@ -159,19 +167,19 @@ symmetric_ciphers::AES::AES(symmetric_ciphers::key_size ks) {
     case key_size::AES_128:
         this->key_len_bits = 128;
         this->round_num = 10;
-        this->actual_key_len = 16;
+        this->actual_key_len = AES128_PLAIN_KEY_SIZE;
         this->expanded_key_len = 176;
         break;
     case key_size::AES_192:
         this->key_len_bits = 192;
         this->round_num = 12;
-        this->actual_key_len = 24;
+        this->actual_key_len = AES192_PLAIN_KEY_SIZE;
         this->expanded_key_len = 208;
         break;
     case key_size::AES_256:
         this->key_len_bits = 256;
         this->round_num = 14;
-        this->actual_key_len = 32;
+        this->actual_key_len = AES256_PLAIN_KEY_SIZE;
         this->expanded_key_len = 240;
         break;
     default:
@@ -439,6 +447,91 @@ int symmetric_ciphers::AES::decrpyt_file(
     ) const {
 
     return this->__process_File__DEC(f_Name, op_file_name, key, key_size);
+
+}
+
+/**
+  * @brief  Function to encrypt given file
+  *         with AES ECB using threads. This function acts as the target 
+  *         method for pybind11 bindings for encrpyt_file()
+  * 
+  * @param  [in]  f_Name     File name to encrypt.
+  * @param  [in]  input      Output file name.
+  * @param  [in]  key        Decryption key.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::encrpyt_file__pybind_target(
+    const std::string          &f_Name,
+    const std::string          &op_file_name, 
+    const std::string          &key 
+    ) const {
+
+    uint8_t initzd_key[MAX_SUPPORTED_PLAIN_KEY_SIZE] = { 0 };    /* Max. supported key size. */
+    size_t key_len = key.length();
+    size_t reqd_key_len;
+
+    switch (this->actual_key_len) {
+    case AES128_PLAIN_KEY_SIZE:
+        reqd_key_len = AES128_PLAIN_KEY_SIZE;
+        std::memcpy(initzd_key, key.c_str(), key_len < AES128_PLAIN_KEY_SIZE ? key_len : AES128_PLAIN_KEY_SIZE);
+        break;
+    case AES192_PLAIN_KEY_SIZE:
+        reqd_key_len = AES192_PLAIN_KEY_SIZE;
+        std::memcpy(initzd_key, key.c_str(), key_len < AES192_PLAIN_KEY_SIZE ? key_len : AES192_PLAIN_KEY_SIZE);
+        break;
+    case AES256_PLAIN_KEY_SIZE:
+        reqd_key_len = AES256_PLAIN_KEY_SIZE;
+        std::memcpy(initzd_key, key.c_str(), key_len < AES256_PLAIN_KEY_SIZE ? key_len : AES256_PLAIN_KEY_SIZE);
+        break;
+    default:
+        throw std::invalid_argument("Error parsing key");
+    }
+
+    return this->__process_File__DEC(f_Name, op_file_name, initzd_key, reqd_key_len);
+
+}
+
+/**
+  * @brief  Function to decrypt given file
+  *         with AES ECB using threads. This function acts as the target 
+  *         method for pybind11 bindings for decrpyt_file()
+  * @param  [in]  f_Name     File name to decrypt.
+  * @param  [in]  input      Output file name.
+  * @param  [in]  key        Decryption key.
+  *         
+  * @retval Status:
+  *             - 0         Success.
+  */
+int symmetric_ciphers::AES::decrpyt_file__pybind_target(
+    const std::string          &f_Name,
+    const std::string          &op_file_name, 
+    const std::string          &key 
+    ) const {
+
+    uint8_t initzd_key[MAX_SUPPORTED_PLAIN_KEY_SIZE] = { 0 };    /* Max. supported key size. */
+    size_t key_len = key.length();
+    size_t reqd_key_len;
+
+    switch (this->actual_key_len) {
+    case AES128_PLAIN_KEY_SIZE:
+        reqd_key_len = AES128_PLAIN_KEY_SIZE;
+        std::memcpy(initzd_key, key.c_str(), key_len < AES128_PLAIN_KEY_SIZE ? key_len : AES128_PLAIN_KEY_SIZE);
+        break;
+    case AES192_PLAIN_KEY_SIZE:
+        reqd_key_len = AES192_PLAIN_KEY_SIZE;
+        std::memcpy(initzd_key, key.c_str(), key_len < AES192_PLAIN_KEY_SIZE ? key_len : AES192_PLAIN_KEY_SIZE);
+        break;
+    case AES256_PLAIN_KEY_SIZE:
+        reqd_key_len = AES256_PLAIN_KEY_SIZE;
+        std::memcpy(initzd_key, key.c_str(), key_len < AES256_PLAIN_KEY_SIZE ? key_len : AES256_PLAIN_KEY_SIZE);
+        break;
+    default:
+        throw std::invalid_argument("Error parsing key");
+    }
+
+    return this->__process_File__DEC(f_Name, op_file_name, initzd_key, reqd_key_len);
 
 }
 
