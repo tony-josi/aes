@@ -34,3 +34,6 @@ if(PROCESS_FILE_EXE)
         aes_lib 
         ${CMAKE_THREAD_LIBS_INIT})
 endif()
+
+
+add_subdirectory(python_bindings)

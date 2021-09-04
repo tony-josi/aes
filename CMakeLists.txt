@@ -28,5 +28,11 @@ if(ENABLE_TESTING)
     )
 endif()
 
+
+# pybind11
+set(PYBIND_PATH "${PROJECT_SOURCE_DIR}/ext_py_binding_lib")
+add_subdirectory(${PYBIND_PATH}/pybind11)
+
 add_subdirectory(src)
+
 
