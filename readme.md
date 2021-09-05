@@ -153,6 +153,15 @@ int main() {
 
 [refer](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 
+#### v3.0 Update Notes
+
+* Added python bindings for the aes library for file encryption/decryption
+* Changed file IO to use basic_stream lib of C++ instead of open() to fix a bug arising from incorrect calculation of file size for larger files
+* Changed plain enums to enum classes
+* Changed iteration variable type to size_t to support larger files
+* Added D_CRT_SECURE_NO_WARNINGS option to cmake file if target platform is MSVC to avoid error/warning about fopen() in Visual Studio
+* Removed warnings associated with string lib header not used in the aes lib.
+
 #### To Do:
 * Use pointer based XOR operation instead of loop - individual bytes & XOR
 * Implement other encryption modes - Cipher block chaining, Output feedback, Counter modes
