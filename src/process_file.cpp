@@ -47,14 +47,14 @@ int main(int argc, char *argv[]) {
         if(strcmp(argv[1], "s") == 0)
             std::cout<<get_FSize(argv[2])<<std::endl;
         else if(argc > 3) {
-            std::string pass_wd((char *) key_128_TRD), op_f_name(argv[3]);
+            //std::string pass_wd((char *) key_128_TRD), op_f_name(argv[3]);
             if (strcmp(argv[1], "e") == 0) {
                 file_tests.encrpyt_file(argv[2], argv[3], key_128_TRD, 24);
-                file_tests.encrpyt_file__pybind_target(argv[2], op_f_name + "pyb", pass_wd);
+                //file_tests.encrpyt_file__pybind_target(argv[2], op_f_name + "pyb", pass_wd);
             }
             else if (strcmp(argv[1], "d") == 0) {
                 file_tests.decrpyt_file(argv[2], argv[3], key_128_TRD, 24);
-                file_tests.decrpyt_file__pybind_target(argv[2], op_f_name + "pyb", pass_wd);
+                //file_tests.decrpyt_file__pybind_target(argv[2], op_f_name + "pyb", pass_wd);
             }
         }
         else

@@ -118,7 +118,7 @@ namespace symmetric_ciphers {
          *         to the output[] pointed to by ip_ptr.
          *         
          */ 
-        int __perform_encryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
+        int __perform_encryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const size_t ip_ptr) const;
 
         /**
          * @brief  Internal function to decrypt 16 bytes of data pointed to by ip_ptr
@@ -126,7 +126,7 @@ namespace symmetric_ciphers {
          *         to the output[] pointed to by ip_ptr.
          *         
          */ 
-        int __perform_decryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const int ip_ptr) const;
+        int __perform_decryption__(const uint8_t input[], std::unique_ptr<uint8_t []> &exp_key, uint8_t output[], const size_t ip_ptr) const;
 
         /**
          * @brief  Internal Function to encrypt/decrypt given data of unsigned integer 8 bit type

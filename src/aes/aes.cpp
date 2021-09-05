@@ -78,13 +78,13 @@ namespace {
     inline void __aes_transposition(
         uint8_t                     cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
         const uint8_t               ip[],
-        const int                   offset
+        const size_t                offset
     );
 
     inline void __aes_rev_transposition(
         const uint8_t               cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
         uint8_t                     op[],
-        const int                   offset
+        const size_t                offset
     );
 
     void __aes_compute_remaining_words(
@@ -295,7 +295,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input plain text array, processing 16 bytes of data every iteration */
-    for(int ip_iter = 0; (static_cast<size_t>(ip_iter) * this->block_size) < ip_size; ++ip_iter) {
+    for(size_t ip_iter = 0; (ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
         this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
     
@@ -344,7 +344,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input cipher text array, processing 16 bytes of data every iteration */
-    for(int ip_iter = 0; (static_cast<size_t>(ip_iter) * this->block_size) < ip_size; ++ip_iter) {
+    for(size_t ip_iter = 0; (ip_iter * this->block_size) < ip_size; ++ip_iter) {
 
         this->__perform_decryption__(input, exp_key, output, (ip_iter * this->block_size));
 
@@ -557,7 +557,7 @@ inline int symmetric_ciphers::AES::__perform_encryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
     uint8_t                         output[],
-    const int                       ip_ptr
+    const size_t                    ip_ptr
     ) const {
 
     uint8_t cur_state[4][4] = {{0}};
@@ -608,7 +608,7 @@ inline int symmetric_ciphers::AES::__perform_decryption__(
     const uint8_t                   input[], 
     std::unique_ptr<uint8_t []>    &exp_key, 
     uint8_t                         output[],
-    const int                       ip_ptr
+    const size_t                    ip_ptr
     ) const {
 
     /* 2D - Array (matrix) to hold the current round state */
@@ -682,8 +682,8 @@ int symmetric_ciphers::AES::__ECB_threaded__(
     /* Data structure to store range of input data buffer being processed
     by a thread at any given instance. */
     struct ip_op_SegmentInfo {
-        int start__;
-        int end__;
+        size_t start__;
+        size_t end__;
     };
 
     /* Data structure handling threading, holds mutex & queue of input data segments. */
@@ -693,11 +693,11 @@ int symmetric_ciphers::AES::__ECB_threaded__(
         std::vector<ip_op_SegmentInfo>  segment_Queue__;
 
         ip_Data_SegmentQueue(size_t input_Sz) {
-            for(int i = 0; i < static_cast<int>(input_Sz); i = i + AES_DATA_SIZE_PER_SEGMENT) {
+            for(size_t i = 0; i < input_Sz; i = i + AES_DATA_SIZE_PER_SEGMENT) {
 
                 /* Slice the input buffer into segments. */
                 segment_Queue__.emplace_back(ip_op_SegmentInfo{i, \
-                std::min(i + AES_DATA_SIZE_PER_SEGMENT, static_cast<int>(input_Sz))});
+                std::min(i + AES_DATA_SIZE_PER_SEGMENT, input_Sz)});
             }
             total_DataSegments__ = segment_Queue__.size();
         }
@@ -726,7 +726,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
         auto primary_Worker = [&] (const ip_op_SegmentInfo &this_Segment) {
             /* Loop through the input plain text array, 
             processing 16 bytes of data every iteration */
-            for(int ip_iter = (this_Segment.start__ / this->block_size); \
+            for(size_t ip_iter = (this_Segment.start__ / this->block_size); \
             (ip_iter) < (this_Segment.end__ / this->block_size); ++ip_iter) {
                 this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
             }    
@@ -742,7 +742,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
         auto primary_Worker = [&] (const ip_op_SegmentInfo &this_Segment) {
             /* Loop through the input plain text array, 
             processing 16 bytes of data every iteration */
-            for(int ip_iter = (this_Segment.start__ / this->block_size); \
+            for(size_t ip_iter = (this_Segment.start__ / this->block_size); \
             (ip_iter) < (this_Segment.end__ / this->block_size); ++ip_iter) {
                 this->__perform_decryption__(input, exp_key, output, (ip_iter * this->block_size));
             }    
@@ -1022,11 +1022,11 @@ namespace {
     inline void __aes_transposition(
         uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
         const uint8_t       ip[],
-        const int           offset
+        const size_t           offset
     ) {
         /* Transposition bytes to matrix form - column major */
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; j < AES_WORD_SIZE; ++j)
+        for(size_t i = 0; i < AES_WORD_SIZE; ++i)
+            for(size_t j = 0; j < AES_WORD_SIZE; ++j)
                 cur_state[i][j] = ip[ offset + (j * 4) + i ];
 
     }
@@ -1034,11 +1034,11 @@ namespace {
     inline void __aes_rev_transposition(
         const uint8_t       cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
         uint8_t             op[],
-        const int           offset
+        const size_t        offset
     ) {
         /* Transposition bytes from matrix (column major) back to output array */
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; j < AES_WORD_SIZE; ++j)
+        for(size_t i = 0; i < AES_WORD_SIZE; ++i)
+            for(size_t j = 0; j < AES_WORD_SIZE; ++j)
                 op[ offset + (j * 4) + i ] = cur_state[i][j];
 
     }
@@ -1245,7 +1245,8 @@ namespace {
         size_t                      siz_
     ) {
         uint32_t c = 0;
-        for(int i = 0; i < static_cast<int>(siz_); ++i) {
+        size_t i = 0;
+        for(; i < siz_; ++i) {
             c += buffer[i];
             c = c << 3 | c >> (32 - 3); 
             c ^= 0xFFFFFFFF; 
