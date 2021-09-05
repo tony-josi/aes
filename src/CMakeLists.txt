@@ -1,6 +1,5 @@
-
-option(LOW_LEVEL_API_SAMPLE "Enable low level api sample" OFF)
 option(PROCESS_FILE_EXE "Build exe for file enc/dec" ON)
+option(LOW_LEVEL_API_SAMPLE "Enable low level api sample" OFF)
 
 include_directories(../inc)
 
@@ -35,5 +34,6 @@ if(PROCESS_FILE_EXE)
         ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-
-add_subdirectory(python_bindings)
+if(PYTHON_BINDINGS_GEN)
+    add_subdirectory(python_bindings)
+endif()

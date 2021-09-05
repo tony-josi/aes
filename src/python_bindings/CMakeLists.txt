@@ -6,7 +6,12 @@ pybind11_add_module (
     ${PYBIND_WRAPPER_SOURCE_DIR}/py_bindings.cpp
 )
 
-target_link_libraries(py_sc_aes PUBLIC aes_lib)
+target_link_libraries(
+    py_sc_aes 
+    PUBLIC         
+    project_options 
+    project_warnings  
+    aes_lib)
 
 target_include_directories (
     py_sc_aes 

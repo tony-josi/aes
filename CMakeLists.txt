@@ -30,8 +30,11 @@ endif()
 
 
 # pybind11
-set(PYBIND_PATH "${PROJECT_SOURCE_DIR}/ext_py_binding_lib")
-add_subdirectory(${PYBIND_PATH}/pybind11)
+option(PYTHON_BINDINGS_GEN "Enable python binding module generation" OFF)
+if(PYTHON_BINDINGS_GEN) 
+    set(PYBIND_PATH "${PROJECT_SOURCE_DIR}/ext_py_binding_lib")
+    add_subdirectory(${PYBIND_PATH}/pybind11)
+endif()
 
 add_subdirectory(src)
 
