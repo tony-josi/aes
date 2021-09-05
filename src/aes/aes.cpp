@@ -295,7 +295,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb(
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input plain text array, processing 16 bytes of data every iteration */
-    for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
+    for(int ip_iter = 0; (static_cast<size_t>(ip_iter) * this->block_size) < ip_size; ++ip_iter) {
 
         this->__perform_encryption__(input, exp_key, output, (ip_iter * this->block_size));
     
@@ -344,7 +344,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb(
     __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     /* Loop through the input cipher text array, processing 16 bytes of data every iteration */
-    for(int ip_iter = 0; static_cast<size_t>(ip_iter * this->block_size) < ip_size; ++ip_iter) {
+    for(int ip_iter = 0; (static_cast<size_t>(ip_iter) * this->block_size) < ip_size; ++ip_iter) {
 
         this->__perform_decryption__(input, exp_key, output, (ip_iter * this->block_size));
 
