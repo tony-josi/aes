@@ -381,7 +381,7 @@ int symmetric_ciphers::AES::encrpyt_block_ecb_threaded(
     const size_t                key_size
     ) const {
 
-    return this->__ECB_threaded__(input, key, output, ip_size, key_size, _ENCRYPT_0__);
+    return this->__ECB_threaded__(input, key, output, ip_size, key_size, aes_Action::_ENCRYPT_0__);
 
 }
 
@@ -412,7 +412,7 @@ int symmetric_ciphers::AES::decrpyt_block_ecb_threaded(
     const size_t                key_size
     ) const {
 
-    return this->__ECB_threaded__(input, key, output, ip_size, key_size, _DECRYPT_1__);
+    return this->__ECB_threaded__(input, key, output, ip_size, key_size, aes_Action::_DECRYPT_1__);
 
 }
 
@@ -756,9 +756,9 @@ int symmetric_ciphers::AES::__ECB_threaded__(
     std::vector<std::thread> enc_THREADS;
     enc_THREADS.reserve(std::thread::hardware_concurrency());
     for(auto i = 0u; i < std::thread::hardware_concurrency(); ++i) {
-        if(action == _ENCRYPT_0__)  
+        if(action == aes_Action::_ENCRYPT_0__)
             enc_THREADS.emplace_back(thread_MAIN_ENC);
-        else if(action == _DECRYPT_1__)
+        else if(action == aes_Action::_DECRYPT_1__)
             enc_THREADS.emplace_back(thread_MAIN_DEC);
     }
 
@@ -845,7 +845,7 @@ int symmetric_ciphers::AES::__process_File__ENC(
     &check_sum, sizeof(uint32_t));
 
     this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
-    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, _ENCRYPT_0__);
+    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, aes_Action::_ENCRYPT_0__);
 
     size_t op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     
@@ -903,7 +903,7 @@ int symmetric_ciphers::AES::__process_File__DEC(
 
 
     this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
-    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, _DECRYPT_1__);
+    op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, aes_Action::_DECRYPT_1__);
 
     size_t op_File_FinalBufferSize = 0;
     /* If decryption remove metadata and padding. */

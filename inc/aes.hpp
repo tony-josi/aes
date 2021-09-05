@@ -20,13 +20,13 @@
 
 namespace symmetric_ciphers {
 
-    enum key_size {          /* Enum to handle different AES Modes */
+    enum class key_size {          /* Enum to handle different AES Modes */
         AES_128,               /* AES 128 bit key mode */
         AES_192,               /* AES 192 bit key mode */
         AES_256                /* AES 256 bit key mode */
     };
 
-    enum aes_Action {
+    enum class aes_Action {
         _ENCRYPT_0__ = 0,
         _DECRYPT_1__
     };

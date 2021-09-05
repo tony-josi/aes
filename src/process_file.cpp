@@ -40,7 +40,7 @@ namespace {
 int main(int argc, char *argv[]) {
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    AES file_tests(AES_128);
+    AES file_tests(key_size::AES_128);
     
 
     if(argc > 2) {

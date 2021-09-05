@@ -26,7 +26,7 @@ int main() {
     uint8_t key_128[16] = "123456781234567";
     uint8_t cipher_128[16];
     uint8_t plain_128[16];
-    AES aes128(AES_128);
+    AES aes128(key_size::AES_128);
     aes128.encrpyt_16bytes_ecb(ip_text_128, key_128,cipher_128);
     aes128.decrpyt_16bytes_ecb(cipher_128, key_128, plain_128);
     for(size_t i = 0; i < sizeof(plain_128); ++i)
@@ -37,7 +37,7 @@ int main() {
     uint8_t key_192[24] = "12345678123456781234567";
     uint8_t cipher_192[16];
     uint8_t plain_192[16];
-    AES aes192(AES_192);
+    AES aes192(key_size::AES_192);
     aes192.encrpyt_16bytes_ecb(ip_text_192, key_192,cipher_192);
     aes192.decrpyt_16bytes_ecb(cipher_192, key_192, plain_192);
     for(size_t i = 0; i < sizeof(plain_192); ++i)
@@ -48,7 +48,7 @@ int main() {
     uint8_t key_256[32] = "1234567812345678123456781234567";
     uint8_t cipher_256[16];
     uint8_t plain_256[16];
-    AES aes256(AES_256);
+    AES aes256(key_size::AES_256);
     aes256.encrpyt_16bytes_ecb(ip_text_256, key_256,cipher_256);
     aes256.decrpyt_16bytes_ecb(cipher_256, key_256, plain_256);
     for(size_t i = 0; i < sizeof(plain_256); ++i)
@@ -85,7 +85,7 @@ int main() {
     std::cout << std::endl;
 
     uint8_t key_128_TRD[16] = "123456781234567";
-    AES aes128_TRD(AES_128);
+    AES aes128_TRD(key_size::AES_128);
     const size_t test_sz = 1280000;     // 1.28 MB
     uint8_t *aes128_plain_TRD = static_cast<uint8_t *>(std::malloc(test_sz));
     uint8_t *aes128_cipher_TRD = static_cast<uint8_t *>(std::malloc(test_sz));

@@ -15,9 +15,9 @@ PYBIND11_MODULE(py_sc_aes, module) {
 		"128 / 192 / 256 bit keys and option for multi threading that spawns upto std::thread::hardware_concurrency() threads.";
 
 	pybind11::enum_<symmetric_ciphers::key_size>(module, "key_size")
-		.value("AES_128", symmetric_ciphers::AES_128, "AES 128 bit key mode")
-		.value("AES_192", symmetric_ciphers::AES_192, "AES 192 bit key mode")
-		.value("AES_256", symmetric_ciphers::AES_256, "AES 256 bit key mode")
+		.value("AES_128", symmetric_ciphers::key_size::AES_128, "AES 128 bit key mode")
+		.value("AES_192", symmetric_ciphers::key_size::AES_192, "AES 192 bit key mode")
+		.value("AES_256", symmetric_ciphers::key_size::AES_256, "AES 256 bit key mode")
 		.export_values();
 
 	pybind11::class_<symmetric_ciphers::AES>(module, "AES")
