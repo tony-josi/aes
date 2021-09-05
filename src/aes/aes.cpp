@@ -21,6 +21,8 @@
 #include <thread>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
+
 
 namespace {
 
@@ -139,6 +141,10 @@ namespace {
 
     size_t __get_File_Size(
         std::unique_ptr<FILE, decltype(&fclose)> &file_Ptr
+    );
+
+    std::streampos __get_File_Size_Fstream(
+        std::ifstream& ip_file_strm
     );
 
     uint32_t __aes_calculate_Checksum(
@@ -782,10 +788,12 @@ int symmetric_ciphers::AES::__process_File__ENC(
     const size_t            key_size 
     ) const {
 
-    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
-    if(ip_file_Ptr.get() == nullptr)
+    
+    std::ifstream ip_file_stream(f_Name, std::ios::binary);
+    if(!ip_file_stream.is_open())
         throw std::invalid_argument("__process_File__() - Error opening input file");
 
+    const size_t file_Size = __get_File_Size_Fstream(ip_file_stream);
     std::unique_ptr<uint8_t []> padded_Key(new uint8_t[this->actual_key_len]);
     memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
 
@@ -794,7 +802,6 @@ int symmetric_ciphers::AES::__process_File__ENC(
         memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
     }
     
-    const size_t file_Size = __get_File_Size(ip_file_Ptr);
     std::unique_ptr<uint8_t []> ip_file_Buff;
     std::unique_ptr<uint8_t []> op_file_Buff;
     
@@ -809,7 +816,7 @@ int symmetric_ciphers::AES::__process_File__ENC(
     ip_Total_PaddedBufferSize += AES_META_DATA_SIZE + pad_Diff;
 
     ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
-    fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+    ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), file_Size);
     op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
     
     /* Set the area reserved for padding and metadata as 0. */
@@ -842,10 +849,12 @@ int symmetric_ciphers::AES::__process_File__ENC(
 
     size_t op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     
-    std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
-    if(op_file_Ptr.get() == nullptr)
+    //std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
+    std::ofstream op_file_strm(op_file_name.c_str(), std::ios::binary);
+    if(!op_file_strm.is_open())
         throw std::invalid_argument("Encrypt - Error opening output file");
-    fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
+    op_file_strm.write(reinterpret_cast<char *>(op_file_Buff.get()), op_File_FinalBufferSize);
+    //fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
 
     return 0;
 
@@ -870,9 +879,11 @@ int symmetric_ciphers::AES::__process_File__DEC(
     const size_t            key_size 
     ) const {
 
-    std::unique_ptr<FILE, decltype(&fclose)> ip_file_Ptr(fopen(f_Name.c_str(), "rb"), &fclose);
-    if(ip_file_Ptr.get() == nullptr)
+    std::ifstream ip_file_stream(f_Name, std::ios::binary);
+    if (!ip_file_stream.is_open())
         throw std::invalid_argument("__process_File__() - Error opening input file");
+
+    const size_t file_Size = __get_File_Size_Fstream(ip_file_stream);
 
     std::unique_ptr<uint8_t []> padded_Key(new uint8_t[this->actual_key_len]);
     memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
@@ -882,7 +893,7 @@ int symmetric_ciphers::AES::__process_File__DEC(
         memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
     }
     
-    const size_t file_Size = __get_File_Size(ip_file_Ptr);
+    //const size_t file_Size = __get_File_Size(ip_file_Ptr);
     std::unique_ptr<uint8_t []> ip_file_Buff;
     std::unique_ptr<uint8_t []> op_file_Buff;
     
@@ -890,7 +901,7 @@ int symmetric_ciphers::AES::__process_File__DEC(
 
     /* If decrypt, read entire .dec file. */
     ip_file_Buff = std::make_unique<uint8_t []>(file_Size);
-    fread(ip_file_Buff.get(), file_Size, 1, ip_file_Ptr.get());
+    ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), file_Size);
     op_file_Buff = std::make_unique<uint8_t []>(file_Size);
 
 
@@ -909,11 +920,10 @@ int symmetric_ciphers::AES::__process_File__DEC(
     if(actual_check_sum != cur_check_sum)
         throw std::invalid_argument("Decrypt - Incorrect key/invalid format");
 
-    
-    std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
-    if(op_file_Ptr.get() == nullptr)
+    std::ofstream op_file_strm(op_file_name.c_str(), std::ios::binary);
+    if (!op_file_strm.is_open())
         throw std::invalid_argument("Decrypt - Error opening output file");
-    fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
+    op_file_strm.write(reinterpret_cast<char*>(op_file_Buff.get()), op_File_FinalBufferSize);
 
     return 0;
 
@@ -1216,6 +1226,21 @@ namespace {
         file_Size = static_cast<size_t>(ftell(file_Ptr.get()));              
         rewind(file_Ptr.get());     
         return file_Size;
+    }
+
+    std::streampos __get_File_Size_Fstream(
+        std::ifstream& ip_file_strm
+    ) {
+
+        std::streampos f_size = 0;
+        if (ip_file_strm.is_open()) {
+            ip_file_strm.seekg(0, ip_file_strm.end);
+            f_size = ip_file_strm.tellg();
+            ip_file_strm.seekg(0, ip_file_strm.beg);
+        }
+
+        return f_size;
+    
     }
 
     uint32_t __aes_calculate_Checksum(
