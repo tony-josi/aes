@@ -733,7 +733,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
         };
 
         while(encrypt_DataSegmentQueue.pop_Segment(primary_Worker)) {
-            // do processing
+            /* Do processing */
         }
     }; 
     
@@ -749,7 +749,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
         };
 
         while(encrypt_DataSegmentQueue.pop_Segment(primary_Worker)) {
-            // do processing
+            /* Do processing */
         }
     }; 
 
@@ -849,12 +849,10 @@ int symmetric_ciphers::AES::__process_File__ENC(
 
     size_t op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     
-    //std::unique_ptr<FILE, decltype(&fclose)> op_file_Ptr(fopen(op_file_name.c_str(), "wb"), &fclose);
     std::ofstream op_file_strm(op_file_name.c_str(), std::ios::binary);
     if(!op_file_strm.is_open())
         throw std::invalid_argument("Encrypt - Error opening output file");
     op_file_strm.write(reinterpret_cast<char *>(op_file_Buff.get()), op_File_FinalBufferSize);
-    //fwrite(op_file_Buff.get(), 1, op_File_FinalBufferSize, op_file_Ptr.get());
 
     return 0;
 
@@ -893,7 +891,6 @@ int symmetric_ciphers::AES::__process_File__DEC(
         memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
     }
     
-    //const size_t file_Size = __get_File_Size(ip_file_Ptr);
     std::unique_ptr<uint8_t []> ip_file_Buff;
     std::unique_ptr<uint8_t []> op_file_Buff;
     
