@@ -103,8 +103,8 @@ namespace {
     );
 
     void __aes_get_round_key_block(
-        int                         round_count,
-        int                         block_size,
+        size_t                      round_count,
+        size_t                      block_size,
         const uint8_t               exp_key[],
         size_t                      exp_key_len,
         uint8_t                     op_key[AES_WORD_SIZE][AES_WORD_SIZE]
@@ -573,7 +573,7 @@ inline int symmetric_ciphers::AES::__perform_encryption__(
     __aes_add_round_key(cur_state, round_key);
 
     /* Remaining rounds of aes */
-    for(int i = 1; i <= this->round_num; ++i) {
+    for(size_t i = 1; i <= this->round_num; ++i) {
         __aes_get_round_key_block(i, this->block_size, exp_key.get(), \
         this->expanded_key_len, round_key);
 
@@ -625,16 +625,16 @@ inline int symmetric_ciphers::AES::__perform_decryption__(
     __aes_add_round_key(cur_state, round_key);
 
     /* Remaining rounds of aes */
-    for(int i = (this->round_num - 1); i >= 0; --i) {
+    for(size_t i = this->round_num; i >= 1; --i) {
 
-        __aes_get_round_key_block(i, this->block_size, exp_key.get(), \
+        __aes_get_round_key_block(i - 1, this->block_size, exp_key.get(), \
         this->expanded_key_len, round_key);
 
         __aes_inv_shift_rows(cur_state);
         __aes_inv_substitue_bytes(cur_state);
         __aes_add_round_key(cur_state, round_key);
         /* Mix column is not performed for last round */
-        if(i != 0)
+        if((i - 1) != 0)
             __aes_inv_mix_columns(cur_state);        
 
     }
@@ -1098,16 +1098,16 @@ namespace {
     }
 
     void __aes_get_round_key_block(
-        int                 round_count,
-        int                 block_size,
+        size_t              round_count,
+        size_t              block_size,
         const uint8_t       exp_key[],
         size_t              exp_key_len,
         uint8_t             op_key[AES_WORD_SIZE][AES_WORD_SIZE]
     ) {
-        for(int i = 0; i < AES_WORD_SIZE; ++i)
-            for(int j = 0; \
+        for(size_t i = 0; i < AES_WORD_SIZE; ++i)
+            for(size_t j = 0; \
             (j < AES_WORD_SIZE) && \
-            ((round_count * block_size + ((j * 4) + i)) < static_cast<int>(exp_key_len)); ++j) 
+            ((round_count * block_size + ((j * 4) + i)) < exp_key_len); ++j)
                 op_key[i][j] = exp_key[((round_count * block_size) + ((j * 4) + i))];
     }
 

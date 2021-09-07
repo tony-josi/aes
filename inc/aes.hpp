@@ -108,9 +108,9 @@ namespace symmetric_ciphers {
     private:
         size_t       actual_key_len;                  /* Stores the actual length of key in bytes */
         size_t       expanded_key_len;                /* Stores the expanded length of key in bytes */
-        int          key_len_bits;                    /* Stores the length of the Key used in AES */
-        int          block_size;                      /* Size of the data block used */
-        int          round_num;                       /* Number of rounds performed */
+        size_t       key_len_bits;                    /* Stores the length of the Key used in AES */
+        size_t       block_size;                      /* Size of the data block used */
+        size_t       round_num;                       /* Number of rounds performed */
 
         /**
          * @brief  Internal function to encrypt 16 bytes of data pointed to by ip_ptr
