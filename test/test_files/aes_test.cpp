@@ -31,7 +31,7 @@ int compare_bytes(uint8_t *a, uint8_t *b, size_t sz) {
 
 int test_1_aes_128() {
 
-    AES aes_128(AES_128);
+    AES aes_128(key_size::AES_128);
     uint8_t plaint[16] = "AES 128 Test";
     uint8_t passwd[16] = "AES128821!$";
     uint8_t op[16] = {0};
@@ -48,7 +48,7 @@ int test_1_aes_128() {
 
 int test_1_aes_192() {
 
-    AES aes_128(AES_192);
+    AES aes_128(key_size::AES_192);
     uint8_t plaint[16] = "AES libgmockd";
     uint8_t passwd[24] = "AES128821!$";
     uint8_t op[16] = {0};
@@ -65,7 +65,7 @@ int test_1_aes_192() {
 
 int test_1_aes_256() {
 
-    AES aes_128(AES_256);
+    AES aes_128(key_size::AES_256);
     uint8_t plaint[16] = "AES 128 Test";
     uint8_t passwd[32] = "libgmockd!$";
     uint8_t op[16] = {0};
@@ -82,7 +82,7 @@ int test_1_aes_256() {
 
 int test_2_aes_128() {
 
-    AES aes_128(AES_128);
+    AES aes_128(key_size::AES_128);
     uint8_t plaint[128] = "And above all these put on love, "
     "which binds everything together in perfect harmony. [Colossians 3:14]"; 
     uint8_t passwd[16] = "Building!$";
@@ -99,7 +99,7 @@ int test_2_aes_128() {
 
 int test_2_aes_192() {
 
-    AES aes_128(AES_192);
+    AES aes_128(key_size::AES_192);
     uint8_t plaint[128] = "And above all these put on love, "
     "which binds everything together in perfect harmony. [Colossians 3:14]"; 
     uint8_t passwd[24] = "dependencies!$";
@@ -116,7 +116,7 @@ int test_2_aes_192() {
 
 int test_2_aes_256() {
 
-    AES aes_128(AES_256);
+    AES aes_128(key_size::AES_256);
     uint8_t plaint[128] = "And above all these put on love, "
     "which binds everything together in perfect harmony. [Colossians 3:14]"; 
     uint8_t passwd[32] = "libgtest_maind!$";
