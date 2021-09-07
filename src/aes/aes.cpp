@@ -22,7 +22,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
-
+#include <chrono>
 
 namespace {
 
@@ -815,9 +815,13 @@ int symmetric_ciphers::AES::__process_File__ENC(
     /* Final buffer size including padding and metadata. */
     ip_Total_PaddedBufferSize += AES_META_DATA_SIZE + pad_Diff;
 
+    auto t1 = std::chrono::high_resolution_clock::now();
     ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
     ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), file_Size);
     op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>\
+    ( std::chrono::high_resolution_clock::now() - t1 ).count();
+    std::cout<<"\nFile Read & Allocation: "<<duration<<"\n";
     
     /* Set the area reserved for padding and metadata as 0. */
     memset(ip_file_Buff.get() + file_Size, 0, ip_Total_PaddedBufferSize - file_Size);
@@ -840,19 +844,33 @@ int symmetric_ciphers::AES::__process_File__ENC(
     
     /* Add metadata, padding size. */
     ip_file_Buff[file_Size + pad_Diff + AES_META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
+
+    t1 = std::chrono::high_resolution_clock::now();
     uint32_t check_sum = __aes_calculate_Checksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>\
+    ( std::chrono::high_resolution_clock::now() - t1 ).count();
+    std::cout<<"\nChecksum calc.: "<<duration<<"\n";
+    
     memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - AES_META_DATA_CHECK_SUM_OFFSET, \
     &check_sum, sizeof(uint32_t));
 
+    t1 = std::chrono::high_resolution_clock::now();
     this->__ECB_threaded__(ip_file_Buff.get(), padded_Key.get(), \
     op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, aes_Action::_ENCRYPT_0__);
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>\
+    ( std::chrono::high_resolution_clock::now() - t1 ).count();
+    std::cout<<"\nAlgo. threaded: "<<duration<<"\n";
 
     size_t op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     
+    t1 = std::chrono::high_resolution_clock::now();
     std::ofstream op_file_strm(op_file_name.c_str(), std::ios::binary);
     if(!op_file_strm.is_open())
         throw std::invalid_argument("Encrypt - Error opening output file");
     op_file_strm.write(reinterpret_cast<char *>(op_file_Buff.get()), op_File_FinalBufferSize);
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>\
+    ( std::chrono::high_resolution_clock::now() - t1 ).count();
+    std::cout<<"\nFile write: "<<duration<<"\n";
 
     return 0;
 
