@@ -2,7 +2,7 @@
 
 #### Build Status:
 
-[![Build Status](https://travis-ci.org/TonyJosi97/aes.svg?branch=master)](https://travis-ci.org/TonyJosi97/aes)
+[![Build Status](https://app.travis-ci.com/TonyJosi97/aes.svg?branch=master)](https://app.travis-ci.com/github/TonyJosi97/aes)
 
 ``` 
  █████╗     ███████╗    ███████╗
