@@ -13,7 +13,7 @@ language: cpp
 script: 
   - mkdir build
   - cd build
-  - "cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON"
+  - "cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=OFF"
   - "make VERBOSE=1"
   - ./src/aes_sample_exe
   - "ctest -V"
