@@ -105,6 +105,8 @@ namespace symmetric_ciphers {
          */ 
         int decrpyt_file__pybind_target(const std::string &f_Name, const std::string &op_file_name, const std::string &key) const;
 
+        int rewrite_file_threads(const std::string& f_name);
+
     private:
         size_t       actual_key_len;                  /* Stores the actual length of key in bytes */
         size_t       expanded_key_len;                /* Stores the expanded length of key in bytes */
@@ -145,6 +147,8 @@ namespace symmetric_ciphers {
          *         with AES using threads.
          */ 
         int __process_File__DEC(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
+
+        
 
     };
 

@@ -30,7 +30,8 @@ namespace {
     constexpr   uint8_t     AES_WORD_SIZE                  = 4;
 
     /* 12.8 KB per data segment. */
-    constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;    
+    constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;  
+    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000;
 
     /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
     constexpr   size_t      AES_META_DATA_SIZE             = AES_WORD_SIZE * AES_WORD_SIZE;  
@@ -151,6 +152,60 @@ namespace {
         uint8_t                     buffer[],
         size_t                      siz_
     );
+
+    class file_io_chunk_map_t {
+    public:
+        size_t      chunk_id;
+        size_t      file_indx;
+        size_t      chunk_size;
+        uint8_t     chunk_data[FILE_IO_CHUNK_SIZE_BYTES];
+        bool        last_chunk;
+    };
+
+    class file_io_process_DataQueue {
+    public:
+        std::mutex                                              fiop_Mutex;
+        std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiop_DataQueue;
+        std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiip_DataQueue;
+        std::ofstream                                           op_file_stream;
+        bool                                                    file_read_complete;
+
+        file_io_process_DataQueue(const std::string& op_f_name) {
+            op_file_stream = std::ofstream(op_f_name, std::ios::binary);
+        }
+
+        ~file_io_process_DataQueue() {
+            op_file_stream.close();
+        }
+
+        bool pop_and_process_data() {
+
+            std::unique_ptr<file_io_chunk_map_t> cur_chunk;
+            std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
+            if (file_read_complete == true && fiop_DataQueue.empty() == true) {
+                fio_pop_LOCK.unlock();
+                return false;
+            }
+            else if (fiop_DataQueue.empty() != true) {
+                cur_chunk = std::move(fiop_DataQueue.back());
+                fiop_DataQueue.pop_back();
+            }
+            else {
+                fio_pop_LOCK.unlock();
+                return true;
+            }
+
+            fio_pop_LOCK.unlock();
+
+            op_file_stream.seekp(cur_chunk.get()->file_indx);
+            op_file_stream.write(reinterpret_cast<char*>(cur_chunk.get()->chunk_data), cur_chunk.get()->chunk_size);
+            std::cout << "Wrote: " << cur_chunk.get()->chunk_id << " Chunk, size: " << cur_chunk.get()->chunk_size << "\n";
+
+            return true;
+
+        }
+
+    };
 
 } /* End of anonymous namespace */
 
@@ -939,6 +994,68 @@ int symmetric_ciphers::AES::__process_File__DEC(
     if (!op_file_strm.is_open())
         throw std::invalid_argument("Decrypt - Error opening output file");
     op_file_strm.write(reinterpret_cast<char*>(op_file_Buff.get()), op_File_FinalBufferSize);
+
+    return 0;
+
+}
+
+int symmetric_ciphers::AES::rewrite_file_threads(const std::string& f_name) {
+
+    std::ifstream ip_file_stream(f_name, std::ios::binary);
+    if (!ip_file_stream.is_open())
+        throw std::invalid_argument("Error opening input file");
+
+    const size_t ip_file_Size = __get_File_Size_Fstream(ip_file_stream);
+    bool last_chunk = false;
+
+    std::vector<std::unique_ptr<file_io_chunk_map_t>> ip_file_DS;
+    file_io_process_DataQueue read_write_DS(f_name + std::string("_copy"));
+
+    auto writer_thread_process = [&] {
+        while (read_write_DS.pop_and_process_data()) {
+            /* Do processing. */
+        }
+    };
+
+    std::vector<std::thread> lfi_Threads;
+    lfi_Threads.reserve(1);
+    lfi_Threads.emplace_back(writer_thread_process);
+
+    size_t remaining_data_to_read = ip_file_Size, chunk_cntr = 0;
+    while (remaining_data_to_read != 0) {
+
+        std::unique_ptr<file_io_chunk_map_t> temp_elem = std::make_unique<file_io_chunk_map_t>();
+        size_t cur_read_size = FILE_IO_CHUNK_SIZE_BYTES;
+        if (remaining_data_to_read < FILE_IO_CHUNK_SIZE_BYTES) {
+            cur_read_size = remaining_data_to_read;
+            last_chunk = true;
+        }
+
+        ip_file_stream.read(reinterpret_cast<char*>(temp_elem.get()->chunk_data), cur_read_size);
+        temp_elem.get()->chunk_size = cur_read_size;
+        temp_elem.get()->file_indx = chunk_cntr * FILE_IO_CHUNK_SIZE_BYTES;
+        chunk_cntr++;
+        temp_elem.get()->chunk_id = chunk_cntr;
+        temp_elem.get()->last_chunk = last_chunk;
+        remaining_data_to_read -= cur_read_size;
+
+        std::unique_lock<std::mutex> fio_LOCK(read_write_DS.fiop_Mutex);
+        read_write_DS.fiip_DataQueue.emplace_back(std::move(temp_elem));
+        fio_LOCK.unlock();
+
+        if (last_chunk) {
+            std::unique_lock<std::mutex> fio_LOCK_Rc(read_write_DS.fiop_Mutex);
+            read_write_DS.file_read_complete = true;
+            fio_LOCK_Rc.unlock();
+        }
+
+        std::cout << "Read: " << chunk_cntr << " Chunk, size: " << cur_read_size << "\n";
+
+    }
+
+    for (auto& t : lfi_Threads) {
+        t.join();
+    }
 
     return 0;
 

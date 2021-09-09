@@ -57,6 +57,11 @@ int main(int argc, char *argv[]) {
                 //file_tests.decrpyt_file__pybind_target(argv[2], op_f_name + "pyb", pass_wd);
             }
         }
+        else if (argc > 2) {
+            if (strcmp(argv[1], "r") == 0) {
+                file_tests.rewrite_file_threads(std::string(argv[2]));
+            }
+        }
         else
             std::cout<<"Invalid option\n";
     }
