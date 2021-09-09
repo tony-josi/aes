@@ -1020,7 +1020,6 @@ int symmetric_ciphers::AES::rewrite_file_threads(
 
     const size_t ip_file_Size = __get_File_Size_Fstream(ip_file_stream);
     bool last_chunk = false;
-    uint32_t file_checksum = 0;
 
     std::vector<std::unique_ptr<file_io_chunk_map_t>> ip_file_DS;
     file_io_process_DataQueue read_write_DS(f_name + std::string("_copy"));
@@ -1034,11 +1033,16 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     auto encrypt_process = [&] {
         
         auto encrypt_chunk_data = [&](const std::unique_ptr<file_io_chunk_map_t> &cur_chunk) {
-            
-            file_checksum += __aes_calculate_Checksum(cur_chunk.get()->chunk_data, cur_chunk.get()->chunk_size);
 
             if (cur_chunk.get()->last_chunk) {
-                /*Add padding and checksum. & increase chunk_size respectively. */
+                /*Add padding and increase chunk_size respectively. */
+                size_t pad_Diff = cur_chunk.get()->chunk_size % (AES_WORD_SIZE * AES_WORD_SIZE);
+                pad_Diff = pad_Diff ? ((AES_WORD_SIZE * AES_WORD_SIZE) - pad_Diff) : 0;
+                size_t new_chunk_sz = cur_chunk.get()->chunk_size + pad_Diff + AES_META_DATA_SIZE;
+                uint8_t* data_buff = cur_chunk.get()->chunk_data;
+                memset(data_buff + cur_chunk.get()->chunk_size, 0, new_chunk_sz - cur_chunk.get()->chunk_size);
+                data_buff[cur_chunk.get()->chunk_size + pad_Diff + AES_META_DATA_PADD_SIZE_OFFSET] = static_cast<uint8_t>(pad_Diff);
+                cur_chunk.get()->chunk_size = new_chunk_sz;
             }
 
             std::unique_ptr<file_io_chunk_map_t> ciphr_elem = std::make_unique<file_io_chunk_map_t>();
