@@ -169,6 +169,7 @@ namespace {
         std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiip_DataQueue;
         std::ofstream                                           op_file_stream;
         bool                                                    encrpt_complete;
+        bool                                                    file_read_complete;
 
         file_io_process_DataQueue(const std::string& op_f_name) {
             op_file_stream = std::ofstream(op_f_name, std::ios::binary);
@@ -178,7 +179,7 @@ namespace {
             op_file_stream.close();
         }
 
-        bool pop_and_process_data() {
+        bool pop_and_write_op_file_data() {
 
             std::unique_ptr<file_io_chunk_map_t> cur_chunk;
             std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
@@ -203,6 +204,27 @@ namespace {
 
             return true;
 
+        }
+
+        bool pop_and_process_ip_data(std::function<void(const std::unique_ptr<file_io_chunk_map_t>&)> __Func__) {
+            std::unique_ptr<file_io_chunk_map_t> cur_chunk;
+            std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
+            if (file_read_complete == true && fiip_DataQueue.empty() == true) {
+                fio_pop_LOCK.unlock();
+                return false;
+            }
+            else if (fiip_DataQueue.empty() != true) {
+                cur_chunk = std::move(fiip_DataQueue.back());
+                fiip_DataQueue.pop_back();
+            }
+            else {
+                fio_pop_LOCK.unlock();
+                return true;
+            }
+
+            fio_pop_LOCK.unlock();
+            __Func__(cur_chunk);
+            return true;
         }
 
     };
@@ -1025,7 +1047,7 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     file_io_process_DataQueue read_write_DS(f_name + std::string("_copy"));
 
     auto writer_thread_process = [&] {
-        while (read_write_DS.pop_and_process_data()) {
+        while (read_write_DS.pop_and_write_op_file_data()) {
             /* Do processing. */
         }
     };
@@ -1062,6 +1084,10 @@ int symmetric_ciphers::AES::rewrite_file_threads(
 
     };
 
+    auto decrypt_process = [&] {
+    
+    };
+
     std::vector<std::thread> lfi_Threads;
     lfi_Threads.reserve(1);
     lfi_Threads.emplace_back(writer_thread_process);
@@ -1087,6 +1113,12 @@ int symmetric_ciphers::AES::rewrite_file_threads(
         std::unique_lock<std::mutex> fio_LOCK(read_write_DS.fiop_Mutex);
         read_write_DS.fiip_DataQueue.emplace_back(std::move(temp_elem));
         fio_LOCK.unlock();
+
+        if (last_chunk) {
+            std::unique_lock<std::mutex> fio_LOCK(read_write_DS.fiop_Mutex);
+            read_write_DS.file_read_complete = true;
+            fio_LOCK.unlock();
+        }
 
         std::cout << "Read: " << chunk_cntr << " Chunk, size: " << cur_read_size << "\n";
 
