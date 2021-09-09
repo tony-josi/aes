@@ -31,7 +31,7 @@ namespace {
 
     /* 12.8 KB per data segment. */
     constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;  
-    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000;
+    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000 * 4;
 
     /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
     constexpr   size_t      AES_META_DATA_SIZE             = AES_WORD_SIZE * AES_WORD_SIZE;  
@@ -1022,8 +1022,9 @@ int symmetric_ciphers::AES::__process_File__DEC(
 
 }
 
-int symmetric_ciphers::AES::rewrite_file_threads(
+int symmetric_ciphers::AES::threaded_file_io_algo(
     const std::string&      f_name,
+    const std::string&      op_file_name,
     const uint8_t           key[],
     const size_t            key_size,
     const aes_Action        action
@@ -1049,7 +1050,7 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     bool last_chunk = false;
 
     std::vector<std::unique_ptr<file_io_chunk_map_t>> ip_file_DS;
-    file_io_process_DataQueue read_write_DS(f_name + std::string("_enc"));
+    file_io_process_DataQueue read_write_DS(op_file_name);
 
     auto writer_thread_process = [&] {
         while (read_write_DS.pop_and_write_op_file_data()) {
@@ -1125,9 +1126,9 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     };
 
     std::vector<std::thread> lfi_Threads;
-    lfi_Threads.reserve(std::thread::hardware_concurrency());
+    lfi_Threads.reserve(std::thread::hardware_concurrency() - 1);
     lfi_Threads.emplace_back(writer_thread_process);
-    for (auto i = 1u; i < std::thread::hardware_concurrency(); ++i) {
+    for (auto i = 1u; i < 2; ++i) {
         if (action == aes_Action::_ENCRYPT_0__) {
             lfi_Threads.emplace_back(encrypt_process);
         }

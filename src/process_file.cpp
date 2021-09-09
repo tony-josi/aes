@@ -56,13 +56,11 @@ int main(int argc, char *argv[]) {
                 file_tests.decrpyt_file(argv[2], argv[3], key_128_TRD, 24);
                 //file_tests.decrpyt_file__pybind_target(argv[2], op_f_name + "pyb", pass_wd);
             }
-        }
-        else if (argc > 2) {
-            if (strcmp(argv[1], "x") == 0) {
-                file_tests.rewrite_file_threads(std::string(argv[2]), key_128_TRD, 24, aes_Action::_ENCRYPT_0__);
+            else if (strcmp(argv[1], "x") == 0) {
+                file_tests.threaded_file_io_algo(std::string(argv[2]), std::string(argv[3]), key_128_TRD, 24, aes_Action::_ENCRYPT_0__);
             }
             else if (strcmp(argv[1], "y") == 0) {
-                file_tests.rewrite_file_threads(std::string(argv[2]), key_128_TRD, 24, aes_Action::_DECRYPT_1__);
+                file_tests.threaded_file_io_algo(std::string(argv[2]), std::string(argv[3]), key_128_TRD, 24, aes_Action::_DECRYPT_1__);
             }
         }
         else
