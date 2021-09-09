@@ -210,6 +210,7 @@ namespace {
             std::unique_ptr<file_io_chunk_map_t> cur_chunk;
             std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
             if (file_read_complete == true && fiip_DataQueue.empty() == true) {
+                encrpt_complete = true;
                 fio_pop_LOCK.unlock();
                 return false;
             }
@@ -1044,7 +1045,7 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     bool last_chunk = false;
 
     std::vector<std::unique_ptr<file_io_chunk_map_t>> ip_file_DS;
-    file_io_process_DataQueue read_write_DS(f_name + std::string("_copy"));
+    file_io_process_DataQueue read_write_DS(f_name + std::string("_enc"));
 
     auto writer_thread_process = [&] {
         while (read_write_DS.pop_and_write_op_file_data()) {
@@ -1082,10 +1083,41 @@ int symmetric_ciphers::AES::rewrite_file_threads(
 
         };
 
+        while (read_write_DS.pop_and_process_ip_data(encrypt_chunk_data)) {
+            /*Do processing. */
+        }
+
     };
 
     auto decrypt_process = [&] {
-    
+
+        auto decrypt_chunk_data = [&](const std::unique_ptr<file_io_chunk_map_t>& cur_chunk) {
+        
+            std::unique_ptr<file_io_chunk_map_t> plain_elem = std::make_unique<file_io_chunk_map_t>();
+            for (size_t ip_iter = 0; ip_iter < cur_chunk.get()->chunk_size; ip_iter += this->block_size) {
+                this->__perform_decryption__(cur_chunk.get()->chunk_data, exp_key, plain_elem.get()->chunk_data, ip_iter);
+            }
+            
+            plain_elem.get()->chunk_id = cur_chunk.get()->chunk_id;
+            plain_elem.get()->chunk_size = cur_chunk.get()->chunk_size;
+            plain_elem.get()->file_indx = cur_chunk.get()->file_indx;
+            plain_elem.get()->last_chunk = cur_chunk.get()->last_chunk;
+            if (cur_chunk.get()->last_chunk) {
+                uint8_t* data_buff = plain_elem.get()->chunk_data;
+                size_t unpadded_buffer_size = cur_chunk.get()->chunk_size - AES_META_DATA_SIZE - data_buff[cur_chunk.get()->chunk_size - AES_META_DATA_SIZE + AES_META_DATA_PADD_SIZE_OFFSET];
+                plain_elem.get()->chunk_size = unpadded_buffer_size;
+            }
+
+            std::unique_lock<std::mutex> fio_LOCK_ciphr(read_write_DS.fiop_Mutex);
+            read_write_DS.fiop_DataQueue.emplace_back(std::move(plain_elem));
+            fio_LOCK_ciphr.unlock();
+
+        };
+
+        while (read_write_DS.pop_and_process_ip_data(decrypt_chunk_data)) {
+            /*Do processing. */
+        }
+
     };
 
     std::vector<std::thread> lfi_Threads;
