@@ -168,7 +168,7 @@ namespace {
         std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiop_DataQueue;
         std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiip_DataQueue;
         std::ofstream                                           op_file_stream;
-        bool                                                    file_read_complete;
+        bool                                                    encrpt_complete;
 
         file_io_process_DataQueue(const std::string& op_f_name) {
             op_file_stream = std::ofstream(op_f_name, std::ios::binary);
@@ -182,7 +182,7 @@ namespace {
 
             std::unique_ptr<file_io_chunk_map_t> cur_chunk;
             std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
-            if (file_read_complete == true && fiop_DataQueue.empty() == true) {
+            if (encrpt_complete == true && fiop_DataQueue.empty() == true) {
                 fio_pop_LOCK.unlock();
                 return false;
             }
@@ -999,7 +999,20 @@ int symmetric_ciphers::AES::__process_File__DEC(
 
 }
 
-int symmetric_ciphers::AES::rewrite_file_threads(const std::string& f_name) {
+int symmetric_ciphers::AES::rewrite_file_threads(
+    const std::string&      f_name,
+    const uint8_t           key[],
+    const size_t            key_size,
+    const aes_Action        action
+    ) const {
+
+    if (key_size != this->actual_key_len)
+        throw std::invalid_argument("encrpyt_block_ecb() - key size should be 16/24/32 bytes "
+            "depending on AES - 128/192/256 bit modes used");
+
+    /* Expand keys to exp_key[] */
+    std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
+    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     std::ifstream ip_file_stream(f_name, std::ios::binary);
     if (!ip_file_stream.is_open())
@@ -1007,6 +1020,7 @@ int symmetric_ciphers::AES::rewrite_file_threads(const std::string& f_name) {
 
     const size_t ip_file_Size = __get_File_Size_Fstream(ip_file_stream);
     bool last_chunk = false;
+    uint32_t file_checksum = 0;
 
     std::vector<std::unique_ptr<file_io_chunk_map_t>> ip_file_DS;
     file_io_process_DataQueue read_write_DS(f_name + std::string("_copy"));
@@ -1015,6 +1029,33 @@ int symmetric_ciphers::AES::rewrite_file_threads(const std::string& f_name) {
         while (read_write_DS.pop_and_process_data()) {
             /* Do processing. */
         }
+    };
+
+    auto encrypt_process = [&] {
+        
+        auto encrypt_chunk_data = [&](const std::unique_ptr<file_io_chunk_map_t> &cur_chunk) {
+            
+            file_checksum += __aes_calculate_Checksum(cur_chunk.get()->chunk_data, cur_chunk.get()->chunk_size);
+
+            if (cur_chunk.get()->last_chunk) {
+                /*Add padding and checksum. & increase chunk_size respectively. */
+            }
+
+            std::unique_ptr<file_io_chunk_map_t> ciphr_elem = std::make_unique<file_io_chunk_map_t>();
+            for (size_t ip_iter = 0; ip_iter < cur_chunk.get()->chunk_size; ip_iter += this->block_size) {
+                this->__perform_encryption__(cur_chunk.get()->chunk_data, exp_key, ciphr_elem.get()->chunk_data, ip_iter);
+            }
+            ciphr_elem.get()->chunk_id = cur_chunk.get()->chunk_id;
+            ciphr_elem.get()->chunk_size = cur_chunk.get()->chunk_size;
+            ciphr_elem.get()->file_indx = cur_chunk.get()->file_indx;
+            ciphr_elem.get()->last_chunk = cur_chunk.get()->last_chunk;
+
+            std::unique_lock<std::mutex> fio_LOCK_ciphr(read_write_DS.fiop_Mutex);
+            read_write_DS.fiop_DataQueue.emplace_back(std::move(ciphr_elem));
+            fio_LOCK_ciphr.unlock();
+
+        };
+
     };
 
     std::vector<std::thread> lfi_Threads;
@@ -1042,12 +1083,6 @@ int symmetric_ciphers::AES::rewrite_file_threads(const std::string& f_name) {
         std::unique_lock<std::mutex> fio_LOCK(read_write_DS.fiop_Mutex);
         read_write_DS.fiip_DataQueue.emplace_back(std::move(temp_elem));
         fio_LOCK.unlock();
-
-        if (last_chunk) {
-            std::unique_lock<std::mutex> fio_LOCK_Rc(read_write_DS.fiop_Mutex);
-            read_write_DS.file_read_complete = true;
-            fio_LOCK_Rc.unlock();
-        }
 
         std::cout << "Read: " << chunk_cntr << " Chunk, size: " << cur_read_size << "\n";
 
