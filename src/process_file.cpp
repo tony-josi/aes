@@ -58,8 +58,11 @@ int main(int argc, char *argv[]) {
             }
         }
         else if (argc > 2) {
-            if (strcmp(argv[1], "r") == 0) {
-                file_tests.rewrite_file_threads(std::string(argv[2]));
+            if (strcmp(argv[1], "x") == 0) {
+                file_tests.rewrite_file_threads(std::string(argv[2]), key_128_TRD, 24, aes_Action::_ENCRYPT_0__);
+            }
+            else if (strcmp(argv[1], "y") == 0) {
+                file_tests.rewrite_file_threads(std::string(argv[2]), key_128_TRD, 24, aes_Action::_DECRYPT_1__);
             }
         }
         else

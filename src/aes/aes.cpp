@@ -1029,13 +1029,17 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     const aes_Action        action
     ) const {
 
-    if (key_size != this->actual_key_len)
-        throw std::invalid_argument("encrpyt_block_ecb() - key size should be 16/24/32 bytes "
-            "depending on AES - 128/192/256 bit modes used");
+    std::unique_ptr<uint8_t[]> padded_Key(new uint8_t[this->actual_key_len]);
+    memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
+
+    if (key_size < this->actual_key_len) {
+        /* Padd with zero's if key size is less than expected. */
+        memset(padded_Key.get() + key_size, 0, this->actual_key_len - key_size);
+    }
 
     /* Expand keys to exp_key[] */
     std::unique_ptr<uint8_t[]> exp_key(new uint8_t[this->expanded_key_len]);
-    __aes_expand_key(key, exp_key.get(), this->actual_key_len, this->expanded_key_len);
+    __aes_expand_key(padded_Key.get(), exp_key.get(), this->actual_key_len, this->expanded_key_len);
 
     std::ifstream ip_file_stream(f_name, std::ios::binary);
     if (!ip_file_stream.is_open())
@@ -1121,8 +1125,17 @@ int symmetric_ciphers::AES::rewrite_file_threads(
     };
 
     std::vector<std::thread> lfi_Threads;
-    lfi_Threads.reserve(1);
+    lfi_Threads.reserve(std::thread::hardware_concurrency());
     lfi_Threads.emplace_back(writer_thread_process);
+    for (auto i = 1u; i < std::thread::hardware_concurrency(); ++i) {
+        if (action == aes_Action::_ENCRYPT_0__) {
+            lfi_Threads.emplace_back(encrypt_process);
+        }
+        else if (action == aes_Action::_DECRYPT_1__) {
+            lfi_Threads.emplace_back(decrypt_process);
+        }
+    }
+
 
     size_t remaining_data_to_read = ip_file_Size, chunk_cntr = 0;
     while (remaining_data_to_read != 0) {
@@ -1147,9 +1160,9 @@ int symmetric_ciphers::AES::rewrite_file_threads(
         fio_LOCK.unlock();
 
         if (last_chunk) {
-            std::unique_lock<std::mutex> fio_LOCK(read_write_DS.fiop_Mutex);
+            std::unique_lock<std::mutex> fio_LOCK_Rd(read_write_DS.fiop_Mutex);
             read_write_DS.file_read_complete = true;
-            fio_LOCK.unlock();
+            fio_LOCK_Rd.unlock();
         }
 
         std::cout << "Read: " << chunk_cntr << " Chunk, size: " << cur_read_size << "\n";
