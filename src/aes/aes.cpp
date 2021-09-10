@@ -31,7 +31,7 @@ namespace {
 
     /* 12.8 KB per data segment. */
     constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;  
-    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000 * 4;
+    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000;
     constexpr   size_t      MAX_ALGO_WORKER_THREAD_COUNT   = 50;
 
     /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
