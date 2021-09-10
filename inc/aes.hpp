@@ -105,7 +105,25 @@ namespace symmetric_ciphers {
          */ 
         int decrpyt_file__pybind_target(const std::string &f_Name, const std::string &op_file_name, const std::string &key) const;
 
+        /**
+         * @brief  Function to encrypt given large files (> 1 GB)
+         *         with AES ECB using threads.
+         */
         int threaded_file_io_algo(const std::string& f_name, const std::string& op_file_name, const uint8_t key[], const size_t key_size, const aes_Action action) const;
+
+        /**
+         * @brief  Function to encrypt given large files (> 1 GB)
+         *         with AES ECB using threads. This function acts as the target
+         *         method for pybind11 bindings for encrpyt_file()
+         */
+        int encrpyt_large_file__pybind_target(const std::string& f_Name, const std::string& op_file_name, const std::string& key) const;
+
+        /**
+         * @brief  Function to decrypt given large files (> 1 GB)
+         *         with AES ECB using threads. This function acts as the target
+         *         method for pybind11 bindings for decrpyt_file()
+         */
+        int decrpyt_large_file__pybind_target(const std::string& f_Name, const std::string& op_file_name, const std::string& key) const;
 
     private:
         size_t       actual_key_len;                  /* Stores the actual length of key in bytes */
@@ -147,6 +165,12 @@ namespace symmetric_ciphers {
          *         with AES using threads.
          */ 
         int __process_File__DEC(const std::string &f_Name, const std::string &op_file_name, const uint8_t key[], const size_t key_size) const;
+
+        /**
+        * @brief  Internal Function to convert string key to
+        *         uint8_t buffer/array of required size.
+        */
+        int __convert_string_to_uint8_key(const std::string &key, uint8_t * const u8_key_buff, size_t* reqd_key_len) const;
 
         
 

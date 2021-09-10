@@ -516,25 +516,9 @@ int symmetric_ciphers::AES::encrpyt_file__pybind_target(
     ) const {
 
     uint8_t initzd_key[MAX_SUPPORTED_PLAIN_KEY_SIZE] = { 0 };    /* Max. supported key size. */
-    size_t key_len = key.length();
     size_t reqd_key_len;
 
-    switch (this->actual_key_len) {
-    case AES128_PLAIN_KEY_SIZE:
-        reqd_key_len = AES128_PLAIN_KEY_SIZE;
-        std::memcpy(initzd_key, key.c_str(), key_len < AES128_PLAIN_KEY_SIZE ? key_len : AES128_PLAIN_KEY_SIZE);
-        break;
-    case AES192_PLAIN_KEY_SIZE:
-        reqd_key_len = AES192_PLAIN_KEY_SIZE;
-        std::memcpy(initzd_key, key.c_str(), key_len < AES192_PLAIN_KEY_SIZE ? key_len : AES192_PLAIN_KEY_SIZE);
-        break;
-    case AES256_PLAIN_KEY_SIZE:
-        reqd_key_len = AES256_PLAIN_KEY_SIZE;
-        std::memcpy(initzd_key, key.c_str(), key_len < AES256_PLAIN_KEY_SIZE ? key_len : AES256_PLAIN_KEY_SIZE);
-        break;
-    default:
-        throw std::invalid_argument("Error parsing key");
-    }
+    this->__convert_string_to_uint8_key(key, initzd_key, &reqd_key_len);
 
     return this->__process_File__ENC(f_Name, op_file_name, initzd_key, reqd_key_len);
 
@@ -558,25 +542,9 @@ int symmetric_ciphers::AES::decrpyt_file__pybind_target(
     ) const {
 
     uint8_t initzd_key[MAX_SUPPORTED_PLAIN_KEY_SIZE] = { 0 };    /* Max. supported key size. */
-    size_t key_len = key.length();
     size_t reqd_key_len;
 
-    switch (this->actual_key_len) {
-    case AES128_PLAIN_KEY_SIZE:
-        reqd_key_len = AES128_PLAIN_KEY_SIZE;
-        std::memcpy(initzd_key, key.c_str(), key_len < AES128_PLAIN_KEY_SIZE ? key_len : AES128_PLAIN_KEY_SIZE);
-        break;
-    case AES192_PLAIN_KEY_SIZE:
-        reqd_key_len = AES192_PLAIN_KEY_SIZE;
-        std::memcpy(initzd_key, key.c_str(), key_len < AES192_PLAIN_KEY_SIZE ? key_len : AES192_PLAIN_KEY_SIZE);
-        break;
-    case AES256_PLAIN_KEY_SIZE:
-        reqd_key_len = AES256_PLAIN_KEY_SIZE;
-        std::memcpy(initzd_key, key.c_str(), key_len < AES256_PLAIN_KEY_SIZE ? key_len : AES256_PLAIN_KEY_SIZE);
-        break;
-    default:
-        throw std::invalid_argument("Error parsing key");
-    }
+    this->__convert_string_to_uint8_key(key, initzd_key, &reqd_key_len);
 
     return this->__process_File__DEC(f_Name, op_file_name, initzd_key, reqd_key_len);
 
@@ -1150,6 +1118,79 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
     }
 
     return 0;
+
+}
+
+/**
+* @brief  Internal Function to convert string key to
+*         uint8_t buffer/array of required size.
+*/
+int symmetric_ciphers::AES::__convert_string_to_uint8_key(
+    const std::string& key,
+    uint8_t* const u8_key_buff,
+    size_t* reqd_key_len
+    ) const {
+
+    size_t key_len = key.length();
+
+    switch (this->actual_key_len) {
+    case AES128_PLAIN_KEY_SIZE:
+        *reqd_key_len = AES128_PLAIN_KEY_SIZE;
+        std::memcpy(u8_key_buff, key.c_str(), key_len < AES128_PLAIN_KEY_SIZE ? key_len : AES128_PLAIN_KEY_SIZE);
+        break;
+    case AES192_PLAIN_KEY_SIZE:
+        *reqd_key_len = AES192_PLAIN_KEY_SIZE;
+        std::memcpy(u8_key_buff, key.c_str(), key_len < AES192_PLAIN_KEY_SIZE ? key_len : AES192_PLAIN_KEY_SIZE);
+        break;
+    case AES256_PLAIN_KEY_SIZE:
+        *reqd_key_len = AES256_PLAIN_KEY_SIZE;
+        std::memcpy(u8_key_buff, key.c_str(), key_len < AES256_PLAIN_KEY_SIZE ? key_len : AES256_PLAIN_KEY_SIZE);
+        break;
+    default:
+        throw std::invalid_argument("Error parsing key");
+    }
+
+    return 0;
+
+}
+
+/**
+ * @brief  Function to encrypt given large files (> 1 GB)
+ *         with AES ECB using threads. This function acts as the target
+ *         method for pybind11 bindings for encrpyt_file()
+ */
+int symmetric_ciphers::AES::encrpyt_large_file__pybind_target(
+    const std::string& f_Name, 
+    const std::string& op_file_name, 
+    const std::string& key
+    ) const {
+
+    uint8_t initzd_key[MAX_SUPPORTED_PLAIN_KEY_SIZE] = { 0 };    /* Max. supported key size. */
+    size_t reqd_key_len;
+
+    this->__convert_string_to_uint8_key(key, initzd_key, &reqd_key_len);
+
+    return this->threaded_file_io_algo(f_Name, op_file_name, initzd_key, reqd_key_len, aes_Action::_ENCRYPT_0__);
+
+}
+
+/**
+ * @brief  Function to decrypt given large files (> 1 GB)
+ *         with AES ECB using threads. This function acts as the target
+ *         method for pybind11 bindings for decrpyt_file()
+ */
+int symmetric_ciphers::AES::decrpyt_large_file__pybind_target(
+    const std::string& f_Name, 
+    const std::string& op_file_name, 
+    const std::string& key
+    ) const {
+
+    uint8_t initzd_key[MAX_SUPPORTED_PLAIN_KEY_SIZE] = { 0 };    /* Max. supported key size. */
+    size_t reqd_key_len;
+
+    this->__convert_string_to_uint8_key(key, initzd_key, &reqd_key_len);
+
+    return this->threaded_file_io_algo(f_Name, op_file_name, initzd_key, reqd_key_len, aes_Action::_DECRYPT_1__);
 
 }
 
