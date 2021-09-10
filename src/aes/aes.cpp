@@ -1081,9 +1081,11 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
     };
 
     std::vector<std::thread> lfi_Threads;
-    lfi_Threads.reserve(std::thread::hardware_concurrency() - 1);
+    size_t max_threads = std::thread::hardware_concurrency();
+    max_threads = max_threads > 1 ? max_threads : 2;
+    lfi_Threads.reserve(max_threads);
     lfi_Threads.emplace_back(writer_thread_process);
-    for (size_t i = 0u; i < std::thread::hardware_concurrency() - 2; ++i) {
+    for (size_t i = 0u; i < (max_threads - 1); ++i) {
         if (action == aes_Action::_ENCRYPT_0__) {
             lfi_Threads.emplace_back(encrypt_process, i);
         }
