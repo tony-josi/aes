@@ -24,6 +24,8 @@
 #include <fstream>
 #include <chrono>
 
+// #define AES_DEBUG_FLAG
+
 namespace {
 
     /* AES Word size */
@@ -31,7 +33,7 @@ namespace {
 
     /* 12.8 KB per data segment. */
     constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;  
-    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000;
+    constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000 * 2;
     constexpr   size_t      MAX_ALGO_WORKER_THREAD_COUNT   = 50;
 
     /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
@@ -860,7 +862,11 @@ int symmetric_ciphers::AES::__process_File__ENC(
     op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>\
     ( std::chrono::high_resolution_clock::now() - t1 ).count();
+
+
+#ifdef AES_DEBUG_FLAG
     std::cout<<"\nFile Read & Allocation: "<<duration<<"\n";
+#endif /* AES_DEBUG_FLAG */
     
     /* Set the area reserved for padding and metadata as 0. */
     memset(ip_file_Buff.get() + file_Size, 0, ip_Total_PaddedBufferSize - file_Size);
@@ -888,8 +894,11 @@ int symmetric_ciphers::AES::__process_File__ENC(
     uint32_t check_sum = __aes_calculate_Checksum(ip_file_Buff.get(), ip_Total_PaddedBufferSize - AES_META_DATA_SIZE);
     duration = std::chrono::duration_cast<std::chrono::milliseconds>\
     ( std::chrono::high_resolution_clock::now() - t1 ).count();
+
+#ifdef AES_DEBUG_FLAG
     std::cout<<"\nChecksum calc.: "<<duration<<"\n";
-    
+#endif /* AES_DEBUG_FLAG */
+
     memcpy(ip_file_Buff.get() + ip_Total_PaddedBufferSize - AES_META_DATA_CHECK_SUM_OFFSET, \
     &check_sum, sizeof(uint32_t));
 
@@ -898,7 +907,10 @@ int symmetric_ciphers::AES::__process_File__ENC(
     op_file_Buff.get(), ip_Total_PaddedBufferSize, this->actual_key_len, aes_Action::_ENCRYPT_0__);
     duration = std::chrono::duration_cast<std::chrono::milliseconds>\
     ( std::chrono::high_resolution_clock::now() - t1 ).count();
+
+#ifdef AES_DEBUG_FLAG
     std::cout<<"\nAlgo. threaded: "<<duration<<"\n";
+#endif /* AES_DEBUG_FLAG */
 
     size_t op_File_FinalBufferSize = ip_Total_PaddedBufferSize;
     
@@ -909,7 +921,10 @@ int symmetric_ciphers::AES::__process_File__ENC(
     op_file_strm.write(reinterpret_cast<char *>(op_file_Buff.get()), op_File_FinalBufferSize);
     duration = std::chrono::duration_cast<std::chrono::milliseconds>\
     ( std::chrono::high_resolution_clock::now() - t1 ).count();
+
+#ifdef AES_DEBUG_FLAG
     std::cout<<"\nFile write: "<<duration<<"\n";
+#endif /* AES_DEBUG_FLAG */
 
     return 0;
 
@@ -1082,7 +1097,8 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
 
     std::vector<std::thread> lfi_Threads;
     size_t max_threads = std::thread::hardware_concurrency();
-    max_threads = max_threads > 1 ? max_threads : 2;
+    max_threads = max_threads > 2 ? max_threads : 3;
+    max_threads -= 1;
     lfi_Threads.reserve(max_threads);
     lfi_Threads.emplace_back(writer_thread_process);
     for (size_t i = 0u; i < (max_threads - 1); ++i) {
@@ -1123,7 +1139,9 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
             fii_LOCK_Rd.unlock();
         }
 
+#ifdef AES_DEBUG_FLAG
         std::cout << "Read: " << chunk_cntr << " Chunk, size: " << cur_read_size << "\n";
+#endif /* AES_DEBUG_FLAG */
 
     }
 
@@ -1511,7 +1529,11 @@ namespace {
 
         op_file_stream.seekp(cur_chunk.get()->file_indx);
         op_file_stream.write(reinterpret_cast<char*>(cur_chunk.get()->chunk_data), cur_chunk.get()->chunk_size);
+
+#ifdef AES_DEBUG_FLAG
         std::cout << "Wrote: " << cur_chunk.get()->chunk_id << " Chunk, size: " << cur_chunk.get()->chunk_size << " Rem ele: "<< rem_elements<< "\n";
+#endif /* AES_DEBUG_FLAG */
+
         return true;
 
     }
@@ -1545,7 +1567,10 @@ namespace {
         algo_worker_status[t_id] = false;
         wrk_s__LOCK2.unlock();
 
+#ifdef AES_DEBUG_FLAG
         std::cout << "Enc:Dec: " << cur_chunk.get()->chunk_id << " Chunk, size: " << cur_chunk.get()->chunk_size<<"\n";
+#endif /* AES_DEBUG_FLAG */
+
         return true;
     }
 
