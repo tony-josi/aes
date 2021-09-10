@@ -32,6 +32,7 @@ namespace {
     /* 12.8 KB per data segment. */
     constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;  
     constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000 * 4;
+    constexpr   size_t      MAX_ALGO_WORKER_THREAD_COUNT   = 50;
 
     /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
     constexpr   size_t      AES_META_DATA_SIZE             = AES_WORD_SIZE * AES_WORD_SIZE;  
@@ -165,13 +166,18 @@ namespace {
     class file_io_process_DataQueue {
     public:
         std::mutex                                              fiop_Mutex;
+        std::mutex                                              fiip_Mutex;
+        std::mutex                                              worker_Status_Mutex;
         std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiop_DataQueue;
         std::vector<std::unique_ptr<file_io_chunk_map_t>>       fiip_DataQueue;
         std::ofstream                                           op_file_stream;
         bool                                                    encrpt_complete;
         bool                                                    file_read_complete;
+        std::vector<bool>                                       algo_worker_status;
 
-        file_io_process_DataQueue(const std::string& op_f_name) {
+        file_io_process_DataQueue(const std::string& op_f_name) : algo_worker_status(MAX_ALGO_WORKER_THREAD_COUNT, false) {
+            encrpt_complete = false;
+            file_read_complete = false;
             op_file_stream = std::ofstream(op_f_name, std::ios::binary);
         }
 
@@ -179,17 +185,32 @@ namespace {
             op_file_stream.close();
         }
 
+        bool get_algo_worker_status() {
+        
+            bool status_ = false;
+            for (auto itr : algo_worker_status)
+                status_ |= itr;
+            return status_;
+        }
+
         bool pop_and_write_op_file_data() {
 
             std::unique_ptr<file_io_chunk_map_t> cur_chunk;
             std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
+            size_t rem_elements = 777;
             if (encrpt_complete == true && fiop_DataQueue.empty() == true) {
                 fio_pop_LOCK.unlock();
-                return false;
+
+                std::unique_lock<std::mutex> wrk_s__LOCK(worker_Status_Mutex);
+                bool wrk_status = get_algo_worker_status();
+                wrk_s__LOCK.unlock();
+
+                return wrk_status;
             }
             else if (fiop_DataQueue.empty() != true) {
                 cur_chunk = std::move(fiop_DataQueue.back());
                 fiop_DataQueue.pop_back();
+                rem_elements = fiop_DataQueue.size();
             }
             else {
                 fio_pop_LOCK.unlock();
@@ -200,18 +221,17 @@ namespace {
 
             op_file_stream.seekp(cur_chunk.get()->file_indx);
             op_file_stream.write(reinterpret_cast<char*>(cur_chunk.get()->chunk_data), cur_chunk.get()->chunk_size);
-            std::cout << "Wrote: " << cur_chunk.get()->chunk_id << " Chunk, size: " << cur_chunk.get()->chunk_size << "\n";
-
+            std::cout << "Wrote: " << cur_chunk.get()->chunk_id << " Chunk, size: " << cur_chunk.get()->chunk_size << " Rem ele: "<< rem_elements<< "\n";
             return true;
 
         }
 
-        bool pop_and_process_ip_data(std::function<void(const std::unique_ptr<file_io_chunk_map_t>&)> __Func__) {
+        bool pop_and_process_ip_data(std::function<void(const std::unique_ptr<file_io_chunk_map_t>&)> __Func__, size_t t_id) {
             std::unique_ptr<file_io_chunk_map_t> cur_chunk;
-            std::unique_lock<std::mutex> fio_pop_LOCK(fiop_Mutex);
+            std::unique_lock<std::mutex> fii_pop_LOCK(fiip_Mutex);
             if (file_read_complete == true && fiip_DataQueue.empty() == true) {
                 encrpt_complete = true;
-                fio_pop_LOCK.unlock();
+                fii_pop_LOCK.unlock();
                 return false;
             }
             else if (fiip_DataQueue.empty() != true) {
@@ -219,12 +239,23 @@ namespace {
                 fiip_DataQueue.pop_back();
             }
             else {
-                fio_pop_LOCK.unlock();
+                fii_pop_LOCK.unlock();
                 return true;
             }
 
-            fio_pop_LOCK.unlock();
+            fii_pop_LOCK.unlock();
+
+            std::unique_lock<std::mutex> wrk_s__LOCK(worker_Status_Mutex);
+            algo_worker_status[t_id] = true;
+            wrk_s__LOCK.unlock();
+
             __Func__(cur_chunk);
+            
+            std::unique_lock<std::mutex> wrk_s__LOCK2(worker_Status_Mutex);
+            algo_worker_status[t_id] = false;
+            wrk_s__LOCK2.unlock();
+
+            std::cout << "Enc:Dec: " << cur_chunk.get()->chunk_id << " Chunk, size: " << cur_chunk.get()->chunk_size<<"\n";
             return true;
         }
 
@@ -1058,7 +1089,7 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
         }
     };
 
-    auto encrypt_process = [&] {
+    auto encrypt_process = [&] (size_t t_id) {
         
         auto encrypt_chunk_data = [&](const std::unique_ptr<file_io_chunk_map_t> &cur_chunk) {
 
@@ -1088,13 +1119,13 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
 
         };
 
-        while (read_write_DS.pop_and_process_ip_data(encrypt_chunk_data)) {
+        while (read_write_DS.pop_and_process_ip_data(encrypt_chunk_data, t_id)) {
             /*Do processing. */
         }
 
     };
 
-    auto decrypt_process = [&] {
+    auto decrypt_process = [&](size_t t_id) {
 
         auto decrypt_chunk_data = [&](const std::unique_ptr<file_io_chunk_map_t>& cur_chunk) {
         
@@ -1119,7 +1150,7 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
 
         };
 
-        while (read_write_DS.pop_and_process_ip_data(decrypt_chunk_data)) {
+        while (read_write_DS.pop_and_process_ip_data(decrypt_chunk_data, t_id)) {
             /*Do processing. */
         }
 
@@ -1128,12 +1159,12 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
     std::vector<std::thread> lfi_Threads;
     lfi_Threads.reserve(std::thread::hardware_concurrency() - 1);
     lfi_Threads.emplace_back(writer_thread_process);
-    for (auto i = 1u; i < 2; ++i) {
+    for (size_t i = 0u; i < std::thread::hardware_concurrency() - 2; ++i) {
         if (action == aes_Action::_ENCRYPT_0__) {
-            lfi_Threads.emplace_back(encrypt_process);
+            lfi_Threads.emplace_back(encrypt_process, i);
         }
         else if (action == aes_Action::_DECRYPT_1__) {
-            lfi_Threads.emplace_back(decrypt_process);
+            lfi_Threads.emplace_back(decrypt_process, i);
         }
     }
 
@@ -1156,14 +1187,14 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
         temp_elem.get()->last_chunk = last_chunk;
         remaining_data_to_read -= cur_read_size;
 
-        std::unique_lock<std::mutex> fio_LOCK(read_write_DS.fiop_Mutex);
+        std::unique_lock<std::mutex> fii_LOCK(read_write_DS.fiip_Mutex);
         read_write_DS.fiip_DataQueue.emplace_back(std::move(temp_elem));
-        fio_LOCK.unlock();
+        fii_LOCK.unlock();
 
         if (last_chunk) {
-            std::unique_lock<std::mutex> fio_LOCK_Rd(read_write_DS.fiop_Mutex);
+            std::unique_lock<std::mutex> fii_LOCK_Rd(read_write_DS.fiip_Mutex);
             read_write_DS.file_read_complete = true;
-            fio_LOCK_Rd.unlock();
+            fii_LOCK_Rd.unlock();
         }
 
         std::cout << "Read: " << chunk_cntr << " Chunk, size: " << cur_read_size << "\n";
