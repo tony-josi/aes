@@ -16,4 +16,3 @@ if __name__ == "__main__":
         elif sys.argv[1] == "y":
             print(aes_128_obj.decrypt_large_file(sys.argv[2], sys.argv[3], sys.argv[4]))
         print("Duration: ", (time.time() - prev_time) * 1000)
-            
