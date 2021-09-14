@@ -18,11 +18,11 @@ Current version: `v3.0.1`
 
 The Advanced Encryption Standard (AES), also known by its original name Rijndael is a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST).
 
-This implementation currently supports Electronic codebook mode with support for **128/192/256 bit keys** and option for **multi threading** for large file encryption. Python bindings generation for the AES library is also supported for easy usage of the AES Library with python scripts.
+This implementation currently supports Electronic Codebook (ECB)  mode with  128/192/256-bit keys and support for multi-threading for large file processing. Python bindings generation for the AES library is also supported for easy usage of the AES Library with python scripts.
 
 ###  Speed benchmark
 
-Encrypts/Decrypts 3.71 GB data in ~18 seconds on 2.90 GHz Hexa-Core Intel® Core™ i5-10400.
+Encrypts/Decrypts 3.71 GB data in ~18 seconds on a 2.90 GHz Hexa-Core Intel® Core™ i5-10400 CPU.
 
 ## Usage
 
@@ -43,7 +43,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DLOW_LEVEL_API_SAMPLE=
 # Test disabled; use -DENABLE_TESTING=ON to build test cases executable. Not building python bindings by default, use -DPYTHON_BINDINGS_GEN=ON if required.
 ```
 
-After generating the build files the target can be build using the build tools supported by the current platform. (`make` for Unix systems, `Visual Studio` for Windows and `Xcode` for MacOS)
+After generating the build files the target can be build using the build tools supported by the current platform. (`make` for Unix systems, `Visual Studio` for Windows and `Xcode` for macOS)
 
 
 ### AES Methods (API)
@@ -135,9 +135,9 @@ int main() {
 }
 ```
 
-### Large file encryption API with multi-threaded file IO
+#### Large file encryption API with multi-threaded file IO
 
-For example usage please refer to: [`process_file.cpp`](https://github.com/TonyJosi97/aes/blob/master/src/process_file.cpp) file
+For example usage please refer to [`process_file.cpp`](https://github.com/TonyJosi97/aes/blob/master/src/process_file.cpp) file
 
 ### Example usage of the python bindings module
 
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     2. 9, 11 or 13 rounds:
         1. `SubBytes` – a non-linear substitution step where each byte is replaced with another according to a lookup table.
         2. `ShiftRows` – a transposition step where the last three rows of the state are shifted cyclically a certain number of steps.
-        3. `MixColumns` – a linear mixing operation which operates on the columns of the state, combining the four bytes in each column.
+        3. `MixColumns` – a linear mixing operation that operates on the columns of the state, combining the four bytes in each column.
         4. `AddRoundKey`
 3. Final round (making 10, 12 or 14 rounds in total):
     1. `SubBytes`
@@ -184,17 +184,17 @@ if __name__ == "__main__":
 
 #### v3.0 Update Notes
 
-* Added python bindings for the aes library for file encryption/decryption
-* Changed file IO to use basic_stream lib of C++ instead of open() to fix a bug arising from incorrect calculation of file size for larger files
+* Added python bindings for the AES library for file encryption/decryption
+* Changed file IO to use basic_stream lib of C++ instead of open() to fix a bug arising from the incorrect calculation of file size for larger files
 * Changed plain enums to enum classes
 * Changed iteration variable type to size_t to support larger files
-* Added D_CRT_SECURE_NO_WARNINGS option to cmake file if target platform is MSVC to avoid error/warning about fopen() in Visual Studio
-* Removed warnings associated with string lib header not used in the aes lib.
+* Added D_CRT_SECURE_NO_WARNINGS option to cmake file if the target platform is MSVC to avoid error/warning about fopen() in Visual Studio
+* Removed warnings associated with string lib header not used in the AES lib.
 
 #### To Do:
-* Use pointer based XOR operation instead of loop - individual bytes & XOR
+* Use pointer based XOR operation instead of a loop - individual bytes & XOR
 * Implement other encryption modes - Cipher block chaining, Output feedback, Counter modes
-* Implement algorithm for mix column & inverse mix column instead of lookup table for learning
+* Implement algorithm for mix column & inverse mix column instead of a lookup table for learning
 
 ###### File TODO:
 * Complete todo
