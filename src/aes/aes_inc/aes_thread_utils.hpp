@@ -11,6 +11,9 @@
  */
 
 
+#ifndef _AES_THRD_HEADER_TJ__
+#define _AES_THRD_HEADER_TJ__
+
 #include <vector>
 
 #include "aes_core_cfg.hpp"
@@ -51,3 +54,5 @@ public:
     );
 
 };
+
+#endif /* _AES_THRD_HEADER_TJ__ */

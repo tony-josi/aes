@@ -7,6 +7,9 @@
  *  @bug            No known bugs.
  */
 
+#ifndef _AES_CORE_CFG_HEADER_TJ__
+#define _AES_CORE_CFG_HEADER_TJ__
+
 /* AES Word size */
 #define     AES_WORD_SIZE					(4ULL)
 
@@ -28,3 +31,5 @@
 #define   AES192_PLAIN_KEY_SIZE				(24ULL)
 #define   AES256_PLAIN_KEY_SIZE				(32ULL)
 
+
+#endif /* _AES_CORE_CFG_HEADER_TJ__ */

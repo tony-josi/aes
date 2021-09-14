@@ -10,6 +10,9 @@
  *  @bug            No known bugs.
  */
 
+#ifndef _AES_OPRN_HEADER_TJ__
+#define _AES_OPRN_HEADER_TJ__
+
 #include <memory>
 
 #include "aes_core_cfg.hpp"
@@ -108,3 +111,5 @@ uint32_t __aes_calculate_Checksum(
     uint8_t                     buffer[],
     size_t                      siz_
 );
+
+#endif /* _AES_OPRN_HEADER_TJ__ */
