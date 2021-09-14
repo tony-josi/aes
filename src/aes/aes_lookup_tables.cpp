@@ -1,3 +1,14 @@
+/** 
+ *  @file   aes_lookup_tables.cpp
+ *  @brief  AES S-BOX, INV-S-BOX and MUL tables
+ *
+ *  This file contains the source code for the AES S-BOX, INV-S-BOX and MUL tables.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
+ */
+
 #include <cstdint>
 
 #include "aes_lookup_tables.hpp"

@@ -1,3 +1,11 @@
+/** 
+ *  @file   aes_core_cfg.hpp
+ *  @brief  AES core configuration definitions.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
+ */
 
 /* AES Word size */
 #define     AES_WORD_SIZE					(4ULL)

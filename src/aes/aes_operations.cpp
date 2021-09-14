@@ -1,3 +1,15 @@
+/** 
+ *  @file   aes_operations.cpp
+ *  @brief  AES process steps.
+ *
+ *  This file contains the source code for the individual steps involved in
+ *  the encryption/decryption process.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
+ */
+
 #include <cstdint>
 #include <string>
 #include <algorithm>

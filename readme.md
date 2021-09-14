@@ -1,6 +1,6 @@
 ## Advanced Encryption Standard 
 
-Current version: `v3.0.1`
+Current version: `v3.1.0`
 
 #### Build Status:
 

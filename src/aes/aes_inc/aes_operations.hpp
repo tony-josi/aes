@@ -1,3 +1,15 @@
+/** 
+ *  @file   aes_operations.hpp
+ *  @brief  AES process steps header.
+ *
+ *  This file contains the header code for the individual steps involved in
+ *  the encryption/decryption process.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
+ */
+
 #include <memory>
 
 #include "aes_core_cfg.hpp"

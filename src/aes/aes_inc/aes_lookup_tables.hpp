@@ -1,3 +1,12 @@
+/** 
+ *  @file   aes_lookup_tables.hpp
+ *  @brief  AES S-BOX, INV-S-BOX and MUL tables
+ *
+ *  This file contains the header code for the AES S-BOX, INV-S-BOX and MUL tables.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
 
 /* Forward declarations for Lookup tables */
 extern      uint8_t     AES_S_BOX[256];

@@ -1,3 +1,16 @@
+/** 
+ *  @file   aes_thread_utils.hpp
+ *  @brief  AES thread workers and DS header.
+ *
+ *  This file contains the header code worker threads and their 
+ *  data structure implementation.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
+ */
+
+
 #include <vector>
 
 #include "aes_core_cfg.hpp"

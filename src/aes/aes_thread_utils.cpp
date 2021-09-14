@@ -1,3 +1,15 @@
+/** 
+ *  @file   aes_thread_utils.cpp
+ *  @brief  AES thread workers and DS.
+ *
+ *  This file contains the source code worker threads and their 
+ *  data structure implementation.
+ *
+ *  @author         Tony Josi   https://tonyjosi97.github.io/profile/
+ *  @copyright      Copyright (C) 2021 Tony Josi
+ *  @bug            No known bugs.
+ */
+
 #include <string>
 #include <fstream>
 #include <mutex>
