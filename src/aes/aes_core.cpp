@@ -9,7 +9,7 @@
  *  @bug            No known bugs.
  */
 
-#include "../inc/aes.hpp"
+
 
 #include <stdexcept>
 #include <string>
@@ -24,8 +24,13 @@
 #include <fstream>
 #include <chrono>
 
-// #define AES_DEBUG_FLAG
+#include "aes.hpp"
+#include "aes_core_cfg.hpp"
+#include "aes_lookup_tables.hpp"
+#include "aes_operations.hpp"
+#include "aes_thread_utils.hpp"
 
+// #define AES_DEBUG_FLAG
 
 
 /**

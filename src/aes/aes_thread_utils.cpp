@@ -1,4 +1,9 @@
+#include <string>
+#include <fstream>
+#include <mutex>
+#include <functional>
 
+#include "aes_thread_utils.hpp"
 
 void file_io_chunk_map_t::copy_meta_data(file_io_chunk_map_t *src_) {
     chunk_id = src_->chunk_id;

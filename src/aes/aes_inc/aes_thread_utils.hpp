@@ -1,4 +1,6 @@
+#include <vector>
 
+#include "aes_core_cfg.hpp"
 
 class file_io_chunk_map_t {
 public:

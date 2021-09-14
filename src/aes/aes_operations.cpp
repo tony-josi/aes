@@ -1,4 +1,12 @@
+#include <cstdint>
+#include <string>
+#include <algorithm>
+#include <cstring>
+#include <stdexcept>
+#include <fstream>
 
+#include "aes_operations.hpp"
+#include "aes_lookup_tables.hpp"
 
 size_t __aes_expand_key(
     const uint8_t           key[], 
@@ -80,7 +88,7 @@ int __aes_key_scheduler(
 
 }
 
-inline void __aes_xor_word(
+void __aes_xor_word(
     uint8_t             target[AES_WORD_SIZE],
     const uint8_t       operand[AES_WORD_SIZE]
 ) {
@@ -90,7 +98,7 @@ inline void __aes_xor_word(
 
 }
 
-inline void __aes_transposition(
+void __aes_transposition(
     uint8_t             cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
     const uint8_t       ip[],
     const size_t           offset
@@ -102,7 +110,7 @@ inline void __aes_transposition(
 
 }
 
-inline void __aes_rev_transposition(
+void __aes_rev_transposition(
     const uint8_t       cur_state[AES_WORD_SIZE][AES_WORD_SIZE],
     uint8_t             op[],
     const size_t        offset

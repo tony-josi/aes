@@ -1,22 +1,22 @@
 
 /* AES Word size */
-constexpr   uint8_t     AES_WORD_SIZE                  = 4;
+#define     AES_WORD_SIZE					(4ULL)
 
 /* 12.8 KB per data segment. */
-constexpr   int         AES_DATA_SIZE_PER_SEGMENT      = 12800;  
-constexpr   size_t      FILE_IO_CHUNK_SIZE_BYTES       = 12800000 * 2;
-constexpr   size_t      MAX_ALGO_WORKER_THREAD_COUNT   = 50;
+#define   AES_DATA_SIZE_PER_SEGMENT			(12800ULL)
+#define   FILE_IO_CHUNK_SIZE_BYTES			(12800000ULL * 2)
+#define   MAX_ALGO_WORKER_THREAD_COUNT		(50ULL)
 
 /* Metdata size should be (AES_WORD_SIZE * AES_WORD_SIZE) */ 
-constexpr   size_t      AES_META_DATA_SIZE             = AES_WORD_SIZE * AES_WORD_SIZE;  
-constexpr   size_t      AES_META_DATA_PADD_SIZE_OFFSET = 0; 
-constexpr   size_t      AES_META_DATA_CHECK_SUM_OFFSET = 8; 
+#define   AES_META_DATA_SIZE				(AES_WORD_SIZE * AES_WORD_SIZE)  
+#define   AES_META_DATA_PADD_SIZE_OFFSET	(0ULL) 
+#define   AES_META_DATA_CHECK_SUM_OFFSET	(8ULL) 
 
 /* Maximum supported plain text key size. */
-constexpr   size_t      MAX_SUPPORTED_PLAIN_KEY_SIZE   = 32;
+#define   MAX_SUPPORTED_PLAIN_KEY_SIZE		(32ULL)
 
 /* Plain text key size. */
-constexpr   size_t      AES128_PLAIN_KEY_SIZE          = 16;
-constexpr   size_t      AES192_PLAIN_KEY_SIZE          = 24;
-constexpr   size_t      AES256_PLAIN_KEY_SIZE          = 32;
+#define   AES128_PLAIN_KEY_SIZE				(16ULL)
+#define   AES192_PLAIN_KEY_SIZE				(24ULL)
+#define   AES256_PLAIN_KEY_SIZE				(32ULL)
 
