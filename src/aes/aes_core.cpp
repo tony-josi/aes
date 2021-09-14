@@ -543,7 +543,7 @@ int symmetric_ciphers::AES::__ECB_threaded__(
 
                 /* Slice the input buffer into segments. */
                 segment_Queue__.emplace_back(ip_op_SegmentInfo{i, \
-                std::min(i + AES_DATA_SIZE_PER_SEGMENT, input_Sz)});
+                std::min(i + static_cast<size_t>(AES_DATA_SIZE_PER_SEGMENT), input_Sz)});
             }
             total_DataSegments__ = segment_Queue__.size();
         }
@@ -639,7 +639,7 @@ int symmetric_ciphers::AES::__process_File__ENC(
     if(!ip_file_stream.is_open())
         throw std::invalid_argument("__process_File__() - Error opening input file");
 
-    const size_t file_Size = __get_File_Size_Fstream(ip_file_stream);
+    const size_t file_Size = static_cast<size_t>(__get_File_Size_Fstream(ip_file_stream));
     std::unique_ptr<uint8_t []> padded_Key(new uint8_t[this->actual_key_len]);
     memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
 
@@ -663,7 +663,7 @@ int symmetric_ciphers::AES::__process_File__ENC(
 
     auto t1 = std::chrono::high_resolution_clock::now();
     ip_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
-    ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), file_Size);
+    ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), static_cast<std::streamsize>(file_Size));
     op_file_Buff = std::make_unique<uint8_t []>(ip_Total_PaddedBufferSize);
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>\
     ( std::chrono::high_resolution_clock::now() - t1 ).count();
@@ -723,7 +723,7 @@ int symmetric_ciphers::AES::__process_File__ENC(
     std::ofstream op_file_strm(op_file_name.c_str(), std::ios::binary);
     if(!op_file_strm.is_open())
         throw std::invalid_argument("Encrypt - Error opening output file");
-    op_file_strm.write(reinterpret_cast<char *>(op_file_Buff.get()), op_File_FinalBufferSize);
+    op_file_strm.write(reinterpret_cast<char *>(op_file_Buff.get()), static_cast<std::streamsize>(op_File_FinalBufferSize));
     duration = std::chrono::duration_cast<std::chrono::milliseconds>\
     ( std::chrono::high_resolution_clock::now() - t1 ).count();
 
@@ -758,7 +758,7 @@ int symmetric_ciphers::AES::__process_File__DEC(
     if (!ip_file_stream.is_open())
         throw std::invalid_argument("__process_File__() - Error opening input file");
 
-    const size_t file_Size = __get_File_Size_Fstream(ip_file_stream);
+    const size_t file_Size = static_cast<size_t>(__get_File_Size_Fstream(ip_file_stream));
 
     std::unique_ptr<uint8_t []> padded_Key(new uint8_t[this->actual_key_len]);
     memcpy(padded_Key.get(), key, std::min(key_size, this->actual_key_len));
@@ -775,7 +775,7 @@ int symmetric_ciphers::AES::__process_File__DEC(
 
     /* If decrypt, read entire .dec file. */
     ip_file_Buff = std::make_unique<uint8_t []>(file_Size);
-    ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), file_Size);
+    ip_file_stream.read(reinterpret_cast<char *>(ip_file_Buff.get()), static_cast<std::streamsize>(file_Size));
     op_file_Buff = std::make_unique<uint8_t []>(file_Size);
 
 
@@ -797,7 +797,7 @@ int symmetric_ciphers::AES::__process_File__DEC(
     std::ofstream op_file_strm(op_file_name.c_str(), std::ios::binary);
     if (!op_file_strm.is_open())
         throw std::invalid_argument("Decrypt - Error opening output file");
-    op_file_strm.write(reinterpret_cast<char*>(op_file_Buff.get()), op_File_FinalBufferSize);
+    op_file_strm.write(reinterpret_cast<char*>(op_file_Buff.get()), static_cast<std::streamsize>(op_File_FinalBufferSize));
 
     return 0;
 
@@ -827,7 +827,7 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
     if (!ip_file_stream.is_open())
         throw std::invalid_argument("Error opening input file");
 
-    const size_t ip_file_Size = __get_File_Size_Fstream(ip_file_stream);
+    const size_t ip_file_Size = static_cast<size_t>(__get_File_Size_Fstream(ip_file_stream));
     bool last_chunk = false;
 
     std::vector<std::unique_ptr<file_io_chunk_map_t>> ip_file_DS;
@@ -926,7 +926,7 @@ int symmetric_ciphers::AES::threaded_file_io_algo(
             last_chunk = true;
         }
 
-        ip_file_stream.read(reinterpret_cast<char*>(temp_elem.get()->chunk_data), cur_read_size);
+        ip_file_stream.read(reinterpret_cast<char*>(temp_elem.get()->chunk_data), static_cast<std::streamsize>(cur_read_size));
         temp_elem.get()->chunk_size = cur_read_size;
         temp_elem.get()->file_indx = chunk_cntr * FILE_IO_CHUNK_SIZE_BYTES;
         chunk_cntr++;
