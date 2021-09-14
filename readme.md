@@ -28,19 +28,19 @@ Encrypts/Decrypts 3.71 GB data in ~18 seconds on 2.90 GHz Hexa-Core Intel® Core
 
 ### Build & Run
 
-Requires [cmake](https://cmake.org/) to build. Optional - Google Test
+Requires [cmake](https://cmake.org/) to build. Optional - [google test](https://en.wikipedia.org/wiki/Google_Test) and [pybind11](https://pybind11.readthedocs.io/en/stable/faq.html)
 
 Uses Google Test for unit testing.
 
-1. Clone project - The project uses use [google test](https://en.wikipedia.org/wiki/Google_Test) and [pybind11](https://pybind11.readthedocs.io/en/stable/faq.html) external submodules, if testing and generation of python bindings for the AES library are required (not mandatory for normal build) then those external modules can be cloned using the command:  `git submodule update --init --recursive`.
+1. Clone project - The project uses use [`google test`](https://en.wikipedia.org/wiki/Google_Test) and [`pybind11`](https://pybind11.readthedocs.io/en/stable/faq.html) external submodules, if testing and generation of python bindings for the AES library are required (not mandatory for normal build) then those external modules can be cloned using the command:  `git submodule update --init --recursive`.
 
 2. Build project - The project uses CMake generator for generating build files. Use `-DENABLE_TESTING=ON` for building test library and test cases and `-DPYTHON_BINDINGS_GEN=ON` for generating python bindings module.
 
 ``` sh
 cd aes
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=OFF -DENABLE_I
-PO=ON # Test disabled; use -DENABLE_TESTING=ON to build test cases executable. Not building python bindings by default, use -DPYTHON_BINDINGS_GEN=ON if required.
+cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=OFF -DENABLE_IPO=ON 
+# Test disabled; use -DENABLE_TESTING=ON to build test cases executable. Not building python bindings by default, use -DPYTHON_BINDINGS_GEN=ON if required.
 ```
 
 After generating the build files the target can be build using the build tools supported by the current platform. (`make` for Unix systems, `Visual Studio` for Windows and `Xcode` for MacOS)
@@ -134,6 +134,10 @@ int main() {
     return 0;
 }
 ```
+
+### Large file encryption API with multi-threaded file IO
+
+For example usage please refer to: [`process_file.cpp`](https://github.com/TonyJosi97/aes/blob/master/src/process_file.cpp) file
 
 ### Example usage of the python bindings module
 
