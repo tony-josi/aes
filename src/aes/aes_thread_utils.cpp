@@ -2,6 +2,7 @@
 #include <fstream>
 #include <mutex>
 #include <functional>
+#include <memory>
 
 #include "aes_thread_utils.hpp"
 
