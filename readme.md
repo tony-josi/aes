@@ -46,7 +46,7 @@ make -j 4
 
 ###  Speed benchmark
 
-Encrypts/Decrypts 2.6 GB data in ~11 seconds on 2.90 GHz Hexa-Core Intel® Core™ i5-10400.
+Encrypts/Decrypts 3.71 GB data in ~18 seconds on 2.90 GHz Hexa-Core Intel® Core™ i5-10400.
 
 ### AES Methods (API)
 
