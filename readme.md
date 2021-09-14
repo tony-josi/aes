@@ -1,5 +1,7 @@
 ## Advanced Encryption Standard 
 
+Current version: `v3.0.1`
+
 #### Build Status:
 
 [![Build Status](https://app.travis-ci.com/TonyJosi97/aes.svg?branch=master)](https://app.travis-ci.com/github/TonyJosi97/aes)
@@ -16,7 +18,11 @@
 
 The Advanced Encryption Standard (AES), also known by its original name Rijndael is a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST).
 
-This implementation currently supports Electronic codebook mode with support for **128/192/256 bit keys** and option for **multi threading** that spawns upto `std::thread::hardware_concurrency()` threads.
+This implementation currently supports Electronic codebook mode with support for **128/192/256 bit keys** and option for **multi threading** for large file encryption. Python bindings generation for the AES library is also supported for easy usage of the AES Library with python scripts.
+
+###  Speed benchmark
+
+Encrypts/Decrypts 3.71 GB data in ~18 seconds on 2.90 GHz Hexa-Core Intel® Core™ i5-10400.
 
 ## Usage
 
@@ -26,27 +32,19 @@ Requires [cmake](https://cmake.org/) to build. Optional - Google Test
 
 Uses Google Test for unit testing.
 
-1. Clone - use `git submodule update --init --recursive` to clone [google test](https://en.wikipedia.org/wiki/Google_Test) for running test cases (not required if not running tests).
+1. Clone project - The project uses use [google test](https://en.wikipedia.org/wiki/Google_Test) and [pybind11](https://pybind11.readthedocs.io/en/stable/faq.html) external submodules, if testing and generation of python bindings for the AES library are required (not mandatory for normal build) then those external modules can be cloned using the command:  `git submodule update --init --recursive`.
 
-2. Build project
+2. Build project - The project uses CMake generator for generating build files. Use `-DENABLE_TESTING=ON` for building test library and test cases and `-DPYTHON_BINDINGS_GEN=ON` for generating python bindings module.
 
 ``` sh
 cd aes
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=ON -DENABLE_I
-PO=ON # Test disabled; use -DENABLE_TESTING=ON to build test cases executable.
-make -j 4
+cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DLOW_LEVEL_API_SAMPLE=ON -DWARNINGS_AS_ERRORS=OFF -DENABLE_I
+PO=ON # Test disabled; use -DENABLE_TESTING=ON to build test cases executable. Not building python bindings by default, use -DPYTHON_BINDINGS_GEN=ON if required.
 ```
 
-3. Run
+After generating the build files the target can be build using the build tools supported by the current platform. (`make` for Unix systems, `Visual Studio` for Windows and `Xcode` for MacOS)
 
-``` sh
-./src/aes_exe
-```
-
-###  Speed benchmark
-
-Encrypts/Decrypts 3.71 GB data in ~18 seconds on 2.90 GHz Hexa-Core Intel® Core™ i5-10400.
 
 ### AES Methods (API)
 
@@ -137,6 +135,33 @@ int main() {
 }
 ```
 
+### Example usage of the python bindings module
+
+If `-DPYTHON_BINDINGS_GEN=ON` option is given during the CMake build file generation the build tools will build the python bindings, the default name for the python module is `py_sc_aes`.
+
+The following code demonstrates the simple usage:
+
+``` py
+import py_sc_aes
+import sys, time
+
+if __name__ == "__main__":
+
+    if len(sys.argv) >= 4:
+
+        prev_time = time.time()
+        aes_128_obj = py_sc_aes.AES(py_sc_aes.AES_128)
+        if sys.argv[1] == "e":
+            print(aes_128_obj.encrypt_file(sys.argv[2], sys.argv[3], sys.argv[4]))
+        elif sys.argv[1] == "d":
+            print(aes_128_obj.decrypt_file(sys.argv[2], sys.argv[3], sys.argv[4]))
+        if sys.argv[1] == "x":
+            print(aes_128_obj.encrypt_large_file(sys.argv[2], sys.argv[3], sys.argv[4]))
+        elif sys.argv[1] == "y":
+            print(aes_128_obj.decrypt_large_file(sys.argv[2], sys.argv[3], sys.argv[4]))
+        print("Duration: ", (time.time() - prev_time) * 1000)
+
+```
 ### Algorithm
 1. `KeyExpansion` – round keys are derived from the cipher key using the AES key schedule. AES requires a separate 128-bit round key block for each round plus one more.
 2. Initial round key addition:
@@ -169,8 +194,7 @@ int main() {
 
 ###### File TODO:
 * Complete todo
-* add padding for ip file and key
-* remove padding while storing pt op file
+
 
 #### Notes:
 
