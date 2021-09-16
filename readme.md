@@ -22,7 +22,7 @@ This implementation currently supports Electronic Codebook (ECB)  mode with  128
 
 ###  Speed benchmark
 
-Encrypts/Decrypts 3.71 GB data in ~18 seconds on a 2.90 GHz Hexa-Core Intel® Core™ i5-10400 CPU.
+Encrypts/Decrypts 2.6 GB data in ~7 seconds on a 2.90 GHz Hexa-Core Intel® Core™ i5-10400 CPU.
 
 ## Usage
 
