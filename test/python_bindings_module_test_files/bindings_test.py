@@ -3,7 +3,7 @@ import sys, time
 
 if __name__ == "__main__":
 
-    if len(sys.argv) >= 4:
+    if len(sys.argv) >= 5:
 
         prev_time = time.time()
         aes_128_obj = py_sc_aes.AES(py_sc_aes.AES_128)
